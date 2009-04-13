@@ -2,6 +2,8 @@
 #include "E_field.h"
 #include "H_field.h"
 #include "Time.h"
+#include "Triple.h"
+//#include "stdafx.h"
 
 Particles::Particles(void)
 {
@@ -25,31 +27,7 @@ Particles::Particles(char* p_name, double p_charge, double p_mass, int p_number,
 	v3 = new double[number];
 	is_alive = new bool[number];
 
-	//jr//
-	///////////////////////////////////
-	//n_grid - кількість ребер
-	j1 = new double*[geom1->n_grid_1-1];
-	for (int i=0; i<(geom1->n_grid_1-1);i++)
-	{
-		j1[i]= new double[geom1->n_grid_2];
-	}
-	///////////////////////////////////
-	//jf//
-	j2 = new double*[geom1->n_grid_1];
-
-	for (int i=0; i<(geom1->n_grid_1);i++)
-	{
-		j2[i]= new double[geom1->n_grid_2];
-	}
-	//////////////////////////////////////
-	//jz//
-	//////////////////////////////////////
-	j3 = new double*[geom1->n_grid_1];
-
-	for (int i=0; i<(geom1->n_grid_1);i++)
-	{
-		j3[i]= new double[geom1->n_grid_2-1];
-	}
+	
 };
 ///////////////////////////////////////////////////
 
@@ -63,46 +41,9 @@ Particles::~Particles()
 	delete [] v2;
 	delete [] v3;
 	delete [] is_alive;
-
-	for (int i=0; i<(geom1->n_grid_1-1);i++)
-		delete[]j1[i];
-    delete[]j1;
-
-	for (int i=0; i<(geom1->n_grid_1);i++)
-		delete[]j2[i];
-    delete[]j2;
-
-	for (int i=0; i<(geom1->n_grid_1);i++)
-		delete[]j3[i];
-    delete[]j3;
 };
 ///////////////////////////////////////////////////////
-void Particles::set_j_0()
-{
-	int i=0;
-	////////////////////////////////////////////
-	////jr////
-	for(i=0;i<(geom1->n_grid_1-1);i++)
-	{
-		for(int k=0;k<(geom1->n_grid_2);k++)
-		{
-			j1[i][k]=0;
-//				j1[i][16]=300;
-		};
-	}
-	///jf////
-	for(i=0;i<(geom1->n_grid_1);i++)
-		for(int k=0;k<(geom1->n_grid_2);k++)
-		{
-			j2[i][k]=0;
-		};
-	///jz////
-	for(i=0;i<(geom1->n_grid_1);i++)
-		for(int k=0;k<(geom1->n_grid_2-1);k++)
-		{
-			j3[i][k]=0;
-		};
-};
+
 void Particles::set_v_0()
 {
 	int i;
@@ -143,8 +84,8 @@ void Particles::step_v(E_field* e_fld, H_field* h_fld, Time* t)
 	for( i=0;i<number;i++)
 		//if (is_alive[i])
 		{
-			E_compon = e_fld->get_field(x1[i],x3[i]);
-	        B_compon = h_fld->get_field(x1[i],x3[i]);
+//			E_compon = e_fld->get_field(x1[i],x3[i]);
+//	        B_compon = h_fld->get_field(x1[i],x3[i]);
 			e1 = E_compon.first*const1;
 	        e2 = E_compon.second*const1;
 	        e3 = E_compon.third*const1;
@@ -207,3 +148,36 @@ void Particles::half_step_coord(Time* t)
 		}
 }
 
+////////////////////////////////////////////////////
+
+///////////////////////////////////////////////////
+	//function for charge density weighting///
+void Particles::charge_weighting(charge_density* ro1)
+{
+	int r_cell_number=0;
+	int z_cell_number=0;
+	double div= 0;
+	double value = 0;
+
+	double ro_p = charge/(geom1->dr*geom1->dz);
+	for(int i=0;i<number;i++)
+	{
+		if((x1[i]<geom1->n_grid_1)&(x3[i]<geom1->n_grid_2))
+			{
+				r_cell_number = (int)ceil(x1[i]/geom1->dr)-1;
+				z_cell_number =  (int)ceil(x3[i]/geom1->dz)-1;
+			}
+		value = ((r_cell_number+1)*geom1->dr-x1[i])*((z_cell_number+1)*geom1->dz-x3[i])*ro_p;
+		ro1->set_ro_weighting(r_cell_number, z_cell_number, value);
+
+		value = (x1[i]-r_cell_number*geom1->dr)*((z_cell_number+1)*geom1->dz-x3[i])*ro_p;
+		ro1->set_ro_weighting(r_cell_number+1,z_cell_number, value);
+
+		value = (x1[i]-r_cell_number*geom1->dr)*(x3[i]-z_cell_number*geom1->dz)*ro_p;
+		ro1->set_ro_weighting(r_cell_number+1,z_cell_number+1,value);
+
+		value = ((r_cell_number+1)*geom1->dr-x1[i])*(x3[i]-z_cell_number*geom1->dz)*ro_p;
+		ro1->set_ro_weighting(r_cell_number,z_cell_number+1,value);
+
+	}
+}

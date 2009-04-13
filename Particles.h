@@ -1,6 +1,8 @@
 #pragma once
 #include "Geometry.h"
 #include "Time.h"
+#include "charge_density.h"
+//#include "stdafx.h"
 //#include "E_field.h"
 //#include "H_field.h"
 
@@ -42,12 +44,8 @@ public:
 	//created for the purpose of integration 
 	//with exsisting routine of Maxwell equations integration
 	Geometry* geom1;
-	double** j1;
-	double** j2;
-	double** j3;
-
 public:
-	double** charge_weighting(Geometry geom);
+	void charge_weighting(charge_density* ro1);
 	void step_v(E_field* e_fld, H_field* H_fld, Time* t);
 	void half_step_coord(Time* t);
 	void set_j_0();

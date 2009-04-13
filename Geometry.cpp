@@ -1,5 +1,6 @@
 #include "Geometry.h"
 #include "PML.h"
+
 // class constructor with sigma // 
 /////////////////////////////////////////////
 Geometry::Geometry(double fs, double ss,  int ng1, int ng2, PML* pml1_t): pml1(pml1_t)//, geom1(geom1_t)

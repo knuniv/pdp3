@@ -1,8 +1,6 @@
 #pragma once
 #include "PML.h"
 class PML;
-
-
 class Geometry
 {
 public:

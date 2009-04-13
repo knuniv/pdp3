@@ -1,7 +1,6 @@
 #pragma once
 #include "Geometry.h"
 #include <complex>
-
 using namespace std;
 class Fourier
 {
