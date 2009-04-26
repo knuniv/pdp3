@@ -327,15 +327,15 @@ Triple H_field::get_field(double x1, double x3, int half)
 	{
 	double h_r = (h1_half_time[i_r-1][k_z]+h1_half_time[i_r][k_z])/2;
 	double h_z = (h3_half_time[i_r][k_z-1]+h3_half_time[i_r][k_z])/2;
-	Triple components();
+	
 	}
 	else 
 	{
 	double h_r = (h1[i_r-1][k_z]+h1[i_r][k_z])/2;
 	double h_z = (h3[i_r][k_z-1]+h3[i_r][k_z])/2;
 
-	Triple components();
+	
 	}
-
-	return components;
+    Triple components(0,0,0);
+	return  components;
 }

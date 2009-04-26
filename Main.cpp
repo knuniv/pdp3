@@ -10,7 +10,7 @@
 using namespace std;
 int main() 
 {
-	PML pml1(0.25,0.0002,0.1);
+	PML pml1(0.0,0.25, 0.02,10.1);
 	Geometry geom1(0.5,0.5, 129, 129, &pml1);
 	Time time1(0,0, 1E-8,2E-12);
 //	Particles particle1(1000, &geom1);
@@ -34,18 +34,18 @@ int main()
 	e_field1.boundary_conditions();
 	e_field1.set_efield_0();
 	e_field1.set_fi_on_z();
-//	e_field1.poisson_equation(&geom1,);
+//	e_field1.poisson_equation(&geom1, &ro1);
 	geom1.set_epsilon();
 //	e_field1.set_sigma();
 	h_field1.initial_h();
 	ofstream out("test");
 	ofstream out2("test2");
-	for(int i=0;i<=2000;i++)
+	for(int i=0;i<=8000;i++)
 	{
 			std::cout<<"iteration"<<i;
 			std::cout<<endl;
 			  for (int j=35;j<37;j++)
-				  for (int k=0;k<129;k++)
+				  for (int k=0;k<128;k++)
 					 {
 //						e_field1.e2[j][k]=sin(0.2*i);
 						current1.set_j3(0,k,1);
@@ -61,6 +61,7 @@ int main()
 			for(int k=0;k<(geom1.n_grid_2-1);k++)
 			{
 				out<<h_field1.h2[j][k]<<" ";
+				//out<<geom1.sigma[j][k]<<" ";
 ////		        out2<<e_field1.fi[j][k]<<" ";
 		}
 			out<<"\n"; 

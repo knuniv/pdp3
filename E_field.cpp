@@ -6,7 +6,7 @@
 E_field::E_field(): epsilon0(8.85E-12)
 {
 }
-////конструктор. ініціалізація динамічних массивів
+////constructor
 E_field::E_field(Geometry* geom1_t): geom1(geom1_t), epsilon0(8.85E-12)
 {
 	//Er//
@@ -171,11 +171,11 @@ void E_field::calc_field(H_field* h_field1, Time* time1, current* current1, PML*
 			this->e1[i][k]=this->e1[i][k]*(2*geom1->epsilon[i][k]-geom1->sigma[i][k])/(2*geom1->epsilon[i][k]+geom1->sigma[i][k])-(j1[i][k]+(h_field1->h2[i][k]-h_field1->h2[i][k-1])/geom1->dz)*time1->delta_t/(2*geom1->epsilon[i][k]+geom1->sigma[i][k])/epsilon0;
 		}
 /////////////////////////////////////
-	//Ez=- j on axis//
-    for(k=1;k<(geom1->n_grid_2-1);k++)
+	//Ez=- j on axis// // ???????????
+    for(k=0;k<(geom1->n_grid_2-1);k++)
 		{
 			 i=0;
-			this->e3[i][k]=this->e3[i][k]*(2.0*geom1->epsilon[i][k]-geom1->sigma[i][k])/(2.0*geom1->epsilon[i][k]+geom1->sigma[i][k])-(j3[i][k])*time1->delta_t/(2.0*geom1->epsilon[i][k]+geom1->sigma[i][k])/epsilon0;
+			 this->e3[i][k]=this->e3[i][k]*(2.0*geom1->epsilon[i][k]-geom1->sigma[i][k])/(2.0*geom1->epsilon[i][k]+geom1->sigma[i][k])-(j3[i][k]-2.0/geom1->dr*h_field1->h2[i][k]) * time1->delta_t/(2.0*geom1->epsilon[i][k]+geom1->sigma[i][k])/epsilon0;
 		}
 
 	for( i=1;i<(geom1->n_grid_1-1);i++)
@@ -219,10 +219,10 @@ void E_field::calc_field(H_field* h_field1, Time* time1, current* current1)
 		}
 
 	//Ez=- j on axis//
-    for(k=1;k<(geom1->n_grid_2-1);k++)
+    for(k=0;k<(geom1->n_grid_2-1);k++)
 		{
 			 i=0;
-			this->e3[i][k]=this->e3[i][k]-(j3[i][k])*time1->delta_t/epsilon0;
+			this->e3[i][k]=this->e3[i][k]-(j3[i][k]-2.0/geom1->dr*h_field1->h2[i][k])*time1->delta_t/epsilon0;
 		}
 
 	for( i=1;i<(geom1->n_grid_1-1);i++)
@@ -408,13 +408,64 @@ for( i=0;i<(geom1->n_grid_1);i++)
 Triple E_field::get_field(double x1, double x3)
 {
 	//first cell, field  weighting?????
-	int i_r = (int)ceil((x1+0.5*geom1->dr)/geom1->dr)-1;
-	int k_z = (int)ceil((x3+0.5*geom1->dz)/geom1->dz)-1;
 
-	double E_r = (e1[i_r-1][k_z]+e1[i_r][k_z])/2;
-	double E_z = (e3[i_r][k_z-1]+e3[i_r][k_z])/2;
+	double s1=0; // square of  [i][k] sell;
+	double s2=0; // square of  [i+1][k] sell;
+	double s3=0; // square of  [i][k+1] sell;
+	double s4=0; // square of [i+1][k+1] sell;
+	double e_f1=0; // weighted field of  [i][k] sell;
+	double e_f2=0; // weighted field of  [i+1][k] sell;
+	double e_f3=0; // weighted field of  [i][k+1] sell;
+	double e_f4=0; // weighted field of  [i+1][k+1] sell;
+	double e_r, e_fi, e_z; //returning components;
 
-	Triple components(E_r, e2[i_r][k_z], E_z);
+	double S = geom1->dr*geom1->dz; // square of cell;
+
+	/////////////////////////////////////////////////
+	int i_r = (int)ceil((x1)/geom1->dr)-1;
+	int k_z = (int)ceil((x3)/geom1->dz)-1;
+	////////////////////////////////////////////////
+		//calculate squares//
+	 s1 = ((i_r+1)*geom1->dr-x1)*((k_z+1)*geom1->dz-x3);
+	 s2 = (x1-i_r*geom1->dr)*((k_z+1)*geom1->dz-x3);
+	 s3 = ((i_r+1)*geom1->dr-x1)*(x3-k_z*geom1->dz);
+	 s4 = (x1-i_r*geom1->dr)*(x3-k_z*geom1->dz);
+	 
+
+    // weighting of E_r//
+///////////////////////////////////////////////////////
+	// calculate E_r in sites//
+	 e_f1 = (e1[i_r-1][k_z]+e1[i_r][k_z])/2;
+	 e_f2 = (e1[i_r+1][k_z]+e1[i_r][k_z])/2;
+	 e_f3 = (e1[i_r][k_z+1]+e1[i_r-1][k_z+1])/2;
+	 e_f4 = (e1[i_r+1][k_z+1]+e1[i_r][k_z+1])/2;
+    //////////////////////////////////////
+
+	 //weighted E_r//
+	 e_r = (e_f1*s1 + e_f2*s2 + e_f3*s3 + e_f4*s4)/S;
+///////////////////////////////////////////////////////
+
+	     // weighting of E_z//
+///////////////////////////////////////////////////////
+	// calculate E_z in sites//
+	 e_f1 = (e3[i_r][k_z]+e3[i_r][k_z-1])/2;
+	 e_f2 = (e3[i_r+1][k_z]+e3[i_r+1][k_z-1])/2;
+	 e_f3 = (e3[i_r][k_z+1]+e3[i_r][k_z])/2;
+	 e_f4 = (e3[i_r+1][k_z+1]+e3[i_r+1][k_z])/2;
+    //////////////////////////////////////
+
+	 //weighted E_z//
+	 e_z = (e_f1*s1 + e_f2*s2 + e_f3*s3 + e_f4*s4)/S;
+///////////////////////////////////////////////////////
+
+	 // weighting of E_fi//
+///////////////////////////////////////////////////////
+
+	 //weighted E_fi//
+	 e_fi = (e2[i_r][k_z]*s1 + e2[i_r+1][k_z]*s2 + e2[i_r][k_z+1]*s3 + e2[i_r+1][k_z+1]*s4)/S;
+///////////////////////////////////////////////////////
+
+	Triple components(e_r, e_fi, e_z);
 
 	return components;
 }
