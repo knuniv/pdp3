@@ -318,6 +318,17 @@ void H_field::magnetostatic_equation(Geometry* geom1)
 
 Triple H_field::get_field(double x1, double x3, int half)
 {
+
+	double s1=0; // square of  [i][k] sell;
+	double s2=0; // square of  [i+1][k] sell;
+	double s3=0; // square of  [i][k+1] sell;
+	double s4=0; // square of [i+1][k+1] sell;
+	double h_f1=0; // weighted field of  [i][k] sell;
+	double h_f2=0; // weighted field of  [i+1][k] sell;
+	double h_f3=0; // weighted field of  [i][k+1] sell;
+	double h_f4=0; // weighted field of  [i+1][k+1] sell;
+	double h_r, e_fi, e_z; //returning components;
+
 	//first cell, field  weighting????? 
 	// h_fi??
 	int i_r = (int)ceil((x1+0.5*geom1->dr)/geom1->dr)-1;
