@@ -462,14 +462,20 @@ Triple E_field::get_field(double x1, double x3)
 
 	     // weighting of E_z//
 ///////////////////////////////////////////////////////
+//finding number of cell. example dz=0.5,  x3 = 0.7, z_k =0;!!
+	i_r = (int)ceil((x1)/geom1->dr)-1;
+	k_z = (int)ceil((x3-0.5*dz)/geom1->dz)-1;
+///////////////////////////////////
+
    if(x1>dr/2)
 	{
-	   //finding number of cell. example dz=0.5,  x3 = 0.7, z_k =0;!!
-		 i_r = (int)ceil((x1)/geom1->dr)-1;
-		 k_z = (int)ceil((x3-0.5*dr)/geom1->dz)-1;
-
+		vol_1 = pi*dz*dr*dr*2*i_r;
+    }
+   else
+   {
+	   vol_1 = pi*dz*dr*dr/4.0; //volume of first cell
+   }
 		  r2 = (i_r+0.5)*dr;
-		  vol_1 = pi*dz*dr*dr*2*i_r;
 		  vol_2 = pi*dz*dr*dr*(2*i_r+2);
 		  dz1 = (k_z+1.5)*dz - x3;
 		  dz2 = x3 - (k_z+0.5)*dz;
@@ -478,93 +484,51 @@ Triple E_field::get_field(double x1, double x3)
 		   //weighting Ez[i][k]//
 		   ez = ez + e3[i_r][k_z]*(pi*dz1*(r2*r2-r1*r1))/vol_1;
 
-		  //weighting Er[i+1][k]//
+		  //weighting Ez[i+1][k]//
 		   ez = ez + e3[i_r+1][k_z]*pi*dz1*(r3*r3-r2*r2)/vol_2;   
 
-          //weighting Er[i][k+1]//
+          //weighting Ez[i][k+1]//
 		   ez = ez + e3[i_r][k_z+1]*pi*dz2*(r2*r2-r1*r1)/vol_1;
    
-         //weighting Er[i+1][k+1]//
+         //weighting Ez[i+1][k+1]//
 		   ez = ez + e3[i_r+1][k_z+1]*pi*dz2*(r3*r3-r2*r2)/vol_2;    
-    }
-   else 
-    {
-		 //finding number of cell. example dz=0.5,  x3 = 0.7, z_k =0;!!
-		  i_r = (int)ceil((x1)/geom1->dr)-1;
-		  k_z = (int)ceil((x3-0.5*dr)/geom1->dz)-1;
-
-		  r2 = (i_r+0.5)*dr;
-		  vol_1 = pi*dz*dr*dr/4.0; //volume of first cell
-		  vol_2 = pi*dz*dr*dr*(2*i_r+2);
-		  dz1 = (k_z+1.5)*dz - x3;
-		  dz2 = x3 - (k_z+0.5)*dz;
-		  //////////////////////////////////////
-
-		   //weighting Ez[i][k]//
-		   ez = ez + e3[i_r][k_z]*(pi*dz1*(r2*r2-r1*r1))/vol_1;
-
-		  //weighting Er[i+1][k]//
-		   ez = ez + e3[i_r+1][k_z]*pi*dz1*(r3*r3-r2*r2)/vol_2;   
-
-          //weighting Er[i][k+1]//
-		   ez = ez + e3[i_r][k_z+1]*pi*dz2*(r2*r2-r1*r1)/vol_1;
    
-         //weighting Er[i+1][k+1]//
-		   ez = ez + e3[i_r+1][k_z+1]*pi*dz2*(r3*r3-r2*r2)/vol_2;    
-    }
-
+  
 ///////////////////////////////////////////////////////
 
 	 // weighting of E_fi//
 ///////////////////////////////////////////////////////
+ //finding number of cell. example dz=0.5,  x3 = 0.7, z_k =1;
+	 i_r = (int)ceil((x1)/geom1->dr)-1;
+     k_z = (int)ceil((x3)/geom1->dz)-1;
+
   if(x1>dr/2)
 	{
-	     //finding number of cell. example dz=0.5,  x3 = 0.7, z_k =1;
-		  i_r = (int)ceil((x1)/geom1->dr)-1;
-		  k_z = (int)ceil((x3)/geom1->dz)-1;
-
-		  r2 = (i_r+0.5)*dr;
-		  vol_1 = pi*dz*dr*dr*2*i_r;
-		  vol_2 = pi*dz*dr*dr*(2*i_r+2);
-		  dz1 = (k_z+1)*dz-x3;
-		  dz2 = x3-k_z*dz;
-		  //////////////////////////////////////
-		  //weighting Ez[i][k]//
-		  efi = efi + e2[i_r][k_z]*pi*dz1*(r2*r2 - r1*r1)/vol_1;
-
-		  //weighting Er[i+1][k]//
-		   efi = efi + e2[i_r+1][k_z]*pi*dz1*(r3*r3-r2*r2)/vol_2;
-
-          //weighting Er[i][k+1]//
-		   efi = efi + e2[i_r][k_z+1]*pi*dz2*(r2*r2-r1*r1)/vol_1;
-   
-         //weighting Er[i+1][k+1]//
-		   efi =efi + e2[i_r+1][k_z+1]*pi*dz2*(r3*r3-r2*r2)/vol_2;
-  }
-  else 
+		vol_1 = pi*dz*dr*dr*2*i_r;
+    }
+  else
   {
-		 //finding number of cell. example dz=0.5,  x3 = 0.7, z_k =1;
-		  i_r = (int)ceil((x1)/geom1->dr)-1;
-		  k_z = (int)ceil((x3)/geom1->dz)-1;
+	 vol_1 = pi*dz*dr*dr/4.0; //volume of first cell
+  }
 
 		  r2 = (i_r+0.5)*dr;
-		  vol_1 = pi*dz*dr*dr/4.0; //volume of first cell
 		  vol_2 = pi*dz*dr*dr*(2*i_r+2);
 		  dz1 = (k_z+1)*dz-x3;
 		  dz2 = x3-k_z*dz;
 		  //////////////////////////////////////
-		  //weighting Ez[i][k]//
+		  //weighting Efi[i][k]//
 		  efi = efi + e2[i_r][k_z]*pi*dz1*(r2*r2 - r1*r1)/vol_1;
 
-		  //weighting Er[i+1][k]//
+		  //weighting Efi[i+1][k]//
 		   efi = efi + e2[i_r+1][k_z]*pi*dz1*(r3*r3-r2*r2)/vol_2;
 
-          //weighting Er[i][k+1]//
+          //weighting Efi[i][k+1]//
 		   efi = efi + e2[i_r][k_z+1]*pi*dz2*(r2*r2-r1*r1)/vol_1;
    
-         //weighting Er[i+1][k+1]//
+         //weighting Efi[i+1][k+1]//
 		   efi =efi + e2[i_r+1][k_z+1]*pi*dz2*(r3*r3-r2*r2)/vol_2;
-  }
+  
+ 
 		   
 	Triple components(er, efi, ez);
 
