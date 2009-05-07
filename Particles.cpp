@@ -242,3 +242,99 @@ void Particles::charge_weighting(charge_density* ro1)
 		
 	}
 }
+
+////////////////////////////////////////////////////////
+//function for initial (Maxwell) distribution//
+
+void Particles::velocity_distribution(double therm_vel)
+{
+	
+int i = 0;
+int j=0;
+double pi = 3.14159;
+double R =0; // number from [0;1]
+double dv = 0.005; // velocity step in calculation integral
+double s =0; 
+double ds =0;
+double* v = new double [number]; //velocity vector
+double nr = sqrt(pi/2.0)* pow(therm_vel, 3);
+
+double ss =0;
+
+for(i=0;i<number;i++)
+{
+ R = (i+0.5)/number;
+ double* dss= new double[100000];
+
+ // part of numerical integral calculation//
+ while (s<R*nr)
+ {
+
+	 ds = dv*j*dv*j * exp(-dv*j*dv*j / (2*therm_vel*therm_vel) ) * dv;
+	 ss  = (dv*j*dv*j * exp(-(dv*j*dv*j)/(2*therm_vel*therm_vel)));
+	 s = s+ds;
+	 j=j+1;
+ }
+ v[i] = dv*j;
+
+}
+////////////////////////////////////////////////////
+
+//random algorithm (binary)//
+/////////////////////////////////////////////////
+
+int b1 =11349;
+ int  bb = b1;
+  j=0;
+  for (int i=0;i<=sizeof(bb)*8;i++)
+  {
+	   bb>>=1;
+	   j=j+1;
+
+	  if(bb==0)
+	  {
+		  break;
+	  }
+
+  }
+
+double res = 0;
+int pass =0;
+for (int i=0;i<=j;i++)
+{
+     pass = b1&(1<<i);
+	
+	if (pass!=0)
+	{
+		res=res+pow(2.0,-(i+1));
+	}
+}		
+//////////////////////////////////////////
+
+/////////////////////////////////////////
+ //random algorithm (ternary)// 
+int N =223;
+ int  bb = 0;
+ int j=1;
+ int aa =0;
+ double res =0;
+//  for (int i=4;i<=N;i++)
+ // {
+	  bb = N;
+	  while(bb>=1)
+	  {
+		aa = bb % 3;
+		res = res + aa*pow(3.0, -j);
+		j=j+1;
+		bb = bb / 3;
+	  }
+	 
+
+//  }
+///////////////////////////////////////////
+
+
+
+delete []v;
+
+}
