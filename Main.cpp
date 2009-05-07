@@ -37,10 +37,14 @@ int main()
 //	e_field1.poisson_equation(&geom1, &ro1);
 	geom1.set_epsilon();
 //	e_field1.set_sigma();
+
+	Particles particle1("ions", 1, 1, 1000, &geom1);
+	particle1.velocity_distribution(1E5);
+
 	h_field1.initial_h();
 	ofstream out("test");
 	ofstream out2("test2");
-	for(int i=0;i<=8000;i++)
+	for(int i=0;i<=800;i++)
 	{
 			std::cout<<"iteration"<<i;
 			std::cout<<endl;

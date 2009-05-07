@@ -52,5 +52,6 @@ public:
 	void set_v_0();
 	void set_x_0();
 	double get_gamma(int i);
+	void velocity_distribution(double therm_vel);
 
 };
