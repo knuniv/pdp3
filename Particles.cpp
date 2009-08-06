@@ -367,12 +367,12 @@ void Particles::simple_j_weighting(current *j1, double x1_new,double x3_new, dou
 		double k = delta_r/delta_z;
 		double b = x1_old;
 	    //calculate current jz in [i,k] cell//
-		wj = charge/(2*dr*dz) * (dr*delta_z - k*delta_z*delta_z/2.0 + delta_z*b + dr*dr/k * ((i_n+0.5)*(i_n+0.5)-0.25)*log((k*delta_z+b)/2.0)); 
+		wj = charge/(2*dr*dz) * (dr*delta_z - k*delta_z*delta_z/2.0 + delta_z*b + dr*dr/k * ((i_n+0.5)*(i_n+0.5)-0.25)*log((k*delta_z+b)/b)); 
 		// set new weighting current value 
 		j1->set_j3(i_n,k_n, wj);
 
         //calculate current in [i+1,k] cell//
-		wj = charge/(2*dr*dz) * (k*delta_z*delta_z/2.0+delta_z*b + delta_z*dr + dr*dr/k * (0.25-(i_n+0.5)*(i_n+0.5)) * log((k*delta_z+b)/2.0)); 
+		wj = charge/(2*dr*dz) * (k*delta_z*delta_z/2.0+delta_z*b + delta_z*dr + dr*dr/k * (0.25-(i_n+0.5)*(i_n+0.5)) * log((k*delta_z+b)/b)); 
 		// set new weighting current value 
 		j1->set_j3(i_n+1,k_n, wj);
 		
@@ -458,4 +458,6 @@ void Particles::j_weighting(current *j1, double x1_new,double x3_new, double x1_
 		}
 		
 	}
+
+	//// 3) charge in 10 cells 
 }
