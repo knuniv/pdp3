@@ -2,6 +2,7 @@
 #include "Geometry.h"
 #include "Time.h"
 #include "charge_density.h"
+#include"current.h"
 //#include "stdafx.h"
 //#include "E_field.h"
 //#include "H_field.h"
@@ -53,5 +54,6 @@ public:
 	void set_x_0();
 	double get_gamma(int i);
 	void velocity_distribution(double therm_vel);
-
+	void simple_j_weighting(current *j1, double x1_new,double x3_new, double x1_old, double x3_old);
+	void j_weighting(current *j1, double x1_new,double x3_new, double x1_old, double x3_old);
 };

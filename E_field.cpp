@@ -168,28 +168,28 @@ void E_field::calc_field(H_field* h_field1, Time* time1, current* current1, PML*
 	for(k=1;k<(geom1->n_grid_2-1);k++)
 		{
 			 i=0;
-			this->e1[i][k]=this->e1[i][k]*(2*geom1->epsilon[i][k]-geom1->sigma[i][k])/(2*geom1->epsilon[i][k]+geom1->sigma[i][k])-(j1[i][k]+(h_field1->h2[i][k]-h_field1->h2[i][k-1])/geom1->dz)*time1->delta_t/(2*geom1->epsilon[i][k]+geom1->sigma[i][k])/epsilon0;
+			this->e1[i][k]=this->e1[i][k]*(2.0*geom1->epsilon[i][k]*epsilon0 - geom1->sigma[i][k]*time1->delta_t) / (2.0*geom1->epsilon[i][k]*epsilon0 + geom1->sigma[i][k]*time1->delta_t) - (j1[i][k]+(h_field1->h2[i][k]-h_field1->h2[i][k-1])/geom1->dz)* 2*time1->delta_t/(2.0*geom1->epsilon[i][k]*epsilon0 + geom1->sigma[i][k]*time1->delta_t);
 		}
 /////////////////////////////////////
 	//Ez=- j on axis// // ???????????
     for(k=0;k<(geom1->n_grid_2-1);k++)
 		{
 			 i=0;
-			 this->e3[i][k]=this->e3[i][k]*(2.0*geom1->epsilon[i][k]-geom1->sigma[i][k])/(2.0*geom1->epsilon[i][k]+geom1->sigma[i][k])-(j3[i][k]-2.0/geom1->dr*h_field1->h2[i][k]) * time1->delta_t/(2.0*geom1->epsilon[i][k]+geom1->sigma[i][k])/epsilon0;
+			 this->e3[i][k]=this->e3[i][k] * (2.0*geom1->epsilon[i][k]*epsilon0 - geom1->sigma[i][k]*time1->delta_t) / (2.0*geom1->epsilon[i][k]*epsilon0 + geom1->sigma[i][k]*time1->delta_t)-(j3[i][k]-2.0/geom1->dr*h_field1->h2[i][k]) * 2*time1->delta_t/(2.0*geom1->epsilon[i][k]*epsilon0 + geom1->sigma[i][k]*time1->delta_t);
 		}
 
 	for( i=1;i<(geom1->n_grid_1-1);i++)
 		for( k=1;k<(geom1->n_grid_2-1);k++)
 		{
-			this->e1[i][k]=this->e1[i][k]*(2.0*geom1->epsilon[i][k]-geom1->sigma[i][k])/(2.0*geom1->epsilon[i][k]+geom1->sigma[i][k])-(j1[i][k]+(h_field1->h2[i][k]-h_field1->h2[i][k-1])/geom1->dz)*time1->delta_t/(2.0*geom1->epsilon[i][k]+geom1->sigma[i][k])/epsilon0;
-			this->e2[i][k]=this->e2[i][k]*(2.0*geom1->epsilon[i][k]-geom1->sigma[i][k])/(2.0*geom1->epsilon[i][k]+geom1->sigma[i][k])-(j2[i][k]-(h_field1->h1[i][k]-h_field1->h1[i][k-1])/geom1->dz + (h_field1->h3[i][k]-h_field1->h3[i-1][k])/geom1->dr)*time1->delta_t/(2.0*geom1->epsilon[i][k]+geom1->sigma[i][k])/epsilon0;;
-			this->e3[i][k]=this->e3[i][k]*(2.0*geom1->epsilon[i][k]-geom1->sigma[i][k])/(2.0*geom1->epsilon[i][k]+geom1->sigma[i][k])-(j3[i][k]-(h_field1->h2[i][k]-h_field1->h2[i-1][k])/geom1->dr - (h_field1->h2[i][k]+h_field1->h2[i-1][k])/(2.0*geom1->dr*i))*time1->delta_t/(2.0*geom1->epsilon[i][k]+geom1->sigma[i][k])/epsilon0;
+			this->e1[i][k]=this->e1[i][k]*(2.0*geom1->epsilon[i][k]*epsilon0 - geom1->sigma[i][k]*time1->delta_t) / (2.0*geom1->epsilon[i][k]*epsilon0 + geom1->sigma[i][k]*time1->delta_t) - (j1[i][k]+(h_field1->h2[i][k]-h_field1->h2[i][k-1])/geom1->dz)* 2*time1->delta_t/(2.0*geom1->epsilon[i][k]*epsilon0 + geom1->sigma[i][k]*time1->delta_t);
+			this->e2[i][k]=this->e2[i][k]*(2.0*geom1->epsilon[i][k]*epsilon0 - geom1->sigma[i][k]*time1->delta_t) / (2.0*geom1->epsilon[i][k]*epsilon0 + geom1->sigma[i][k]*time1->delta_t) - (j2[i][k]-(h_field1->h1[i][k]-h_field1->h1[i][k-1])/geom1->dz + (h_field1->h3[i][k]-h_field1->h3[i-1][k])/geom1->dr)* 2*time1->delta_t/(2.0*geom1->epsilon[i][k]*epsilon0 + geom1->sigma[i][k]*time1->delta_t);
+			this->e3[i][k]=this->e3[i][k]*(2.0*geom1->epsilon[i][k]*epsilon0 - geom1->sigma[i][k]*time1->delta_t) / (2.0*geom1->epsilon[i][k]*epsilon0 + geom1->sigma[i][k]*time1->delta_t) -(j3[i][k]-(h_field1->h2[i][k]-h_field1->h2[i-1][k])/geom1->dr - (h_field1->h2[i][k]+h_field1->h2[i-1][k])/(2.0*geom1->dr*i))* 2*time1->delta_t/(2.0*geom1->epsilon[i][k]*epsilon0 + geom1->sigma[i][k]*time1->delta_t);
 		}
 
     for(i=1;i<(geom1->n_grid_1-1);i++)		
 		{
 			 k=0;
-			this->e3[i][k]=this->e3[i][k]*(2.0*geom1->epsilon[i][k]-geom1->sigma[i][k])/(2.0*geom1->epsilon[i][k]+geom1->sigma[i][k])-(j3[i][k]-(h_field1->h2[i][k]-h_field1->h2[i-1][k])/geom1->dr - (h_field1->h2[i][k]+h_field1->h2[i-1][k])/(2.0*geom1->dr*i))*time1->delta_t/(2.0*geom1->epsilon[i][k]+geom1->sigma[i][k])/epsilon0;
+			this->e3[i][k]=this->e3[i][k]*(2.0*geom1->epsilon[i][k]*epsilon0 - geom1->sigma[i][k]*time1->delta_t) / (2.0*geom1->epsilon[i][k]*epsilon0 + geom1->sigma[i][k]*time1->delta_t)-(j3[i][k]-(h_field1->h2[i][k]-h_field1->h2[i-1][k])/geom1->dr - (h_field1->h2[i][k]+h_field1->h2[i-1][k])/(2.0*geom1->dr*i))* 2*time1->delta_t/(2.0*geom1->epsilon[i][k]*epsilon0 + geom1->sigma[i][k]*time1->delta_t);
 		}
 
 return; 

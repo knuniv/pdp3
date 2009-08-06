@@ -172,7 +172,7 @@ void Particles::charge_weighting(charge_density* ro1)
 
 	for(int i=0;i<number;i++)
 	{
-            // finding number of i ank cell. example: dr = 0.5; r = 0.4; i =0
+            // finding number of i and k cell. example: dr = 0.5; r = 0.4; i =0
 		////////////////////////////
 		    r_i = (int)ceil(x1[i]/dr)-1;
 			z_k =  (int)ceil(x3[i]/dz)-1;
@@ -313,21 +313,21 @@ for (int i=0;i<=j;i++)
 
 /////////////////////////////////////////
  //random algorithm (ternary)// 
-int N =223;
- int  bb = 0;
- int j=1;
- int aa =0;
- double res =0;
-//  for (int i=4;i<=N;i++)
- // {
-	  bb = N;
-	  while(bb>=1)
-	  {
-		aa = bb % 3;
-		res = res + aa*pow(3.0, -j);
-		j=j+1;
-		bb = bb / 3;
-	  }
+//int N =223;
+//// int  bb = 0;
+// int j=1;
+// int aa =0;
+// double res =0;
+////  for (int i=4;i<=N;i++)
+// // {
+//	  bb = N;
+//	  while(bb>=1)
+//	  {
+////		aa = bb % 3;
+//		res = res + aa*pow(3.0, -j);
+//		j=j+1;
+////		bb = bb / 3;
+//	  }
 	 
 
 //  }
@@ -337,4 +337,125 @@ int N =223;
 
 delete []v;
 
+}
+
+
+void Particles::simple_j_weighting(current *j1, double x1_new,double x3_new, double x1_old, double x3_old)
+{
+	double dr = geom1->dr;
+	double dz = geom1->dz;
+	double wj = 0;
+
+	//defining number of cell
+	int i_n = (int)ceil((x1_new)/dr)-1;
+	int k_n =(int)ceil((x3_new)/dr)-1;
+	int i_o = (int)ceil((x1_old)/dr)-1;
+	int k_o =(int)ceil((x3_old)/dr)-1;
+// cheking 
+	if ((i_n !=i_o)&&(k_n!=k_o))
+	{
+	
+	}
+	else
+	{
+		// distance of particle moving//
+		double delta_r = x1_new - x1_old;
+		double delta_z = x3_new - x3_old;
+		///////////////////////////////////
+		// equation y = k*x+b;//
+		// finding k & b//
+		double k = delta_r/delta_z;
+		double b = x1_old;
+	    //calculate current jz in [i,k] cell//
+		wj = charge/(2*dr*dz) * (dr*delta_z - k*delta_z*delta_z/2.0 + delta_z*b + dr*dr/k * ((i_n+0.5)*(i_n+0.5)-0.25)*log((k*delta_z+b)/2.0)); 
+		// set new weighting current value 
+		j1->set_j3(i_n,k_n, wj);
+
+        //calculate current in [i+1,k] cell//
+		wj = charge/(2*dr*dz) * (k*delta_z*delta_z/2.0+delta_z*b + delta_z*dr + dr*dr/k * (0.25-(i_n+0.5)*(i_n+0.5)) * log((k*delta_z+b)/2.0)); 
+		// set new weighting current value 
+		j1->set_j3(i_n+1,k_n, wj);
+		
+		///////////////////////////////////
+	    //calculate current jz in [i,k] cell//
+		double z1 = (k_n+0.5)*dz - (x3_old-dz/2.0);
+		double z2 = (k_n+0.5)*dz - (x3_new-dz/2.0);
+		double z3 = (x3_old+dz/2.0) - (k_n+0.5)*dz;
+		double z4 = (x3_new+dz/2.0) - (k_n+0.5)*dz;
+		double full_j  = ((x1_new+dr/2.0)*(x1_new+dr/2.0) - i_n*i_n*dr*dr)/x1_new - ((x1_new+dr/2.0)*(x1_old+dr/2.0) - i_n*i_n*dr*dr)/x1_old;
+		
+		wj = (z1+z2)/(4.0*dr*dz) * full_j;//weighting jr in [i][k] cell
+		j1->set_j1(i_n,k_n, wj);
+
+		wj = (z3+z4)/(4.0*dr*dz) * full_j;//weighting jr in [i][k+1] cell
+		j1->set_j1(i_n, k_n+1, wj);
+
+		
+	}
+}
+
+
+void Particles::j_weighting(current *j1, double x1_new,double x3_new, double x1_old, double x3_old)
+{
+
+	double dr = geom1->dr;
+	double dz = geom1->dz;
+//defining number of cell
+	int i_new = (int)ceil((x1_new)/dr)-1;
+	int k_new =(int)ceil((x3_new)/dr)-1;
+	int i_old = (int)ceil((x1_old)/dr)-1;
+	int k_old =(int)ceil((x3_old)/dr)-1;
+	/// 1) charge in four cells
+	if ((i_new == i_old)&&(k_new == k_old))
+	{
+		simple_j_weighting(j1, x1_new,x3_new ,x1_old,x3_old);
+	}
+	// 2) charge in seven cells (i_new != i_old)
+	else if ((i_new!=i_old)&&(k_new==k_old))
+	{
+			if (x1_old >(i_new+1)*dr)
+			{
+				double a = (x1_old - x1_new)/(x3_old - x3_new);
+				double r_boundary = (i_new+1)*dr;
+				double delta_r = r_boundary - x1_new;
+				double z_boundary = x3_new + delta_r/a;
+
+				simple_j_weighting(j1, r_boundary,z_boundary ,x1_old,x3_old);
+				simple_j_weighting(j1, x1_new,x3_new, r_boundary,z_boundary);
+			}
+			else 
+			{
+				double a = (x1_new - x1_old)/(x3_new - x3_old);
+				double r_boundary = (i_new)*dr;
+				double delta_r = r_boundary - x1_old;
+				double z_boundary = x3_old + delta_r/a;
+
+				simple_j_weighting(j1, r_boundary,z_boundary ,x1_old,x3_old);
+				simple_j_weighting(j1, x1_new,x3_new, r_boundary,z_boundary);
+			}
+
+	}
+	// 3) charge in seven cells (k_new != k_old)
+	else if ((i_new==i_old)&&(k_new!=k_old))
+	{
+		if (x3_old<k_new*dz)
+		{
+			double z_boundary = k_new*dz;
+			double delta_z  = z_boundary - x3_old;
+			double a = (x1_new - x1_old)/(x3_new - x3_old);
+			double r_boundary = x1_old + a*delta_z;
+			simple_j_weighting(j1, r_boundary,z_boundary ,x1_old,x3_old);
+			simple_j_weighting(j1, x1_new,x3_new, r_boundary,z_boundary);
+		}
+		else 
+		{
+			double z_boundary = (k_new+1)*dz;
+			double delta_z  = z_boundary - x3_new;
+			double a = (x1_old - x1_new)/(x3_old - x3_new);
+			double r_boundary = x1_new + a*delta_z;
+			simple_j_weighting(j1, r_boundary,z_boundary ,x1_old,x3_old);
+			simple_j_weighting(j1, x1_new,x3_new, r_boundary,z_boundary);
+		}
+		
+	}
 }
