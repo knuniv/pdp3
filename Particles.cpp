@@ -401,22 +401,22 @@ void Particles::j_weighting(current *j1, double x1_new,double x3_new, double x1_
 	double dr = geom1->dr;
 	double dz = geom1->dz;
 //defining number of cell
-	int i_new = (int)ceil((x1_new)/dr)-1;
-	int k_new =(int)ceil((x3_new)/dr)-1;
-	int i_old = (int)ceil((x1_old)/dr)-1;
-	int k_old =(int)ceil((x3_old)/dr)-1;
+	int i_n = (int)ceil((x1_new)/dr)-1;
+	int k_n =(int)ceil((x3_new)/dr)-1;
+	int i_o = (int)ceil((x1_old)/dr)-1;
+	int k_o =(int)ceil((x3_old)/dr)-1;
 	/// 1) charge in four cells
-	if ((i_new == i_old)&&(k_new == k_old))
+	if ((i_n == i_o)&&(k_n == k_o))
 	{
 		simple_j_weighting(j1, x1_new,x3_new ,x1_old,x3_old, i_n, k_n);
 	}
 	// 2) charge in seven cells (i_new != i_old)
-	else if ((i_new!=i_old)&&(k_new==k_old))
+	else if ((i_n!=i_o)&&(k_n==k_o))
 	{
-			if (x1_old >(i_new+1)*dr)
+			if (x1_old >(i_n+1)*dr)
 			{
 				double a = (x1_old - x1_new)/(x3_old - x3_new);
-				double r_boundary = (i_new+1)*dr;
+				double r_boundary = (i_n+1)*dr;
 				double delta_r = r_boundary - x1_new;
 				double z_boundary = x3_new + delta_r/a;
 
@@ -426,7 +426,7 @@ void Particles::j_weighting(current *j1, double x1_new,double x3_new, double x1_
 			else 
 			{
 				double a = (x1_new - x1_old)/(x3_new - x3_old);
-				double r_boundary = (i_new)*dr;
+				double r_boundary = (i_n)*dr;
 				double delta_r = r_boundary - x1_old;
 				double z_boundary = x3_old + delta_r/a;
 
@@ -436,12 +436,12 @@ void Particles::j_weighting(current *j1, double x1_new,double x3_new, double x1_
 
 	}
 	// 3) charge in seven cells (k_new != k_old)
-	else if ((i_new==i_old)&&(k_new!=k_old))
+	else if ((i_n==i_o)&&(k_n!=k_o))
 	{
 		
-		if (x3_old<k_new*dz)
+		if (x3_old<k_n*dz)
 		{
-			double z_boundary = k_new*dz;
+			double z_boundary = k_n*dz;
 			double delta_z  = z_boundary - x3_old;
 			double a = (x1_new - x1_old)/(x3_new - x3_old);
 			double r_boundary = x1_old + a*delta_z;
@@ -450,7 +450,7 @@ void Particles::j_weighting(current *j1, double x1_new,double x3_new, double x1_
 		}
 		else 
 		{
-			double z_boundary = (k_new+1)*dz;
+			double z_boundary = (k_n+1)*dz;
 			double delta_z  = z_boundary - x3_new;
 			double a = (x1_old - x1_new)/(x3_old - x3_new);
 			double r_boundary = x1_new + a*delta_z;
@@ -459,11 +459,14 @@ void Particles::j_weighting(current *j1, double x1_new,double x3_new, double x1_
 		}
 		
 	}
-	//// 3) charge in 10 cells 
-	else if ((i_new!=i_old)&&(k_new!=k_old))
+
+	/////////////////////////////////////////
+	///////// 3) charge in 10 cells /////////
+	/////////////////////////////////////////
+	else if ((i_n!=i_o)&&(k_n!=k_o))
 	{
 		/// case, when particle move from [i-1] cell to [i] cell
-		if (x1_old<i*dr)
+		if (x1_old<i_n*dr)
 	/////////////////////////////////////////////////////////////////
 		{
 		    // case, when particle move from [i-1][k-1] -> [i][k] cell
@@ -486,7 +489,7 @@ void Particles::j_weighting(current *j1, double x1_new,double x3_new, double x1_
 				else if (z1>k_n*dz)
 				{
 					simple_j_weighting(j1, r2, z2 ,x1_old, x3_old, i_n-1, k_n-1);
-					simple_j_weighting(j1, r1, z1, r2, z2,i_n-1, n_k);
+					simple_j_weighting(j1, r1, z1, r2, z2,i_n-1, k_n);
 					simple_j_weighting(j1, x1_new, x3_new, r1, z1, i_n, k_n);
 				}				
 			}
@@ -510,7 +513,7 @@ void Particles::j_weighting(current *j1, double x1_new,double x3_new, double x1_
 				else if (z1<(k_n+1)*dz)
 				{
 					simple_j_weighting(j1, r2, z2 ,x1_old, x3_old, i_n-1, k_n+1);
-					simple_j_weighting(j1, r1, z1, r2, z2,i_n-1, n_k);
+					simple_j_weighting(j1, r1, z1, r2, z2,i_n-1, k_n);
 					simple_j_weighting(j1, x1_new, x3_new, r1, z1, i_n, k_n);
 				}
 
@@ -519,7 +522,7 @@ void Particles::j_weighting(current *j1, double x1_new,double x3_new, double x1_
 		}
 	////////////////////////////////////////////////////////////////////////////
 		/// case, when particle move from [i+1] cell to [i] cell
-		else if (x1_old>(i+1)*dr)
+		else if (x1_old>(i_n+1)*dr)
 		{
 		// case, when particle move from [i+1][k-1] -> [i][k] cell
 			if(x3_old<k_n*dz)
@@ -542,7 +545,7 @@ void Particles::j_weighting(current *j1, double x1_new,double x3_new, double x1_
 				else if (z1>(k_n)*dz)
 				{
 					simple_j_weighting(j1, r2, z2 ,x1_old, x3_old, i_n+1, k_n-1);
-					simple_j_weighting(j1, r1, z1, r2, z2,i_n+1, n_k);
+					simple_j_weighting(j1, r1, z1, r2, z2,i_n+1, k_n);
 					simple_j_weighting(j1, x1_new, x3_new, r1, z1, i_n, k_n);
 				}
 
@@ -568,7 +571,7 @@ void Particles::j_weighting(current *j1, double x1_new,double x3_new, double x1_
 				else if (z1<(k_n+1)*dz)
 				{
 					simple_j_weighting(j1, r2, z2 ,x1_old, x3_old, i_n+1, k_n+1);
-					simple_j_weighting(j1, r1, z1, r2, z2,i_n+1, n_k);
+					simple_j_weighting(j1, r1, z1, r2, z2,i_n+1, k_n);
 					simple_j_weighting(j1, x1_new, x3_new, r1, z1, i_n, k_n);
 				}
 
