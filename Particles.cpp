@@ -374,7 +374,7 @@ void Particles::simple_j_weighting(Time* time1, current *j1, double x1_new,doubl
 		j1->set_j3(i_n,k_n, wj);
 
         //calculate current in [i+1,k] cell//
-		wj = charge/(2*dr*dz*delta_t*2*pi*i_n*dr*dr) * (k*delta_z*delta_z/2.0+delta_z*b + delta_z*dr + dr*dr/k * (0.25-(i_n+0.5)*(i_n+0.5)) * log((k*delta_z+b)/b)); 
+		wj = charge/(2*dr*dz*delta_t*2*pi*(i_n+1)*dr*dr) * (k*delta_z*delta_z/2.0+delta_z*b + delta_z*dr + dr*dr/k * (0.25-(i_n+0.5)*(i_n+0.5)) * log((k*delta_z+b)/b)); 
 		// set new weighting current value 
 		j1->set_j3(i_n+1,k_n, wj);
 		
@@ -385,15 +385,17 @@ void Particles::simple_j_weighting(Time* time1, current *j1, double x1_new,doubl
 		 k = -delta_r/delta_z;
 		 double r0 = (i_n+0.5)*dr;
 		 double r1 =  x1_old;
+		 b= (k_n+1.0)*dz - x3_old;
 
-		 wj = charge/(2*pi*r0*dz*dz*dr*delta_t) * (r0*k*delta_r+k/2.0 * delta_r*(x1_old+delta_r/2.0)+0.5*delta_r*(b-k*(2*r0+r1))+ delta_r*(b-k*r1)*(4*r0*r0-dr*dr)/(8*x1_old*(x1_old+delta_r)) + (k*(r0*r0/2.0-dr*dr/8.0))*log((x1_old+delta_r)/x1_old));
-		
+		// wj = charge/(2*pi*r0*dz*dz*dr*delta_t) * (r0*k*delta_r+k/2.0 * delta_r*(x1_old+delta_r/2.0)+0.5*delta_r*(b-k*(2*r0+r1))+ delta_r*(b-k*r1)*(4*r0*r0-dr*dr)/(8*x1_old*(x1_old+delta_r)) + (k*(r0*r0/2.0-dr*dr/8.0))*log((x1_old+delta_r)/x1_old));
+		 wj = (r0*k*delta_r+k/2.0 * delta_r*(x1_old+delta_r/2.0)+0.5*delta_r*(b-k*(2*r0+r1))+ delta_r*(b-k*r1)*(4*r0*r0-dr*dr)/(8*x1_old*(x1_old+delta_r)) + (k*(r0*r0/2.0-dr*dr/8.0))*log((x1_old+delta_r)/x1_old));
 		 //weighting jr in [i][k] cell
 		j1->set_j1(i_n,k_n, wj);
 
+          b= x3_old- k_n*dz;;
          //weighting jr in [i][k+1] cell
-		 wj = charge/(2*pi*r0*dz*dz*dr*delta_t) * (-r0*k*delta_r - k/2.0*delta_r*(x1_old+delta_r/2.0)+0.5*delta_r*(b+k*(2*r0+r1))+ delta_r*(b-k*r1)*(4*r0*r0-dr*dr)/(8*x1_old*(x1_old+delta_r)) - (k*(r0*r0/2.0+dr*dr/8.0))*log((x1_old+delta_r)/x1_old));
-		
+		// wj = charge/(2*pi*r0*dz*dz*dr*delta_t) * (-r0*k*delta_r - k/2.0*delta_r*(x1_old+delta_r/2.0)+0.5*delta_r*(b+k*(2*r0+r1))+ delta_r*(b-k*r1)*(4*r0*r0-dr*dr)/(8*x1_old*(x1_old+delta_r)) - (k*(r0*r0/2.0+dr*dr/8.0))*log((x1_old+delta_r)/x1_old));
+		 wj = (-r0*k*delta_r - k/2.0*delta_r*(x1_old+delta_r/2.0)+0.5*delta_r*(b+k*(2*r0+r1))+ delta_r*(b+k*r1)*(4*r0*r0-dr*dr)/(8*x1_old*(x1_old+delta_r)) - (k*(r0*r0/2.0-dr*dr/8.0))*log((x1_old+delta_r)/x1_old));
 		j1->set_j1(i_n, k_n+1, wj);
 
 		
