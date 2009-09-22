@@ -154,7 +154,7 @@ void Particles::half_step_coord(Time* t)
 	//function for charge density weighting///
 void Particles::charge_weighting(charge_density* ro1)
 {
-	double pi = 3.14159;
+	double pi = 3.14159265;
 
 	int r_i=0;  // number of particle i cell 
 	int z_k=0;  // number of particle k cell
@@ -176,12 +176,12 @@ void Particles::charge_weighting(charge_density* ro1)
 	{
             // finding number of i and k cell. example: dr = 0.5; r = 0.4; i =0
 		////////////////////////////
-		    r_i = (int)ceil((x1[i]+0.5*dr)/dr)-1;
-			z_k =  (int)ceil((x3[i]+0.5*dr)/dz)-1;
+		    r_i = (int)ceil((x1[i])/dr)-1;
+			z_k =  (int)ceil((x3[i])/dz)-1;
 		///////////////////////////
 
         // in first cell other alg. of ro_v calc
-		if(r_i>dr/2)
+		if(x1[i]>dr)
 		{
 			///////////////////////////
 			 r1 =  x1[i] - 0.5*dr;
@@ -219,22 +219,24 @@ void Particles::charge_weighting(charge_density* ro1)
 			 r3 = x1[i]+0.5*dr;
 			 dz1 = (z_k+1)*dz-x3[i];
 			 dz2 = x3[i] - z_k*dz;
+			 v_1 = pi*dz*dr*dr/4.0;
+			 v_2 = pi*dz*dr*dr*2.0*(r_i+1);
 		   ///////////////////////////
 
 			// weighting in ro[i][k] cell
-			value = ro_v*pi*dz1*(r2*r2-r1*r1); 			
+			value = ro_v*pi*dz1*(r2*r2-r1*r1)/v_1; 			
 			ro1->set_ro_weighting(r_i, z_k, value);
 		
 			// weighting in ro[i+1][k] cell
-			value = ro_v*pi*dz1*(r3*r3-r2*r2);
+			value = ro_v*pi*dz1*(r3*r3-r2*r2)/v_2;
 			ro1->set_ro_weighting(r_i+1,z_k, value);
 
 			// weighting in ro[i][k+1] cell
-			value = ro_v*pi*dz2*(r2*r2-r1*r1);
+			value = ro_v*pi*dz2*(r2*r2-r1*r1)/v_1;
 			ro1->set_ro_weighting(r_i, z_k+1, value);
 
 			// weighting in ro[i+1][k+1] cell
-			value = ro_v*pi*dz2*(r3*r3-r2*r2);
+			value = ro_v*pi*dz2*(r3*r3-r2*r2)/v_2;
 			ro1->set_ro_weighting(r_i+1, z_k+1, value);
 
 
@@ -364,6 +366,8 @@ void Particles::simple_j_weighting(Time* time1, current *j1, double x1_new,doubl
 		// distance of particle moving//
 		double delta_r = x1_new - x1_old;
 		double delta_z = x3_new - x3_old;
+		if (i_n>=1)
+		{
 		///////////////////////////////////
 		// equation y = k*x+b;//
 		// finding k & b//
@@ -396,8 +400,43 @@ void Particles::simple_j_weighting(Time* time1, current *j1, double x1_new,doubl
          //weighting jr in [i][k+1] cell
 		 wj = charge/(2*pi*r0*dz*dz*dr*delta_t) * (-r0*k*delta_r - k/2.0*delta_r*(x1_old+delta_r/2.0)+0.5*delta_r*(b+k*(2*r0+r1))+ delta_r*(b+k*r1)*(4*r0*r0-dr*dr)/(8*x1_old*(x1_old+delta_r)) - (k*(r0*r0/2.0-dr*dr/8.0))*log((x1_old+delta_r)/x1_old));
 		j1->set_j1(i_n, k_n+1, wj);
+		}
+		else
+		{
+///////////////////////////////////
+		// equation y = k*x+b;//
+		// finding k & b//
+		double k = delta_r/delta_z;
+		double b = x1_old;
+	    //calculate current jz in [i,k] cell//
+		wj = charge/(2*dr*dz*delta_t*pi*dr*dr/4.0) * (dr*delta_z - k*delta_z*delta_z/2.0 - delta_z*b + dr*dr/k * ((i_n+0.5)*(i_n+0.5)-0.25)*log((k*delta_z+b)/b)); 
+		// set new weighting current value 
+		j1->set_j3(i_n,k_n, wj);
 
+        //calculate current in [i+1,k] cell//
+		wj = charge/(2*dr*dz*delta_t*2*pi*(i_n+1)*dr*dr) * (k*delta_z*delta_z/2.0+delta_z*b + delta_z*dr + dr*dr/k * (0.25-(i_n+0.5)*(i_n+0.5)) * log((k*delta_z+b)/b)); 
+		// set new weighting current value 
+		j1->set_j3(i_n+1,k_n, wj);
 		
+		///////////////////////////////////
+	    //calculate current jr in [i,k] cell//
+		// equation y = k*x+b;//
+		// finding k & b//
+		 k = -delta_z/delta_r;
+		 double r0 = (i_n+0.5)*dr;
+		 double r1 =  x1_old;
+		 b= (k_n+1.0)*dz - x3_old;
+
+        //weighting jr in [i][k] cell
+		wj = charge/(2*pi*r0*dz*dz*dr*delta_t) *(r0*k*delta_r+k/2.0 * delta_r*(x1_old+delta_r/2.0)+0.5*delta_r*(b-k*(2*r0+r1))+ delta_r*(b-k*r1)*(4*r0*r0-dr*dr)/(8*x1_old*(x1_old+delta_r)) + (k*(r0*r0/2.0-dr*dr/8.0))*log((x1_old+delta_r)/x1_old));
+		j1->set_j1(i_n,k_n, wj);
+
+          b= x3_old- k_n*dz;;
+         //weighting jr in [i][k+1] cell
+		 wj = charge/(2*pi*r0*dz*dz*dr*delta_t) * (-r0*k*delta_r - k/2.0*delta_r*(x1_old+delta_r/2.0)+0.5*delta_r*(b+k*(2*r0+r1))+ delta_r*(b+k*r1)*(4*r0*r0-dr*dr)/(8*x1_old*(x1_old+delta_r)) - (k*(r0*r0/2.0-dr*dr/8.0))*log((x1_old+delta_r)/x1_old));
+		j1->set_j1(i_n, k_n+1, wj);
+		}
+	
 	//}
 }
 

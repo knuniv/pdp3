@@ -41,11 +41,11 @@ int main()
 //	e_field1.set_sigma();
 
 	Particles particle1("ions", 1, 1, 1, &geom1);
-	particle1.j_weighting(&time1,&current1,2.9999,2.53,2.0001,2.0001);
-	particle1.x1[0] = 2.00001;
-    particle1.x3[0] = 2.00001;
+	particle1.j_weighting(&time1,&current1,2.6,2.5,2.0001,2.0001);
+	particle1.x1[0] = 2.0001;
+    particle1.x3[0] = 2.0001;
 	particle1.charge_weighting(&ro1);
-    particle1.x1[0] = 2.99999;
+    particle1.x1[0] = 2.6;
     particle1.x3[0] = 2.5;
 	particle1.charge_weighting(&ro2);
 
@@ -56,7 +56,7 @@ int main()
 	h_field1.initial_h();
 	ofstream out("test");
 	ofstream out2("test2");
-	for(int i=0;i<=20000;i++)
+	for(int i=0;i<=2;i++)
 	{
 			std::cout<<"iteration"<<i;
 			std::cout<<endl;
