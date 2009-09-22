@@ -12,8 +12,8 @@ int main()
 {
 	///dcommebvbvbvbvbvb
 	PML pml1(0.0,0.25, 0.001,1);
-	Geometry geom1(0.5,0.5, 129, 129, &pml1);
-	Time time1(0,0, 1E-8,2E-12);
+	Geometry geom1(128,128, 129, 129, &pml1);
+	Time time1(0,0, 1,1);
 //	Particles particle1(1000, &geom1);
 	E_field e_field1(&geom1);
 	H_field h_field1(&geom1);
@@ -21,6 +21,7 @@ int main()
 	//double** ft;
 	current current1(&geom1);
 	charge_density ro1(&geom1);
+	charge_density ro2(&geom1);
 	//ft = new double* [1];
 	//for (int i=0; i<1;i++)
 	//{
@@ -39,8 +40,18 @@ int main()
 	geom1.set_epsilon();
 //	e_field1.set_sigma();
 
-	Particles particle1("ions", 1, 1, 1000, &geom1);
-	particle1.velocity_distribution(1E5);
+	Particles particle1("ions", 1, 1, 1, &geom1);
+	particle1.j_weighting(&time1,&current1,2.9999,2.53,2.0001,2.0001);
+	particle1.x1[0] = 2.00001;
+    particle1.x3[0] = 2.00001;
+	particle1.charge_weighting(&ro1);
+    particle1.x1[0] = 2.99999;
+    particle1.x3[0] = 2.5;
+	particle1.charge_weighting(&ro2);
+
+    double res =  continuity_equation(&time1, &geom1, &current1, &ro1, &ro2, 2,2);
+
+	//particle1.velocity_distribution(1E5);
 
 	h_field1.initial_h();
 	ofstream out("test");

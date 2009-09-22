@@ -157,15 +157,17 @@ void Particles::charge_weighting(charge_density* ro1)
 	double pi = 3.14159;
 
 	int r_i=0;  // number of particle i cell 
-	int z_k=0;  // numbr of particle k cell
+	int z_k=0;  // number of particle k cell
 	
 	double dr = geom1->dr;
 	double dz = geom1->dz;
 	double r1, r2, r3; // temp variables for calculation
 	double dz1, dz2;   // temp var.: width of k and k+1 cell 
 	
-	double ro_v_1 =0; // charge density Q/V, V - volume of elementary cell 
-	double ro_v_2=0; // charge density in i+1 cell
+	double ro_v =0; // charge density Q/V, V - volume of particle
+	double v_1 =0; // volume of [i][k] cell
+	double v_2= 0; // volume of [i+1][k] cell
+	//double ro_v_2=0; // charge density in i+1 cell
 	
 	double value =0;
 
@@ -174,37 +176,38 @@ void Particles::charge_weighting(charge_density* ro1)
 	{
             // finding number of i and k cell. example: dr = 0.5; r = 0.4; i =0
 		////////////////////////////
-		    r_i = (int)ceil(x1[i]/dr)-1;
-			z_k =  (int)ceil(x3[i]/dz)-1;
+		    r_i = (int)ceil((x1[i]+0.5*dr)/dr)-1;
+			z_k =  (int)ceil((x3[i]+0.5*dr)/dz)-1;
 		///////////////////////////
 
-        // in first cell ohter alg. of ro_v calc
+        // in first cell other alg. of ro_v calc
 		if(r_i>dr/2)
 		{
 			///////////////////////////
 			 r1 =  x1[i] - 0.5*dr;
 			 r2 = (r_i+0.5)*dr;
 			 r3 = x1[i] + 0.5*dr;
-			 ro_v_1 = charge/(pi*dz*dr*dr*2.0*i);
-			 ro_v_2 = charge/(pi*dz*dr*dr*2.0*(i+1));
+			 ro_v = charge/(2.0*pi*dz*dr*x1[i]);
+			 v_1 = pi*dz*dr*dr*2.0*(r_i);
+			 v_2 = pi*dz*dr*dr*2.0*(r_i+1);
 			 dz1 = (z_k+1)*dz-x3[i];
 			 dz2 = x3[i] - z_k*dz;
 		   ///////////////////////////
 
 			// weighting in ro[i][k] cell
-			value = ro_v_1*pi*dz1*(r2*r2-r1*r1); 			
+			value = ro_v*pi*dz1*(r2*r2-r1*r1)/v_1; 			
 			ro1->set_ro_weighting(r_i, z_k, value);
 		
 			// weighting in ro[i+1][k] cell
-			value = ro_v_2*pi*dz1*(r3*r3-r2*r2);
+			value = ro_v*pi*dz1*(r3*r3-r2*r2)/v_2;
 			ro1->set_ro_weighting(r_i+1,z_k, value);
 
 			// weighting in ro[i][k+1] cell
-			value = ro_v_1*pi*dz2*(r2*r2-r1*r1);
+			value = ro_v*pi*dz2*(r2*r2-r1*r1)/v_1;
 			ro1->set_ro_weighting(r_i, z_k+1, value);
 
 			// weighting in ro[i+1][k+1] cell
-			value = ro_v_2*pi*dz2*(r3*r3-r2*r2);
+			value = ro_v*pi*dz2*(r3*r3-r2*r2)/v_2;
 			ro1->set_ro_weighting(r_i+1, z_k+1, value);
 
 		}
@@ -214,26 +217,24 @@ void Particles::charge_weighting(charge_density* ro1)
 			 r1 =  x1[i] - 0.5*dr;
 			 r2 = (r_i+0.5)*dr;
 			 r3 = x1[i]+0.5*dr;
-			 ro_v_1 = charge/(pi*dz*dr*dr/4.0); //volume of first cell
-			 ro_v_2 = charge/(pi*dz*dr*dr*2.0*(i+1));
 			 dz1 = (z_k+1)*dz-x3[i];
 			 dz2 = x3[i] - z_k*dz;
 		   ///////////////////////////
 
 			// weighting in ro[i][k] cell
-			value = ro_v_1*pi*dz1*(r2*r2-r1*r1); 			
+			value = ro_v*pi*dz1*(r2*r2-r1*r1); 			
 			ro1->set_ro_weighting(r_i, z_k, value);
 		
 			// weighting in ro[i+1][k] cell
-			value = ro_v_2*pi*dz1*(r3*r3-r2*r2);
+			value = ro_v*pi*dz1*(r3*r3-r2*r2);
 			ro1->set_ro_weighting(r_i+1,z_k, value);
 
 			// weighting in ro[i][k+1] cell
-			value = ro_v_1*pi*dz2*(r2*r2-r1*r1);
+			value = ro_v*pi*dz2*(r2*r2-r1*r1);
 			ro1->set_ro_weighting(r_i, z_k+1, value);
 
 			// weighting in ro[i+1][k+1] cell
-			value = ro_v_2*pi*dz2*(r3*r3-r2*r2);
+			value = ro_v*pi*dz2*(r3*r3-r2*r2);
 			ro1->set_ro_weighting(r_i+1, z_k+1, value);
 
 
@@ -382,20 +383,18 @@ void Particles::simple_j_weighting(Time* time1, current *j1, double x1_new,doubl
 	    //calculate current jr in [i,k] cell//
 		// equation y = k*x+b;//
 		// finding k & b//
-		 k = -delta_r/delta_z;
+		 k = -delta_z/delta_r;
 		 double r0 = (i_n+0.5)*dr;
 		 double r1 =  x1_old;
 		 b= (k_n+1.0)*dz - x3_old;
 
-		// wj = charge/(2*pi*r0*dz*dz*dr*delta_t) * (r0*k*delta_r+k/2.0 * delta_r*(x1_old+delta_r/2.0)+0.5*delta_r*(b-k*(2*r0+r1))+ delta_r*(b-k*r1)*(4*r0*r0-dr*dr)/(8*x1_old*(x1_old+delta_r)) + (k*(r0*r0/2.0-dr*dr/8.0))*log((x1_old+delta_r)/x1_old));
-		 wj = (r0*k*delta_r+k/2.0 * delta_r*(x1_old+delta_r/2.0)+0.5*delta_r*(b-k*(2*r0+r1))+ delta_r*(b-k*r1)*(4*r0*r0-dr*dr)/(8*x1_old*(x1_old+delta_r)) + (k*(r0*r0/2.0-dr*dr/8.0))*log((x1_old+delta_r)/x1_old));
-		 //weighting jr in [i][k] cell
+        //weighting jr in [i][k] cell
+		wj = charge/(2*pi*r0*dz*dz*dr*delta_t) *(r0*k*delta_r+k/2.0 * delta_r*(x1_old+delta_r/2.0)+0.5*delta_r*(b-k*(2*r0+r1))+ delta_r*(b-k*r1)*(4*r0*r0-dr*dr)/(8*x1_old*(x1_old+delta_r)) + (k*(r0*r0/2.0-dr*dr/8.0))*log((x1_old+delta_r)/x1_old));
 		j1->set_j1(i_n,k_n, wj);
 
           b= x3_old- k_n*dz;;
          //weighting jr in [i][k+1] cell
-		// wj = charge/(2*pi*r0*dz*dz*dr*delta_t) * (-r0*k*delta_r - k/2.0*delta_r*(x1_old+delta_r/2.0)+0.5*delta_r*(b+k*(2*r0+r1))+ delta_r*(b-k*r1)*(4*r0*r0-dr*dr)/(8*x1_old*(x1_old+delta_r)) - (k*(r0*r0/2.0+dr*dr/8.0))*log((x1_old+delta_r)/x1_old));
-		 wj = (-r0*k*delta_r - k/2.0*delta_r*(x1_old+delta_r/2.0)+0.5*delta_r*(b+k*(2*r0+r1))+ delta_r*(b+k*r1)*(4*r0*r0-dr*dr)/(8*x1_old*(x1_old+delta_r)) - (k*(r0*r0/2.0-dr*dr/8.0))*log((x1_old+delta_r)/x1_old));
+		 wj = charge/(2*pi*r0*dz*dz*dr*delta_t) * (-r0*k*delta_r - k/2.0*delta_r*(x1_old+delta_r/2.0)+0.5*delta_r*(b+k*(2*r0+r1))+ delta_r*(b+k*r1)*(4*r0*r0-dr*dr)/(8*x1_old*(x1_old+delta_r)) - (k*(r0*r0/2.0-dr*dr/8.0))*log((x1_old+delta_r)/x1_old));
 		j1->set_j1(i_n, k_n+1, wj);
 
 		
@@ -588,4 +587,17 @@ void Particles::j_weighting(Time* time1, current *j1, double x1_new,double x3_ne
 	}
 
 
+}
+double continuity_equation(Time *input_time, Geometry *input_geometry, current *input_J, charge_density *rho_start, charge_density *rho_end, int i, int k)
+{
+	double **rho_start_array = rho_start->get_ro() ;
+    double **rho_end_array = rho_end->get_ro() ;
+	double **J1 = input_J->get_j1() ;
+	double **J3 = input_J->get_j3() ;
+	double delta_rho = 1.0/(input_geometry->dz*4.0*3.1415*input_geometry->dr*input_geometry->dr) ;
+	double  res = (rho_end_array[i][k] - rho_start_array[i][k]) +(J3[i][k] - J3[i][k-1])/input_geometry->dz   +(J1[i][k] - J1[i-1][k])/input_geometry->dr + (J1[i][k] + J1[i-1][k])/(2.0*i*input_geometry->dr);
+
+	return res;
+	/*return delta_rho -(J3[i][k] - J3[i][k-1])/input_geometry->dz  +
+		(J1[i][k] + J1[i-1][k])/input_geometry->dr + (J1[i][k] + J1[i-1][k])/(i+0.5)/input_geometry->dr ;*/
 }

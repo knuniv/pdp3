@@ -56,4 +56,5 @@ public:
 	void velocity_distribution(double therm_vel);
 	void simple_j_weighting(Time* time1, current *j1, double x1_new,double x3_new, double x1_old, double x3_old, int i_n, int k_n);
 	void j_weighting(Time* time1, current *j1, double x1_new,double x3_new, double x1_old, double x3_old);
-};
+	};
+double continuity_equation(Time *input_time, Geometry *input_geometry, current *input_J, charge_density *rho_start, charge_density *rho_end, int i, int k);
