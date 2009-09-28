@@ -109,15 +109,15 @@ double** current::get_j3() const
 	// functions for changing values of j//
 void current::set_j1(int i, int k, double value)
 {
-	j1[i][k]=value;
+	j1[i][k]+=value;
 }
 
 void current::set_j2(int i, int k, double value)
 {
-	j2[i][k]=value;
+	j2[i][k]+=value;
 }
 
 void current::set_j3(int i, int k, double value)
 {
-	j3[i][k]=value;
+	j3[i][k]+=value;
 }

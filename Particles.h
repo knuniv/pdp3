@@ -3,6 +3,8 @@
 #include "Time.h"
 #include "charge_density.h"
 #include"current.h"
+#include <fstream>
+#include<iostream>
 //#include "stdafx.h"
 //#include "E_field.h"
 //#include "H_field.h"
@@ -43,7 +45,7 @@ public:
 	//current density
 	//temporaty member of Particle class
 	//created for the purpose of integration 
-	//with exsisting routine of Maxwell equations integration
+	//with exsisting routine of Maxwell equations integration 
 	Geometry* geom1;
 public:
 	void charge_weighting(charge_density* ro1);
@@ -57,4 +59,4 @@ public:
 	void simple_j_weighting(Time* time1, current *j1, double x1_new,double x3_new, double x1_old, double x3_old, int i_n, int k_n);
 	void j_weighting(Time* time1, current *j1, double x1_new,double x3_new, double x1_old, double x3_old);
 	};
-double continuity_equation(Time *input_time, Geometry *input_geometry, current *input_J, charge_density *rho_start, charge_density *rho_end, int i, int k);
+bool continuity_equation(Time *input_time, Geometry *input_geometry, current *input_J, charge_density *rho_start, charge_density *rho_end);
