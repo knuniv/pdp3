@@ -86,25 +86,25 @@ E_field::~E_field()
 	//початковий розподіл E//
 ////////////////////////////////////////////
 ///////////////////////////////////////////
-void E_field::set_efield_0()
+void E_field::set_homogeneous_efield(double E1, double E2, double E3)
 {
 	////Er////
 	for(int i=0;i<(geom1->n_grid_1-1);i++)
 		for(int k=1;k<(geom1->n_grid_2-1);k++)
 		{
-			e1[i][k]=0;
+			e1[i][k]= E1;
 		}
 	///Ef////
 	for(int i=1;i<(geom1->n_grid_1-1);i++)
 		for(int k=1;k<(geom1->n_grid_2-1);k++)
 		{
-			e2[i][k]=0;
+			e2[i][k]=E2;
 		}
 	///Ez////
 	for(int i=1;i<(geom1->n_grid_1-1);i++)
 		for(int k=0;k<(geom1->n_grid_2-1);k++)
 		{
-			e3[i][k]=0;
+			e3[i][k]=E3;
 		}
 }
 /////////////////////////////////////////////////

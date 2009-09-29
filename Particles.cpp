@@ -75,12 +75,11 @@ double Particles::get_gamma(int i)
 
 
 
-void Particles::step_v(E_field* e_fld, H_field* h_fld, Time* t)
+void Particles::step_v(Triple E_compon, Triple B_compon, Time* t)
 {
 	int i;
 	double gamma, b1, b2, b3, e1, e2, e3, vv1, vv2, vv3;
 	const double mu0 = 1e-6;
-	Triple E_compon(0.0, 0.0, 0.0), B_compon(0.0, 0.0, 0.0);
 	double const1 = charge*t->delta_t/2.0/mass, const2;
 	for( i=0;i<number;i++)
 		//if (is_alive[i])
@@ -170,13 +169,13 @@ void Particles::half_step_coord(Time* t)
 
 			if (x1[i] < half_dr)
 			{
-				x1[i] = - x1[i];
+				x1[i] = dr - x1[i];
 				v1[i] = -v1[i];
 			}
 
 			if (x3[i] < half_dz)
 			{
-				x3[i] = - x3[i];
+				x3[i] = dz - x3[i];
 				v3[i] = -v3[i];
 			}
 		}
