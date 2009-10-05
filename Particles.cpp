@@ -9,7 +9,7 @@ using namespace std;
 Particles::Particles(void)
 {
 }
-	////////конструктор//////
+	////////constructor//////
 ////////////////////////////////////////////////
 Particles::Particles(char* p_name, double p_charge, double p_mass, int p_number,
 					 Geometry* geom)  : geom1(geom), c_light(3.0e8), c2(9.0e16) 
@@ -31,6 +31,35 @@ Particles::Particles(char* p_name, double p_charge, double p_mass, int p_number,
 	
 };
 ///////////////////////////////////////////////////
+
+//////////////////////////////////////////////////
+//copy constructor//
+Particles::Particles(const Particles &cp_particles)
+{
+	name = new char[strlen(cp_particles.name)];
+	strcpy(name,cp_particles.name);
+	charge = cp_particles.charge;
+	mass = cp_particles.mass;
+	c_light = cp_particles.c_light;
+	c2 = cp_particles.c2;
+
+	x1 = new double[number];
+	x3 = new double[number];
+	v1 = new double[number];
+	v2 = new double[number];
+	v3 = new double[number];
+	is_alive = new bool[number];
+	for (int i=0;i<cp_particles.number;i++)
+	{
+		x1[i] = cp_particles.x1[i];
+		x3[i] = cp_particles.x3[i];
+		v1[i] = cp_particles.v1[i];
+		v2[i] = cp_particles.v2[i];
+		v3[i] = cp_particles.v3[i];
+	}
+
+}
+/////////////////////////////////////////////////
 
 //Десткуктор. вивілнення памяті
 Particles::~Particles()

@@ -16,6 +16,7 @@ class Particles
 {
 public:
 	Particles(void);
+	Particles(const Particles& cp_particles);
 	Particles(char* p_name, double p_charge, double p_mass, int p_number,
 			  Geometry* geom);
 	~Particles();

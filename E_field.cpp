@@ -418,7 +418,7 @@ Triple E_field::get_field(double x1, double x3)
 	double dr = geom1->dr;
 	double dz = geom1->dz;
 	double r1, r2, r3; // temp variables for calculation
-	double dz1, dz2;   // temp var.: width of k and k+1 cell 
+	double dz1, dz2;   //  temp var.: width of k and k+1 cell 
 	double er =0;
 	double efi =0;
 	double ez =0;
@@ -451,7 +451,7 @@ Triple E_field::get_field(double x1, double x3)
    er = er + e1[i_r+1][k_z]*(pi*dz1*(r3*r3-r2*r2))/vol_2;
 
    //weighting Er[i][k+1]//
-   er= er + e1[i_r][k_z+1]*(pi*dz2*(r3*r3-r2*r2))/vol_1;
+   er= er + e1[i_r][k_z+1]*(pi*dz2*(r2*r2-r1*r1))/vol_1;
 
    //weighting Er[i+1][k+1]//
    er = er + e1[i_r+1][k_z+1]*(pi*dz2*(r3*r3-r2*r2))/vol_2;
