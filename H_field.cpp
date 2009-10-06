@@ -157,26 +157,26 @@ H_field::~H_field(void)
 
 }
 
-void H_field::initial_h()
+void H_field::set_homogeneous_h(double H1, double H2, double H3)
 {
 for (int i=0;i<geom1->n_grid_1;i++)
 	for (int k=0;(k<geom1->n_grid_2-1);k++)
 	{
 			//if (h1[i][k]!= NULL)
-				h1[i][k]=0.0;
+				h1[i][k]=H1;
 	}
 
 for (int i=0;i<(geom1->n_grid_1-1);i++)
 	for (int k=0;(k<geom1->n_grid_2-1);k++)
 	{
 			//if (h1[i][k]!= NULL)
-				h2[i][k]=0.0;
+				h2[i][k]=H2;
 	}
 for (int i=0;i<(geom1->n_grid_1-1);i++)
 	for (int k=0;(k<geom1->n_grid_2);k++)
 	{
 			//if (h1[i][k]!= NULL)
-				h3[i][k]=0.0;
+				h3[i][k]=H3;
 	}
 
 
@@ -316,7 +316,7 @@ void H_field::magnetostatic_equation(Geometry* geom1)
 ////////////////////////////////////////////////////////////
 	//function for magnetic field weighting//
 
-Triple H_field::get_field(double x1, double x3, int half)
+Triple H_field::get_field(double x1, double x3)
 {
 
 	{	
@@ -354,16 +354,16 @@ Triple H_field::get_field(double x1, double x3, int half)
     ///////////////////////////////////////
   
     //weighting Hz[i][k]//
-   hz = hz + h3[i_r][k_z]*(pi*dz1*(r2*r2-r1*r1))/vol_1;
+   hz = hz + h3_half_time[i_r][k_z]*(pi*dz1*(r2*r2-r1*r1))/vol_1;
 
 	//weighting Hz[i+1][k]//
-   hz = hz + h3[i_r+1][k_z]*(pi*dz1*(r3*r3-r2*r2))/vol_2;
+   hz = hz + h3_half_time[i_r+1][k_z]*(pi*dz1*(r3*r3-r2*r2))/vol_2;
 
    //weighting Hz[i][k+1]//
-   hz= hz + h3[i_r][k_z+1]*(pi*dz2*(r3*r3-r2*r2))/vol_1;
+   hz= hz + h3_half_time[i_r][k_z+1]*(pi*dz2*(r3*r3-r2*r2))/vol_1;
 
    //weighting Hz[i+1][k+1]//
-  hz = hz + h3[i_r+1][k_z+1]*(pi*dz2*(r3*r3-r2*r2))/vol_2;
+  hz = hz + h3_half_time[i_r+1][k_z+1]*(pi*dz2*(r3*r3-r2*r2))/vol_2;
    
 ///////////////////////////////////////////////////////
 
@@ -394,16 +394,16 @@ Triple H_field::get_field(double x1, double x3, int half)
 		  //////////////////////////////////////
 
 		   //weighting Hr[i][k]//
-		   hr = hr + h1[i_r][k_z]*(pi*dz1*(r2*r2-r1*r1))/vol_1;
+		   hr = hr + h1_half_time[i_r][k_z]*(pi*dz1*(r2*r2-r1*r1))/vol_1;
 
 		  //weighting Hr[i+1][k]//
-		   hr = hr + h1[i_r+1][k_z]*pi*dz1*(r3*r3-r2*r2)/vol_2;   
+		   hr = hr + h1_half_time[i_r+1][k_z]*pi*dz1*(r3*r3-r2*r2)/vol_2;   
 
           //weighting Hr[i][k+1]//
-		   hr = hr + h1[i_r][k_z+1]*pi*dz2*(r2*r2-r1*r1)/vol_1;
+		   hr = hr + h1_half_time[i_r][k_z+1]*pi*dz2*(r2*r2-r1*r1)/vol_1;
    
          //weighting Hr[i+1][k+1]//
-		   hr = hr + h1[i_r+1][k_z+1]*pi*dz2*(r3*r3-r2*r2)/vol_2;    
+		   hr = hr + h1_half_time[i_r+1][k_z+1]*pi*dz2*(r3*r3-r2*r2)/vol_2;    
     
   
 ///////////////////////////////////////////////////////
@@ -423,21 +423,23 @@ Triple H_field::get_field(double x1, double x3, int half)
 		  dz2 = x3-(k_z+0.5)*dz;
 		  //////////////////////////////////////
 		  //weighting Hfi[i][k]//
-		  hfi = hfi + h2[i_r][k_z]*pi*dz1*(r2*r2-r1*r1)/vol_1;
+		  hfi = hfi + h2_half_time[i_r][k_z]*pi*dz1*(r2*r2-r1*r1)/vol_1;
 
 		  //weighting Hfi[i+1][k]//
-		  hfi = hfi + h2[i_r+1][k_z]*pi*dz1*(r3*r3-r2*r2)/vol_2;
+		  hfi = hfi + h2_half_time[i_r+1][k_z]*pi*dz1*(r3*r3-r2*r2)/vol_2;
 		   
           //weighting Hfi[i][k+1]//
-		   hfi = hfi + h2[i_r][k_z+1]*dz2*pi*(r2*r2-r1*r1)/vol_1;
+		   hfi = hfi + h2_half_time[i_r][k_z+1]*dz2*pi*(r2*r2-r1*r1)/vol_1;
    
          //weighting Hfi[i+1][k+1]//
-		   hfi = hfi + h2[i_r+1][k_z+1]*pi*dz2*(r3*r3-r2*r2)/vol_2;
+		   hfi = hfi + h2_half_time[i_r+1][k_z+1]*pi*dz2*(r3*r3-r2*r2)/vol_2;
   
 		   
 	Triple components(hr, hfi, hz);
 
 	return components;
 }
+
+
 
 }

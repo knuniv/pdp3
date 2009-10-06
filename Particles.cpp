@@ -15,8 +15,8 @@ Particles::Particles(char* p_name, double p_charge, double p_mass, int p_number,
 					 Geometry* geom)  : geom1(geom), c_light(3.0e8), c2(9.0e16) 
 {
 	name = p_name;
-	charge = p_charge;
-	mass = p_mass;
+	charge = p_charge*1.6e-19;
+	mass = p_mass*9.1e-31;
 	number = p_number;
 
     //allocate memory for coordinates and velocities of particles
@@ -166,7 +166,7 @@ void Particles::step_v(Triple E_compon, Triple B_compon, Time* t)
 
 }
 
-void Particles::half_step_coord(Time* t)
+void Particles::step_coord(Time* t)
 {
 	int i;
 	double dr = geom1->dr;
@@ -181,8 +181,8 @@ void Particles::half_step_coord(Time* t)
 	for( i=0;i<number;i++)
 		if (is_alive[i])
 		{	
-			x1[i] = x1[i] + v1[i]*t->delta_t/2.0;
-            x3[i] = x3[i] + v3[i]*t->delta_t/2.0;
+			x1[i] = x1[i] + v1[i]*t->delta_t;
+            x3[i] = x3[i] + v3[i]*t->delta_t;
 
 			if (x1[i] > x1_wall)
 			{
@@ -741,7 +741,7 @@ bool continuity_equation(Time *input_time, Geometry *input_geometry, current *in
 
 		for (k=1;k<input_geometry->n_grid_2-1;k++)
 		{
-			res = (rho_new_array[i][k] - rho_old_array[i][k]) +(J3[i][k] - J3[i][k-1])/input_geometry->dz   +(J1[i][k] - J1[i-1][k])/input_geometry->dr + (J1[i][k] + J1[i-1][k])/(2.0*i*input_geometry->dr);
+			res = (rho_new_array[i][k] - rho_old_array[i][k])/input_time->delta_t +(J3[i][k] - J3[i][k-1])/input_geometry->dz   +(J1[i][k] - J1[i-1][k])/input_geometry->dr + (J1[i][k] + J1[i-1][k])/(2.0*i*input_geometry->dr);
 			if (res > tolerance)
 			{
 				ok = false;
