@@ -456,7 +456,7 @@ Triple E_field::get_field(double x1, double x3)
 	k_z = (int)ceil((x3-0.5*dz)/geom1->dz)-1;
 ///////////////////////////////////
 
-   if(x1>dr/2)
+   if(x1>dr)
 	{
 		vol_1 = pi*dz*dr*dr*2*i_r;
     }
@@ -491,7 +491,7 @@ Triple E_field::get_field(double x1, double x3)
 	 i_r = (int)ceil((x1)/geom1->dr)-1;
      k_z = (int)ceil((x3)/geom1->dz)-1;
 
-  if(x1>dr/2)
+  if(x1>dr)
 	{
 		vol_1 = pi*dz*dr*dr*2*i_r;
     }

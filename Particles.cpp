@@ -592,9 +592,9 @@ void Particles::j_weighting(Time* time1, current *j1, double x1_new,double x3_ne
 					{
 						delta_z = k_n*dz - x3_old;
 						wj = wj_lower*delta_z;
-						j1->set_j3(i_n,k_n-1,wj_lower);
+						j1->set_j3(i_n,k_n-1,wj);
 						wj = wj_upper*delta_z;
-						j1->set_j3(i_n+1,k_n-1,wj_lower);
+						j1->set_j3(i_n+1,k_n-1,wj);
 
 						delta_z = x3_new - k_n*dz;
 						wj = wj_lower*delta_z;
@@ -607,11 +607,11 @@ void Particles::j_weighting(Time* time1, current *j1, double x1_new,double x3_ne
 				case -1:
 					{
 						
-						delta_z = (k_n+1)*dz - x3_old;
+							delta_z = (k_n+1)*dz - x3_old;
 						wj = wj_lower*delta_z;
-						j1->set_j3(i_n,k_n+1,wj_lower);
+						j1->set_j3(i_n,k_n+1,wj);
 						wj = wj_upper*delta_z;
-						j1->set_j3(i_n+1,k_n+1,wj_lower);
+						j1->set_j3(i_n+1,k_n+1,wj);
 
 						delta_z = x3_new - (k_n+1)*dz;
 						wj = wj_lower*delta_z;

@@ -164,6 +164,7 @@ for (int i=0;i<geom1->n_grid_1;i++)
 	{
 			//if (h1[i][k]!= NULL)
 				h1[i][k]=H1;
+				h1_half_time[i][k]=H1;
 	}
 
 for (int i=0;i<(geom1->n_grid_1-1);i++)
@@ -171,12 +172,14 @@ for (int i=0;i<(geom1->n_grid_1-1);i++)
 	{
 			//if (h1[i][k]!= NULL)
 				h2[i][k]=H2;
+				h2_half_time[i][k]=H2;
 	}
 for (int i=0;i<(geom1->n_grid_1-1);i++)
 	for (int k=0;(k<geom1->n_grid_2);k++)
 	{
 			//if (h1[i][k]!= NULL)
 				h3[i][k]=H3;
+				h3_half_time[i][k]=H3;
 	}
 
 
@@ -377,7 +380,7 @@ Triple H_field::get_field(double x1, double x3)
 	k_z = (int)ceil((x3-0.5*dz)/geom1->dz)-1;
   ////////////////////////////
 
-   if(x1>dr/2)
+   if(x1>dr)
 	{
 		vol_1 = pi*dz*dr*dr*2*i_r;
     }
