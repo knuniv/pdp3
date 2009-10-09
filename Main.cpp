@@ -7,6 +7,7 @@
 #include "Fourier.h"
 #include <fstream>
 #include <math.h>
+#define  pi = 3.14159265;
 using namespace std;
 int main() 
 {
@@ -34,8 +35,24 @@ int main()
 	geom1.set_epsilon();
 //	e_field1.set_sigma();
 
-	Particles new_particles("ions", 1, 1, 1, &geom1), old_particles("ions", 1, 1, 1, &geom1);
+	Particles new_particles("ions", 1.6e5, 1, 1, &geom1), old_particles("ions", 1, 1, 1, &geom1);
 	//////////////////////
+	
+ 	//////////////////////
+	double new_x1 =1.4;
+	double new_x3 = 1.4;
+	double old_x1 = 0.6;
+	double old_x3 = 2.1;
+    new_particles.x1[0]=old_x1;
+	new_particles.x3[0]=old_x3;
+	new_particles.charge_weighting(&rho_old);
+	new_particles.x1[0]=new_x1;
+	new_particles.x3[0]=new_x3;
+	new_particles.charge_weighting(&rho_new);
+	new_particles.j_weighting(&time1,&current1,new_x1,new_x3,old_x1,old_x3);
+    res =  continuity_equation(&time1, &geom1, &current1, &rho_old, &rho_new);
+ 
+	//////////////////////////////////
 
 
 	new_particles.x1[0] = 52.0001;

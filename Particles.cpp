@@ -3,6 +3,7 @@
 #include "H_field.h"
 #include "Time.h"
 #include "Triple.h"
+#define  pi 3.14159265
 using namespace std;
 //#include "stdafx.h"
 
@@ -216,7 +217,7 @@ void Particles::step_coord(Time* t)
 	//function for charge density weighting///
 void Particles::charge_weighting(charge_density* ro1)
 {
-	double pi = 3.14159265;
+
 
 	int r_i=0;  // number of particle i cell 
 	int z_k=0;  // number of particle k cell
@@ -323,7 +324,6 @@ void Particles::velocity_distribution(double therm_vel)
 	
 int i = 0;
 int j=0;
-double pi = 3.14159;
 double R =0; // number from [0;1]
 double dv = 0.005; // velocity step in calculation integral
 double s =0; 
@@ -417,7 +417,6 @@ void Particles::simple_j_weighting(Time* time1, current *j1, double x1_new,doubl
 	double dr = geom1->dr;
 	double dz = geom1->dz;
 	double wj = 0;
-	double pi = 3.14159265;
 	double delta_t = time1->delta_t;
 
 	////defining number of cell
@@ -551,6 +550,153 @@ void Particles::j_weighting(Time* time1, current *j1, double x1_new,double x3_ne
 	int k_n =(int)ceil((x3_new)/dr)-1;
 	int i_o = (int)ceil((x1_old)/dr)-1;
 	int k_o =(int)ceil((x3_old)/dr)-1;
+
+	//stirct axis motion
+//////////////////////////////////////////
+	if (x1_new == x1_old)
+	{
+
+			double r1=0, r2=0,r3=0;
+			double delta_z = 0.0;
+			double value_part = 2*pi*x1_new*dr*dz;
+			double wj_lower =0;
+			r1 = x1_new-0.5*dr;
+			r2 = (i_n+0.5)*dr;
+			r3 = x1_new+0.5*dr;
+			if (i_n==0)
+			{
+			   wj_lower = charge/(time1->delta_t*pi*dr*dr/4.0) * pi*(r2*r2-r1*r1)/value_part;
+			}
+			else
+			{
+			 wj_lower = charge/(time1->delta_t*2*pi*i_n*dr*dr) * pi*(r2*r2-r1*r1)/value_part;
+			}
+			double wj_upper =  charge/(time1->delta_t*2*pi*(i_n+1)*dr*dr) *pi*(r3*r3-r2*r2)/value_part;
+			double wj=0;
+			j1->set_j1(i_n,k_n,0.0);
+			j1->set_j1(i_n,k_n+1,0.0);
+			int res_k = k_n-k_o;
+			switch(res_k)
+			{
+				case 0: 
+						{
+							delta_z = x3_new - x3_old;
+							wj = wj_lower*delta_z;
+							j1->set_j3(i_n,k_n,wj);
+							wj = wj_upper*delta_z;
+							j1->set_j3(i_n+1,k_n,wj);
+						}
+				break;
+
+				case 1:
+					{
+						delta_z = k_n*dz - x3_old;
+						wj = wj_lower*delta_z;
+						j1->set_j3(i_n,k_n-1,wj_lower);
+						wj = wj_upper*delta_z;
+						j1->set_j3(i_n+1,k_n-1,wj_lower);
+
+						delta_z = x3_new - k_n*dz;
+						wj = wj_lower*delta_z;
+						j1->set_j3(i_n,k_n,wj);
+						wj = wj_upper*delta_z;
+						j1->set_j3(i_n+1,k_n,wj);
+					}
+				break;
+
+				case -1:
+					{
+						
+						delta_z = (k_n+1)*dz - x3_old;
+						wj = wj_lower*delta_z;
+						j1->set_j3(i_n,k_n+1,wj_lower);
+						wj = wj_upper*delta_z;
+						j1->set_j3(i_n+1,k_n+1,wj_lower);
+
+						delta_z = x3_new - (k_n+1)*dz;
+						wj = wj_lower*delta_z;
+						j1->set_j3(i_n,k_n,wj);
+						wj = wj_upper*delta_z;
+						j1->set_j3(i_n+1,k_n,wj);
+
+					}
+				break;
+		}
+   	}
+///////////////////////////////////////////////////////
+	
+	////stirct radial motion///
+//////////////////////////////////////////////////////
+	else if (x3_new==x3_old)
+	{
+		double r0  =(i_n+0.5)*dr;
+		double wj= 0;
+		double delta_r=0;
+		double left_delta_z = 0, right_delta_z = 0;
+		double res_j = 0;
+		int res_i = i_n - i_o;
+		switch(res_i)
+		{
+		case  0:
+			{
+				 delta_r = x1_new - x1_old;
+				 left_delta_z = (k_n+1)*dz-x3_new;
+				 right_delta_z = x3_new - k_n*dz;
+				 wj = charge/(pi*4.0*r0*dz*dz*dr*time1->delta_t)*(delta_r - r0*r0/(x1_old+delta_r) +r0*r0/x1_old + dr*dr/(4.0*(x1_old+delta_r)) - dr*dr/(4.0*x1_old));
+				 res_j = wj*left_delta_z;
+				 j1->set_j1(i_n,k_n,res_j);
+				 res_j = wj*right_delta_z;
+				 j1->set_j1(i_n,k_n+1,res_j);
+
+			}
+			break;
+		case 1:
+			{
+				 delta_r = (i_n)*dr- x1_old;
+				 left_delta_z = (k_n+1)*dz-x3_new;
+				 right_delta_z = x3_new - k_n*dz;
+				 r0 = (i_n-0.5)*dr;
+				 wj = charge/(pi*4.0*r0*dz*dz*dr*time1->delta_t)*(delta_r - r0*r0/(x1_old+delta_r) +r0*r0/x1_old + dr*dr/(4.0*(x1_old+delta_r)) - dr*dr/(4.0*x1_old));
+				 res_j = wj*left_delta_z;
+				 j1->set_j1(i_n-1,k_n,res_j);
+				 res_j = wj*right_delta_z;
+				 j1->set_j1(i_n-1,k_n+1,res_j);
+				
+				 delta_r = x1_new - i_n*dr;
+				 r0 = (i_n+0.5)*dr;
+				 wj = charge/(pi*4.0*r0*dz*dz*dr*time1->delta_t)*(delta_r - r0*r0/(i_n*dr+delta_r) +r0*r0/i_n*dr + dr*dr/(4.0*(i_n*dr+delta_r)) - dr*dr/(4.0*i_n*dr));
+				 res_j = wj*left_delta_z;
+				 j1->set_j1(i_n,k_n,res_j);
+				 res_j = wj*right_delta_z;
+				 j1->set_j1(i_n,k_n+1,res_j);
+			}
+			break;
+			case -1:
+			{
+			     delta_r = (i_n+1)*dr - x1_old ;
+				 left_delta_z = (k_n+1)*dz-x3_new;
+				 right_delta_z = x3_new - k_n*dz;
+				 r0 = (i_n+1.5)*dr;
+				 wj = charge/(pi*4.0*r0*dz*dz*dr*time1->delta_t)*(delta_r - r0*r0/(x1_old+delta_r) +r0*r0/x1_old + dr*dr/(4.0*(x1_old+delta_r)) - dr*dr/(4.0*x1_old));
+				 res_j = wj*left_delta_z;
+				 j1->set_j1(i_n+1,k_n,res_j);
+				 res_j = wj*right_delta_z;
+				 j1->set_j1(i_n+1,k_n+1,res_j);
+				
+				 delta_r = x1_new - (i_n+1)*dr;
+				 r0 = (i_n+0.5)*dr;
+				 wj = charge/(pi*4.0*r0*dz*dz*dr*time1->delta_t)*(delta_r - r0*r0/((i_n+1)*dr+delta_r) +r0*r0/(i_n+1)*dr + dr*dr/(4.0*((i_n+1)*dr+delta_r)) - dr*dr/(4.0*(i_n+1)*dr));
+				 res_j = wj*left_delta_z;
+				 j1->set_j1(i_n,k_n,res_j);
+				 res_j = wj*right_delta_z;
+				 j1->set_j1(i_n,k_n+1,res_j);
+			}
+		 break;
+		}
+
+	}
+	else 
+	{
 	/// 1) charge in four cells
 	if ((i_n == i_o)&&(k_n == k_o))
 	{
@@ -702,11 +848,11 @@ void Particles::j_weighting(Time* time1, current *j1, double x1_new,double x3_ne
 				double a = (x1_old-x1_new)/(x3_old-x3_new);
 				double r1 = (i_n+1)*dr;
 				double delta_z1 = (r1-x1_new)/a;
-				double z1 = x3_old + delta_z1;
+				double z1 = x3_new + delta_z1;
 
 				double z2 = (k_n+1)*dz;
 				double delta_r2 = (z2-x3_new)*a;
-				double r2 = x1_old + delta_r2;
+				double r2 = x1_new + delta_r2;
 				
 				if (z1>(k_n+1)*dz)
 				{
@@ -725,7 +871,7 @@ void Particles::j_weighting(Time* time1, current *j1, double x1_new,double x3_ne
 		}
 	}
 
-
+  }
 }
 bool continuity_equation(Time *input_time, Geometry *input_geometry, current *input_J, charge_density *rho_old, charge_density *rho_new)
 {
