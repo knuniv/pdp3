@@ -546,68 +546,27 @@ void Particles::j_weighting(Time* time1, current *j1, Particles *old_part)
 	 for(k=0;k<(geom1->n_grid_2-1);k++)
 		J3[geom1->n_grid_1-1][k]=0;
 
-//defining number of cell
-	int i_n = (int)ceil((x1_new)/dr)-1;
-	int k_n =(int)ceil((x3_new)/dr)-1;
-	int i_o = (int)ceil((x1_old)/dr)-1;
-	int k_o =(int)ceil((x3_old)/dr)-1;
-
-	//stirct axis motion
-//////////////////////////////////////////
-	if (x1_new == x1_old)
 //////////////////////////////////////////////////////////////
 	for (i=0;i<number;i++)
 	{
 	    double x1_old=old_part->x1[i];
 		double x3_old = old_part->x3[i];
-
-			double r1=0, r2=0,r3=0;
-			double delta_z = 0.0;
-			double value_part = 2*pi*x1_new*dr*dz;
-			double wj_lower =0;
-			r1 = x1_new-0.5*dr;
-			r2 = (i_n+0.5)*dr;
-			r3 = x1_new+0.5*dr;
-			if (i_n==0)
-			{
-			   wj_lower = charge/(time1->delta_t*pi*dr*dr/4.0) * pi*(r2*r2-r1*r1)/value_part;
-			}
-			else
-			{
-			 wj_lower = charge/(time1->delta_t*2*pi*i_n*dr*dr) * pi*(r2*r2-r1*r1)/value_part;
-			}
-			double wj_upper =  charge/(time1->delta_t*2*pi*(i_n+1)*dr*dr) *pi*(r3*r3-r2*r2)/value_part;
-			double wj=0;
-			j1->set_j1(i_n,k_n,0.0);
-			j1->set_j1(i_n,k_n+1,0.0);
-			int res_k = k_n-k_o;
-			switch(res_k)
-			{
-				case 0: 
-						{
-							delta_z = x3_new - x3_old;
-							wj = wj_lower*delta_z;
-							j1->set_j3(i_n,k_n,wj);
-							wj = wj_upper*delta_z;
-							j1->set_j3(i_n+1,k_n,wj);
-						}
-				break;
-
-				case 1:
-					{
-						delta_z = k_n*dz - x3_old;
-						wj = wj_lower*delta_z;
-						j1->set_j3(i_n,k_n-1,wj);
-						wj = wj_upper*delta_z;
-						j1->set_j3(i_n+1,k_n-1,wj_lower);
-						j1->set_j3(i_n+1,k_n-1,wj);
+		//finding number new and old cells
+		int i_n = (int)ceil((x1[i])/dr)-1;
+		int k_n =(int)ceil((x3[i])/dr)-1;
+		int i_o = (int)ceil((x1_old)/dr)-1;
+		int k_o =(int)ceil((x3_old)/dr)-1;
+	    int res_cell = abs(i_n-i_o) + abs(k_n-k_o); 
+		if ((x1[i]==x1_old)||(x3[i]==x3_old))
+		{
+			strict_motion_weighting(time1, j1,x1[i],x3[i],x1_old,x3_old);
+		}
+		else
+		{
+			switch (res_cell)
 			{
 			/// 1) charge in four cells
 			case 0: simple_j_weighting(time1, j1, x1[i],x3[i] ,x1_old,x3_old, i_n, k_n);
-						wj = wj_lower*delta_z;
-						j1->set_j3(i_n,k_n+1,wj_lower);
-						wj = wj_upper*delta_z;
-						j1->set_j3(i_n+1,k_n+1,wj_lower);
 			break;
 
            /// 2) charge in seven cells 
@@ -624,7 +583,7 @@ void Particles::j_weighting(Time* time1, current *j1, Particles *old_part)
 						double z_boundary = x3[i] + delta_r/a;
 
 						simple_j_weighting(time1,j1, r_boundary,z_boundary ,x1_old,x3_old, i_n+1,k_n);
-						simple_j_weighting(time1,j1, x1[i],x3[i], r_boundary,z_boundary, i_n, k_n);
+	   					simple_j_weighting(time1,j1, x1[i],x3[i], r_boundary,z_boundary, i_n, k_n);
 					}
 				else 
 					{
@@ -669,15 +628,15 @@ void Particles::j_weighting(Time* time1, current *j1, Particles *old_part)
 		case 2:
 	{
 			/// case, when particle move from [i-1] cell to [i] cell
-			if (i_o<i_n)
+		if (i_o<i_n)
 			/////////////////////////////////////////////////////////////////
 			{
 			   // case, when particle move from [i-1][k-1] -> [i][k] cell
-				if(k_o<k_n)
+			if(k_o<k_n)
 					{
 						double a = (x1[i] - x1_old)/(x3[i] - x3_old);
 						double r1 = i_n*dr;
-						double delta_z1 = (r1 - x1_old)/a;
+					double delta_z1 = (r1 - x1_old)/a;
 						double z1 = x3_old + delta_z1;
 						double z2 = k_n*dz;
 						double delta_r2 = (z2-x3_old)*a;
@@ -713,7 +672,7 @@ void Particles::j_weighting(Time* time1, current *j1, Particles *old_part)
 								simple_j_weighting(time1, j1, x1[i], x3[i], r2, z2, i_n, k_n);
 							}
 						else if (z1<(k_n+1)*dz)
-							{
+						{
 								simple_j_weighting(time1, j1, r2, z2 ,x1_old, x3_old, i_n-1, k_n+1);
 								simple_j_weighting(time1, j1, r1, z1, r2, z2,i_n-1, k_n);
 								simple_j_weighting(time1, j1, x1[i], x3[i], r1, z1, i_n, k_n);
@@ -729,12 +688,12 @@ void Particles::j_weighting(Time* time1, current *j1, Particles *old_part)
 					{
 						double a = (x1[i] - x1_old)/(x3[i] - x3_old);
 						double r1 = (i_n+1)*dr;
-						double delta_z1 = -(x1_old-r1)/a;
+					double delta_z1 = -(x1_old-r1)/a;
 						double z1 = x3_old + delta_z1;
 
 						double z2 = k_n*dz;
 						double delta_r2 = -(z2-x3_old)*a;
-						double r2 = x1_old- delta_r2;
+					double r2 = x1_old- delta_r2;
 					
 						if (z1<(k_n)*dz)
 						{
@@ -774,7 +733,7 @@ void Particles::j_weighting(Time* time1, current *j1, Particles *old_part)
 							simple_j_weighting(time1, j1, r1, z1, r2, z2,i_n+1, k_n);
 							simple_j_weighting(time1, j1, x1[i], x3[i], r1, z1, i_n, k_n);
 						}
-			     }
+		     }
 			 }
        	} //close case;
         break;
