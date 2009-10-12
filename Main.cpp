@@ -79,8 +79,7 @@ int main()
 		old_particles.x3[0] = new_particles.x3[0];
 		new_particles.charge_weighting(&rho_old);  //continuity equation
         new_particles.step_coord(&time1);
-		new_particles.j_weighting(&time1,&current1, new_particles.x1[0], new_particles.x3[0], 
-			                                        old_particles.x1[0], old_particles.x3[0]);
+		new_particles.j_weighting(&time1,&current1,&old_particles);
 
         //4. Calculate E
         e_field1.calc_field(&h_field1, &time1, &current1, &pml1);
