@@ -24,6 +24,7 @@ Particles::Particles(char* p_name, double p_charge, double p_mass, int p_number,
 
 	x1 = new double[number];
 	x3 = new double[number];
+	x3 = new double[number];
 	v1 = new double[number];
 	v2 = new double[number];
 	v3 = new double[number];
@@ -167,7 +168,7 @@ void Particles::step_v(Triple E_compon, Triple B_compon, Time* t)
 
 }
 
-void Particles::step_coord(Time* t)
+void Particles::half_step_coord(Time* t)
 {
 	int i;
 	double dr = geom1->dr;
@@ -178,12 +179,14 @@ void Particles::step_coord(Time* t)
 	double half_dz = dz/2.0;
 	double x1_wallX2 = x1_wall*2.0;
 	double x3_wallX2 = x3_wall*2.0;
+	double temp1, temp3;
+	double half_dt = t->delta_t/2.0;
 
 	for( i=0;i<number;i++)
 		if (is_alive[i])
 		{	
-			x1[i] = x1[i] + v1[i]*t->delta_t;
-            x3[i] = x3[i] + v3[i]*t->delta_t;
+			x1[i] = x1[i] + v1[i]*half_dt; 
+            x3[i] = x3[i] + v3[i]*half_dt;
 
 			if (x1[i] > x1_wall)
 			{
@@ -531,17 +534,11 @@ void Particles::j_weighting(Time* time1, current *j1, Particles *old_part)
 		for (k=0; k<(geom1->n_grid_2-1);k++)
 		{
 			J1[i][k]=0;
-			J2[i][k]=0;
 			J3[i][k]=0;
 		}
 	 for (i=0; i<(geom1->n_grid_1-1);i++)
 		J1[i][geom1->n_grid_2-1]=0;
 
-	 for(k=0;k<(geom1->n_grid_2);k++)
-		J2[geom1->n_grid_1-1][k]=0;
-
-	 for(i=0;i<(geom1->n_grid_1);i++)
-		J3[i][geom1->n_grid_2-1]=0;
 
 	 for(k=0;k<(geom1->n_grid_2-1);k++)
 		J3[geom1->n_grid_1-1][k]=0;
@@ -760,7 +757,7 @@ void Particles::azimuthal_j_weighting(Time* time1, current *this_j)
 	
 	double rho =0; //charge density in cell
 	double current; // j_phi in cell
-	double **temp = this_j->get_j1();
+	double **temp = this_j->get_j2();
 	int i,k;
 
 	for (i=0;i<geom1->n_grid_1;i++)

@@ -76,7 +76,7 @@ current::~current(void)
 		delete[]j2[i];
     delete[]j2;
 
-	for (int i=0; i<(geom1->n_grid_1);i++)
+	for (int i=0; i<(geom1->n_grid_1-1);i++)
 		delete[]j3[i];
     delete[]j3;
 }
