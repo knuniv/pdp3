@@ -36,7 +36,7 @@ Particles::Particles(char* p_name, double p_charge, double p_mass, int p_number,
 
 //////////////////////////////////////////////////
 //copy constructor//
-Particles::Particles(const Particles &cp_particles)
+Particles::Particles(Particles &cp_particles)
 {
 	name = new char[strlen(cp_particles.name)];
 	strcpy(name,cp_particles.name);
@@ -106,17 +106,19 @@ double Particles::get_gamma(int i)
 
 
 
-void Particles::step_v(Triple E_compon, Triple B_compon, Time* t)
+void Particles::step_v(E_field *e_fld, H_field *h_fld, Time* t)
 {
 	int i;
 	double gamma, b1, b2, b3, e1, e2, e3, vv1, vv2, vv3;
 	const double mu0 = 1e-6;
+	Triple E_compon(0.0, 0.0, 0.0), B_compon(0.0, 0.0, 0.0);
 	double const1 = charge*t->delta_t/2.0/mass, const2;
+	if (t->current_time == t->start_time) const1 = const1/2.0;
 	for( i=0;i<number;i++)
 		//if (is_alive[i])
 		{
-//			E_compon = e_fld->get_field(x1[i],x3[i]);
-//	        B_compon = h_fld->get_field(x1[i],x3[i]);
+			E_compon = e_fld->get_field(x1[i],x3[i]);
+	        B_compon = h_fld->get_field(x1[i],x3[i]);
 			e1 = E_compon.first*const1;
 	        e2 = E_compon.second*const1;
 	        e3 = E_compon.third*const1;
@@ -238,12 +240,6 @@ void Particles::charge_weighting(charge_density* ro1)
 	double value =0;
 	double **temp = ro1->get_ro();
 	int i,k;
-
-	for (i=0;i<geom1->n_grid_1;i++)
-		for (k=0;k<geom1->n_grid_2;k++)
-			//ro1->set_ro_weighting(i,k,-temp[i][k]);
-			temp[i][k] = 0.0;
-			
 	for(i=0;i<number;i++)
 	{
             // finding number of i and k cell. example: dr = 0.5; r = 0.4; i =0
@@ -527,22 +523,6 @@ void Particles::j_weighting(Time* time1, current *j1, Particles *old_part)
 	int i,k;
 
 
-	//////////////////////////////////////
-	   //initialization//
-
-	for (i=0; i<(geom1->n_grid_1-1);i++)
-		for (k=0; k<(geom1->n_grid_2-1);k++)
-		{
-			J1[i][k]=0;
-			J3[i][k]=0;
-		}
-	 for (i=0; i<(geom1->n_grid_1-1);i++)
-		J1[i][geom1->n_grid_2-1]=0;
-
-
-	 for(k=0;k<(geom1->n_grid_2-1);k++)
-		J3[geom1->n_grid_1-1][k]=0;
-
 //////////////////////////////////////////////////////////////
 	for (i=0;i<number;i++)
 	{
@@ -760,10 +740,6 @@ void Particles::azimuthal_j_weighting(Time* time1, current *this_j)
 	double **temp = this_j->get_j2();
 	int i,k;
 
-	for (i=0;i<geom1->n_grid_1;i++)
-		for (k=0;k<geom1->n_grid_2;k++)
-			//ro1->set_ro_weighting(i,k,-temp[i][k]);
-			temp[i][k] = 0.0;
 			
 	for(i=0;i<number;i++)
 	{

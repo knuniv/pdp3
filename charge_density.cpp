@@ -49,3 +49,10 @@ void charge_density::set_ro_weighting(int i, int k, double value)
 {
 	ro[i][k]=ro[i][k]+value;
 }
+void charge_density::reset_rho()
+{
+	for (int i=0;i<geom1->n_grid_1;i++)
+		for (int k=0;k<geom1->n_grid_2;k++)
+			ro[i][k] = 0.0;
+			
+}

@@ -13,6 +13,7 @@ public:
 	void set_j1(int i, int k, double value);
 	void set_j2(int i, int k, double value);
 	void set_j3(int i, int k, double value);
+	void reset_j();
 protected:
 	double** j1;
 	double** j2;
