@@ -290,7 +290,7 @@ for( i=0;i<(geom1->n_grid_1);i++)
 	
 		for (i=0;i<geom1->n_grid_1;i++)
 		{
-			four1->fast_cosine_transform(t_charge_density, temp, i, false);
+			four1->fast_fourier_transform(t_charge_density, temp, i, false);
 		}
 
 		//sweep method//
@@ -367,7 +367,7 @@ for( i=0;i<(geom1->n_grid_1);i++)
 	for (i=0;i<geom1->n_grid_1;i++)
 		{
 			int temp=geom1->n_grid_2;
-			four1->fast_cosine_transform(fi, temp,i, true);
+			four1->fast_fourier_transform(fi, temp,i, true);
 		}
 ////////////////////////////////////////////////////////////
 
@@ -522,4 +522,39 @@ Triple E_field::get_field(double x1, double x3)
 	Triple components(er, efi, ez);
 
 	return components;
+}
+
+//poisson equation solving//
+///////////////////////////////////////////////////////////////////////////////
+bool E_field::prove_poisson_equation(Geometry* geom1, charge_density* inp_rho)
+{	
+	const double pi = 3.141592, epsilon0 = 8.85e-12;
+	int i=0;
+	int k=0;
+	double** rho=inp_rho->get_ro();
+	bool res = true;
+	double temp;
+	ofstream delta("delta");
+
+
+	//prove equation del(E) = rho/epsilon0 for each nod of the grid except those on the 
+	//boundaries
+	for (i = 1; i < geom1->n_grid_1-1; i++)
+		for (k = 1; k < geom1->n_grid_2-1; k++)
+		{
+			temp = rho[i][k]/epsilon0 - (e1[i][k] + e1[i-1][k])/(i*geom1->dr) + 
+				                      (e1[i][k] - e1[i-1][k])/geom1->dr +
+									  (e3[i][k] - e3[i][k-1])/geom1->dz ;
+			if (abs(temp) > 1e-8)
+	           res = false ;
+
+			delta<<temp<<" ";
+		}
+		delta<<"\n";
+		delta.close();
+	return res;
+
+
+
+	
 }
