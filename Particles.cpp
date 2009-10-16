@@ -533,6 +533,10 @@ void Particles::j_weighting(Time* time1, current *j1, Particles *old_part)
 		int k_n =(int)ceil((x3[i])/dr)-1;
 		int i_o = (int)ceil((x1_old)/dr)-1;
 		int k_o =(int)ceil((x3_old)/dr)-1;
+		if (x1_old==(i_o+1)*dr)
+			i_o=i_o+1;
+		if(x3_old==(k_o+1)*dz)
+			k_o=k_o+1;
 	    int res_cell = abs(i_n-i_o) + abs(k_n-k_o); 
 		if ((x1[i]==x1_old)||(x3[i]==x3_old))
 		{

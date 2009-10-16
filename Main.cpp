@@ -12,8 +12,8 @@ using namespace std;
 int main() 
 {
 	PML pml1(0.15,0.15, 0.00001,1);
-	Geometry geom1(64,256, 65, 257, &pml1);
-	Time time1(0,0, 50000e-10,1e-10);
+	Geometry geom1(256,256, 257, 257, &pml1);
+	Time time1(0,0,0, 50000e-10,1e-10);
 	E_field e_field1(&geom1);
 	H_field h_field1(&geom1);
 	Fourier four1(0);
@@ -22,6 +22,7 @@ int main()
 	ofstream out_vel("velocities");
 	ofstream out_efield("e_field");
 	ofstream out_hfield("h_field");
+	ofstream fi("fi");
 
 	current current1(&geom1);
 	charge_density rho_new(&geom1);
@@ -31,7 +32,17 @@ int main()
 	e_field1.set_homogeneous_efield(0.0, 0.0, 0.0);
 	h_field1.set_homogeneous_h(0.0, 0.0, 0.0);
 	e_field1.set_fi_on_z();
+	rho_new.set_ro_weighting(25,128,1);
 	e_field1.poisson_equation(&geom1, &rho_new);
+	for(int j=0;(j<geom1.n_grid_1);j++)
+			{
+				for(int k=0;k<(geom1.n_grid_2);k++)
+					{
+						fi<<e_field1.fi[j][k]<<" ";
+				    }
+				
+	    	}
+			fi.close();
 	geom1.set_epsilon();
 //	e_field1.set_sigma();
 
