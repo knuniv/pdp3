@@ -23,7 +23,7 @@ int main()
 	ofstream out_vel("velocities");
 	ofstream out_efield("e_field");
 	ofstream out_hfield("h_field");
-	ofstream fi("fi");
+	ofstream curr("curr");
 	ofstream rho("rho");
 
 	current current1(&geom1);
@@ -38,19 +38,13 @@ int main()
 	//////////////////////////////////////////
 	//poisson  equetion testing//
 	for(k=0;k<geom1.n_grid_2;k++)
-		rho_new.set_ro_weighting(25,k,1);
+		rho_new.set_ro_weighting(25,k,1e-7);
 
-	e_field1.poisson_equation(&geom1,&rho_new);
-	bool res1 = e_field1.prove_poisson_equation(&geom1,&rho_new);
+	e_field1.poisson_equation2(&geom1,&rho_new);
+	bool res1 = e_field1.test_poisson_equation(&rho_new);
 //////////////////////////////////////////////////////
-//////////////////////////////////////////////////////
-	
-						fi<<e_field1.fi[j][k]<<" ";
-				    }
-				
-	    	}
-			fi.close();
-	geom1.set_epsilon();
+
+	geom1.set_epsilon() ;
 //	e_field1.set_sigma();
     int n_species = 2 ;
 	Particles *new_particles = new Particles[1];
@@ -96,7 +90,7 @@ int main()
 	//solve Poisson equation
 	e_field1.poisson_equation(&geom1, &rho_new);
 
-	bool res2 = e_field1.prove_poisson_equation(&geom1, &rho_new);
+	bool res2 = e_field1.test_poisson_equation(&rho_new);
 
 
 	//relaxation period

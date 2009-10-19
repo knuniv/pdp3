@@ -290,6 +290,7 @@ for( i=0;i<(geom1->n_grid_1);i++)
 	
 		for (i=0;i<geom1->n_grid_1;i++)
 		{
+			//four1->fast_cosine_transform(t_charge_density, temp, i, false);
 			four1->fast_fourier_transform(t_charge_density, temp, i, false);
 		}
 
@@ -330,11 +331,12 @@ for( i=0;i<(geom1->n_grid_1);i++)
 
 	//call function for inverse cosine transform//
 ////////////////////////////////////////////////////////////
-	//for (i=0;i<geom1->n_grid_1;i++)
-	//	{
-	//		int temp=geom1->n_grid_2;
-	//		four1->fast_cosine_transform(fi, temp,i, true);
-	//	}
+	for (i=0;i<geom1->n_grid_1;i++)
+		{
+			int temp=geom1->n_grid_2;
+			//four1->fast_cosine_transform(fi, temp,i, true);
+			four1->fast_fourier_transform(fi, temp,i, true);
+		}
 ////////////////////////////////////////////////////////////
 
 
@@ -358,6 +360,110 @@ for( i=0;i<(geom1->n_grid_1);i++)
 }
 /////////////////////////////////////////////////////////////
 
+//poisson equation solving 2//
+///////////////////////////////////////////////////////////////////////////////
+void E_field::poisson_equation2(Geometry* geom1, charge_density* ro1)
+{	
+	const double pi = 3.141592;
+	int i=0;
+	int k=0;
+	double a=0;
+	double c=0;
+	double b=0;
+	double f=0;
+	double* alpha = new double [geom1->n_grid_1];
+	double* beta = new double [geom1->n_grid_1];
+	double dr2 = geom1->dr*geom1->dr;
+	Fourier* four1=0;
+	double** ro=ro1->get_ro();
+
+
+	//call function for cosine transform//
+////////////////////////////////////////////////
+////////////////////////////////////////////////
+
+///////////////////////////////////////////////
+		//copy charge_density array in to temp array//
+for( i=0;i<(geom1->n_grid_1);i++)
+	for( k=0;k<(geom1->n_grid_2);k++)
+	{
+		t_charge_density[i][k]= ro[i][k];
+	}
+	
+	int temp=geom1->n_grid_2;
+	
+		for (i=0;i<geom1->n_grid_1;i++)
+		{
+			//four1->fast_cosine_transform(t_charge_density, temp, i, false);
+			four1->fast_fourier_transform(t_charge_density, temp, i, false);
+		}
+
+		//sweep method//
+//////////////////////////////////////////////////////////////////
+
+	for( k=0;k<(geom1->n_grid_2);k++)
+	{
+			c=(cos(2*pi*k/geom1->n_grid_1) - 1.0 - 2.0/dr2);
+
+		double b1 = -1.0;
+		double c1 = 1.0;
+		double f1 = dr2*t_charge_density[0][k]/epsilon0/4.0;
+		alpha[1] = -b1/c1;
+		beta[1] = f1/c1;
+
+			for ( i=1;i<(geom1->n_grid_1-1);i++)
+			  {	
+			//ay-1 + cy + by+1= = f//
+				
+				a = (1.0-1.0/(2.0*(i)))/dr2;
+
+				b = (1.0+1.0/(2.0*(i)))/dr2;
+				f = -t_charge_density[i][k]/epsilon0;
+
+				alpha[i+1] = -b/(alpha[i]*a + c);
+				beta[i+1]  = (f-beta[i]*a)/(alpha[i]*a + c);
+
+			  }
+		   
+				fi[geom1->n_grid_1-2][k]= ((-t_charge_density[0][k]/epsilon0+
+					                      b*fi[geom1->n_grid_1-1][k])-a*beta[geom1->n_grid_1-2])/(a*alpha[geom1->n_grid_1-2]+c);
+
+				for(i=(geom1->n_grid_1-3);i>=0;i--)
+				 {
+					fi[i][k]=beta[i+1]+alpha[i+1]*fi[i+1][k];
+				 }
+	}
+
+	//call function for inverse cosine transform//
+////////////////////////////////////////////////////////////
+	for (i=0;i<geom1->n_grid_1;i++)
+		{
+			int temp=geom1->n_grid_2;
+			//four1->fast_cosine_transform(fi, temp,i, true);
+			four1->fast_fourier_transform(fi, temp,i, true);
+		}
+////////////////////////////////////////////////////////////
+
+
+	//calculate electric field//
+///////////////////////////////////////////////////////////
+	for (i=0;i<(geom1->n_grid_1-1);i++)
+		for (k=1;k<(geom1->n_grid_2);k++)
+			{
+				e1[i][k]=(fi[i][k]-fi[i+1][k])/geom1->dr;
+			}
+
+	for (i=0;i<(geom1->n_grid_1);i++)
+		for (k=1;k<(geom1->n_grid_2-1);k++)
+			{
+				e3[i][k]=(fi[i][k]-fi[i][k+1])/geom1->dz;
+			}
+////////////////////////////////////////////////////////////
+
+ delete [] alpha;
+ delete [] beta;
+}
+/////////////////////////////////////////////////////////////
 
 
 
@@ -508,16 +614,6 @@ bool E_field::test_poisson_equation(charge_density *rho)
 			delta<<a<<" ";
 		}
 	delta.close();
- return res;
-				                      (e1[i][k] - e1[i-1][k])/geom1->dr +
-									  (e3[i][k] - e3[i][k-1])/geom1->dz ;
-			if (abs(temp) > 1e-8)
-	           res = false ;
-
-			delta<<temp<<" ";
-		}
-		delta<<"\n";
-		delta.close();
 	return res;
 
 
