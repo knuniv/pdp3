@@ -23,7 +23,7 @@ int main()
 	ofstream out_vel("velocities");
 	ofstream out_efield("e_field");
 	ofstream out_hfield("h_field");
-    ofstream curr("er");
+	ofstream fi("fi");
 	ofstream rho("rho");
 
 	current current1(&geom1);
@@ -45,6 +45,11 @@ int main()
 //////////////////////////////////////////////////////
 //////////////////////////////////////////////////////
 	
+						fi<<e_field1.fi[j][k]<<" ";
+				    }
+				
+	    	}
+			fi.close();
 	geom1.set_epsilon();
 //	e_field1.set_sigma();
     int n_species = 2 ;
