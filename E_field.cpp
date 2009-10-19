@@ -2,7 +2,7 @@
 #include "H_field.h"
 #include "Math.h"
 #include "Fourier.h"
-
+#include <fstream>
 E_field::E_field(): epsilon0(8.85E-12)
 {
 }
@@ -302,73 +302,39 @@ for( i=0;i<(geom1->n_grid_1);i++)
 			d=geom1->dr*geom1->dr*t_charge_density[0][k]/epsilon0;
 			alpha[1]=4.0/(2.0+b);
 			beta[1]=d/(2.0+b);
-			for ( i=2;i<(geom1->n_grid_1-1);i++)
+		//double a1 = 0.5;
+		//double c1 = 1.5;
+		//alpha[2] = c1/(a1-b);
+		//beta[2] = (4.0*t_charge_density[1][k]+a1*t_charge_density[0][k]*geom1->dr*geom1->dr)/(4.0*epsilon0*(b-a1));
+
+			for ( i=1;i<(geom1->n_grid_1-1);i++)
 			  {	
 			//ay-1 - by + cy+1= = -d//
 				
-				a = 1.0-1.0/(2.0*(i-1));
-				c = 1.0+1.0/(2.0*(i-1));
-				d = geom1->dr*geom1->dr*t_charge_density[i-1][k]/epsilon0;
+				a = 1.0-1.0/(2.0*(i));
+				c = 1.0+1.0/(2.0*(i));
+				d = geom1->dr*geom1->dr*t_charge_density[i][k]/epsilon0;
 
-				alpha[i] = c/(b-alpha[i-1]*a);
-				beta[i]  = (d+beta[i-1]*a)/(b-alpha[i-1]*a);
+				alpha[i+1] = c/(b-alpha[i]*a);
+				beta[i+1]  = (d+beta[i]*a)/(b-alpha[i]*a);
 
 			  }
-			 //   i=geom1->n_grid_1;
-				//a = 1.0-1.0/(2.0*(i-1));
-				//c = 1.0+1.0/(2.0*(i-1));
-				//d = geom1->dr*geom1->dr*charge_density[i-1][k]/epsilon0;
-			   
-				fi[geom1->n_grid_1-2][k]= -d-c*fi[geom1->n_grid_1-1][k]-a*beta[geom1->n_grid_1-2]/(a*alpha[geom1->n_grid_1-2]-b);
+		   
+				//fi[geom1->n_grid_1-2][k]= -d-c*fi[geom1->n_grid_1-1][k]-a*beta[geom1->n_grid_1-2]/(a*alpha[geom1->n_grid_1-2]-b);
 
-				for(i=(geom1->n_grid_1-3);i>=0;i--)
+				for(i=(geom1->n_grid_1-2);i>=0;i--)
 				 {
 					fi[i][k]=beta[i+1]+alpha[i+1]*fi[i+1][k];
 				 }
 	}
 
-
-
-//		
-//for( k=0;k<(geom1->n_grid_2);k++)
-//{
-//	double* c = new double [geom1->n_grid_1];
-//	double* d = new double [geom1->n_grid_1];
-//	double* a = new double [geom1->n_grid_1];
-//	double* b = new double [geom1->n_grid_1];
-//	for ( i=1;i<(geom1->n_grid_1);i++)
-//	{
-//			a[i] = 1.0-1.0/(2.0*(i));
-//			c[i] = 1.0+1.0/(2.0*(i));
-//			d[i]=-geom1->dr*geom1->dr*charge_density[i][k]/epsilon0;
-//			b[i]=-2.0- pow((geom1->dr*pi*k/(geom1->dz*geom1->n_grid_2)),2);
-//	}
-//	b[0]=-2.0- pow((geom1->dr*pi*k/(geom1->dz*geom1->n_grid_2)),2);
-//    c[0] =4/(-2+b[0]) ;
-//	d[0]=geom1->dr*geom1->dr*charge_density[0][k]/epsilon0;
-//	d[0]=d[0]/(-2+b[0]);
-//
-//	for(i = 1; i < geom1->n_grid_1; i++)
-//	{
-//	double id = (b[i] - c[i-1] * a[i]);	/* Division by zero risk. */
-//	c[i] /= id;				/* Last value calculated is redundant. */
-//	d[i] = (d[i] - d[i-1] * a[i])/id;
-//	}
-//	fi[geom1->n_grid_1 - 1][k] = 0;
-//	for(i = geom1->n_grid_1 - 2; i >= 0; i--)
-//		fi[i][k] = d[i] - c[i] * fi[i + 1][k];
-//
-//}
-
-
-
 	//call function for inverse cosine transform//
 ////////////////////////////////////////////////////////////
-	for (i=0;i<geom1->n_grid_1;i++)
-		{
-			int temp=geom1->n_grid_2;
-			four1->fast_cosine_transform(fi, temp,i, true);
-		}
+	//for (i=0;i<geom1->n_grid_1;i++)
+	//	{
+	//		int temp=geom1->n_grid_2;
+	//		four1->fast_cosine_transform(fi, temp,i, true);
+	//	}
 ////////////////////////////////////////////////////////////
 
 
@@ -522,4 +488,25 @@ Triple E_field::get_field(double x1, double x3)
 	Triple components(er, efi, ez);
 
 	return components;
+}
+bool E_field::test_poisson_equation(charge_density *rho)
+{
+	int i=0, k=0;
+	double dr = geom1->dr;
+	double dz = geom1->dz;
+	double accur =10e-10;
+	double a=0;
+	bool res =true;
+	double **rho1 = rho->get_ro();
+	ofstream delta("delta");
+	for (i=1;i<geom1->n_grid_1-1;i++)
+		for (k=1;k<geom1->n_grid_2-1;k++)
+		{
+			a = rho1[i][k]/epsilon0 - (e1[i][k]+e1[i-1][k])/(i*2.0*dr) - (e1[i][k]-e1[i-1][k])/(dr)-(e3[i][k]-e3[i][k-1])/dz;
+			if (abs(a)>accur)
+				res=false;
+			delta<<a<<" ";
+		}
+	delta.close();
+ return res;
 }
