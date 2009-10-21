@@ -32,17 +32,26 @@ int main()
 	e_field1.set_homogeneous_efield(0.0, 0.0, 0.0);
 	h_field1.set_homogeneous_h(0.0, 0.0, 0.0);
 	e_field1.set_fi_on_z();
-	rho_new.set_ro_weighting(25,128,1);
+
+	//////////////////////////////////////
+	ofstream rho("rho");
+	rho_new.set_ro_weighting(50,128,1e-6);
 	e_field1.poisson_equation(&geom1, &rho_new);
 	for(int j=0;(j<geom1.n_grid_1);j++)
 			{
 				for(int k=0;k<(geom1.n_grid_2);k++)
 					{
 						fi<<e_field1.fi[j][k]<<" ";
+						rho<<e_field1.t_charge_density[j][k]<<" ";
+
 				    }
 				
 	    	}
-			fi.close();
+	rho.close();
+	fi.close();
+	bool res1 = e_field1.test_poisson_equation(&rho_new);
+
+////////////////////////////////////////////////
 	geom1.set_epsilon();
 //	e_field1.set_sigma();
 
