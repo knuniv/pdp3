@@ -27,6 +27,7 @@ public:
 	 void calc_field(H_field* h_field1, Time* time1, current* current1, PML* pml1);
 	 void calc_field(H_field* h_field1, Time* time1, current* current1);
 	 void poisson_equation(Geometry* geom1, charge_density* ro1);
+	 void E_field::poisson_equation2(Geometry* geom1, charge_density* ro1);
 	 void cosine_ftansfrom(double** fi_ro, int lenght_n, int k);
 	 void set_homogeneous_efield(double E1, double E2, double E3);
 	 void set_fi_on_z();

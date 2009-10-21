@@ -11,18 +11,20 @@
 using namespace std;
 int main() 
 {
-	PML pml1(0.15,0.15, 0.00001,1);
-	Geometry geom1(256,256, 257, 257, &pml1);
-	Time time1(0,0,0, 50000e-10,1e-10);
+	PML pml1(0.15,0.15, 0.0000001, 0.15);
+	Geometry geom1(127,127, 128, 128, &pml1);
+	Time time1(0,0, 10000e-10,10000e-10,1e-10);
 	E_field e_field1(&geom1);
 	H_field h_field1(&geom1);
 	Fourier four1(0);
 	bool res = true;
+	int  k, i;
     ofstream out_coord("coords");
 	ofstream out_vel("velocities");
 	ofstream out_efield("e_field");
 	ofstream out_hfield("h_field");
-	ofstream fi("fi");
+	ofstream curr("curr");
+	ofstream rho("rho");
 
 	current current1(&geom1);
 	charge_density rho_new(&geom1);
@@ -32,46 +34,84 @@ int main()
 	e_field1.set_homogeneous_efield(0.0, 0.0, 0.0);
 	h_field1.set_homogeneous_h(0.0, 0.0, 0.0);
 	e_field1.set_fi_on_z();
+	///////////////////////////////////////////
+	//////////////////////////////////////////
+	//poisson  equetion testing//
+	for(k=0;k<geom1.n_grid_2;k++)
+		rho_new.set_ro_weighting(25,k,1e-7);
 
-	//////////////////////////////////////
-	ofstream rho("rho");
-	rho_new.set_ro_weighting(50,128,1e-6);
-	e_field1.poisson_equation(&geom1, &rho_new);
-	for(int j=0;(j<geom1.n_grid_1);j++)
-			{
-				for(int k=0;k<(geom1.n_grid_2);k++)
-					{
-						fi<<e_field1.fi[j][k]<<" ";
+	e_field1.poisson_equation2(&geom1,&rho_new);
+	bool res1 = e_field1.test_poisson_equation(&rho_new);
+//////////////////////////////////////////////////////
 						rho<<e_field1.t_charge_density[j][k]<<" ";
 
-				    }
-				
-	    	}
+
 	rho.close();
-	fi.close();
 	bool res1 = e_field1.test_poisson_equation(&rho_new);
 
 ////////////////////////////////////////////////
-	geom1.set_epsilon();
+	geom1.set_epsilon() ;
 //	e_field1.set_sigma();
+    int n_species = 2 ;
+	Particles *new_particles = new Particles[1];
+	Particles *old_particles = new Particles[1];
+	Particles new_electrons("electrons", -1e2, 1, 1, &geom1), old_electrons("electrons", -1e2, 1, 1, &geom1),
+		      new_positrons("positrons", 1e2, 1, 1, &geom1), old_positrons("positrons", 1e2, 1, 1, &geom1);
 
-	Particles new_particles("ions", 1.6e5, 1, 1, &geom1), old_particles("ions", 1, 1, 1, &geom1);
+	new_particles[0] = new_electrons;
+	old_particles[0] = old_electrons;
+    new_particles[1] = new_positrons;
+    old_particles[1] = old_positrons;
 	//////////////////////
+
 	
  	//////////////////////
 
 
+    //two particles test
+	new_particles[0].x1[0] = 16.0001;
+    new_particles[0].x3[0] = 55.0001;
+	new_particles[0].v1[0] = 0.0;
+	new_particles[0].v2[0] = 0.0;
+	new_particles[0].v3[0] = 1.0e6;
 
-	new_particles.x1[0] = 20.000;
-    new_particles.x3[0] = 12.000;
-	new_particles.v1[0] = 0.0;
-	new_particles.v2[0] = 1e6;
-	new_particles.v3[0] = 0.0;
-	new_particles.charge_weighting(&rho_new);
-	//res =  continuity_equation(&time1, &geom1, &current1, &rho_old, &rho_new);
+	new_particles[1].x1[0] = 16.0001;
+    new_particles[1].x3[0] = 65.0001;
+	new_particles[1].v1[0] = 0.0;
+	new_particles[1].v2[0] = 0.0;
+	new_particles[1].v3[0] = 0.0;
+    //////////////////////////
+
 
 	//0. Half step back
-	current1.set_j2(12,20,1e-0);
+
+	//weight currents and charges before relaxation period
+	for (k=0; k<n_species; k++)
+	{
+		new_particles[k].azimuthal_j_weighting(&time1, &current1);
+		new_particles[k].j_weighting(&time1,&current1,&old_particles[k]);
+		new_particles[k].charge_weighting(&rho_new);
+	}
+
+	//solve Poisson equation
+	e_field1.poisson_equation(&geom1, &rho_new);
+
+	bool res2 = e_field1.test_poisson_equation(&rho_new);
+
+
+	//relaxation period
+	while (time1.current_time < time1.relaxation_time)
+	{
+        //1. Calculate H field
+		h_field1.calc_field(&e_field1, &time1);
+
+        //2. Calculate E
+        e_field1.calc_field(&h_field1, &time1, &current1, &pml1);
+		time1.current_time = time1.current_time + time1.delta_t;
+		
+       
+	}
+	time1.current_time = 0.0 ;
      
     while (time1.current_time < time1.end_time)
 	{
@@ -79,27 +119,36 @@ int main()
 		h_field1.calc_field(&e_field1, &time1);
 
 		//2. Calculate v
-		/*new_particles.step_v(e_field1.get_field(new_particles.x1[0], new_particles.x3[0]),
-			                 h_field1.get_field(new_particles.x1[0], new_particles.x3[0]), &time1);*/
+		current1.reset_j();
+		rho_old.reset_rho();
+		for (k=0; k<n_species; k++)
+		{
+			new_particles[k].step_v(&e_field1, &h_field1, &time1);
 
 		//3. Calculate x, calculate J
-		//old_particles.x1[0] = new_particles.x1[0];
-		//old_particles.x3[0] = new_particles.x3[0];
-		//new_particles.charge_weighting(&rho_old);  //continuity equation
-        //new_particles.half_step_coord(&time1);
-		//new_particles.azimuthal_j_weighting(&time1, &current1);
-		//new_particles.half_step_coord(&time1);
-		//new_particles.j_weighting(&time1,&current1,&old_particles);
+			for (i = 0; i< new_particles[k].number; i++)
+			{
+				old_particles[k].x1[i] = new_particles[k].x1[i];
+				old_particles[k].x3[i] = new_particles[k].x3[i];
+			}
+			new_particles[k].charge_weighting(&rho_old);  //continuity equation
+			new_particles[k].half_step_coord(&time1);
+			new_particles[k].azimuthal_j_weighting(&time1, &current1);
+			new_particles[k].half_step_coord(&time1);
+			new_particles[k].j_weighting(&time1,&current1,&old_particles[k]);
+		}
 
         //4. Calculate E
         e_field1.calc_field(&h_field1, &time1, &current1, &pml1);
 		
         //continuity equation
-		//new_particles.charge_weighting(&rho_new);  //continuity equation
-		//res =  continuity_equation(&time1, &geom1, &current1, &rho_old, &rho_new); 
+		rho_new.reset_rho();
+		for (k=0; k<n_species; k++)
+			new_particles[k].charge_weighting(&rho_new);  //continuity equation
+		res =  continuity_equation(&time1, &geom1, &current1, &rho_old, &rho_new); 
 
-		out_coord<<new_particles.x1[0]<<" "<<new_particles.x3[0]<<" ";
-		out_vel<<new_particles.v1[0]<<" "<<new_particles.v2[0]<<" "<<new_particles.v3[0]<<" ";
+		out_coord<<new_particles[0].x1[0]<<" "<<new_particles[0].x3[0]<<" ";
+		out_vel<<new_particles[0].v1[0]<<" "<<new_particles[0].v2[0]<<" "<<new_particles[0].v3[0]<<" ";
 		
 		if ((((int)(time1.current_time/time1.delta_t)%1000)==0))
 		{
@@ -109,7 +158,9 @@ int main()
 				for(int k=0;k<(geom1.n_grid_2-1);k++)
 					{
 						out_efield<<e_field1.e3[j][k]<<" ";
-						out_hfield<<h_field1.h3[j][k]<<" ";
+						out_hfield<<h_field1.h2[j][k]<<" ";
+						curr<<e_field1.e1[j][k]<<" ";
+						rho<<rho_new.get_ro()[j][k]<<" ";
 				    }
 	    	}
 			out_efield<<"\n"; 
@@ -129,4 +180,6 @@ out_efield.close();
 out_hfield.close();
 out_vel.close();
 out_coord.close();
+curr.close();
+rho.close();
 };
