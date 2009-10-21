@@ -32,6 +32,7 @@ public:
 	 void set_fi_on_z();
 	 void boundary_conditions();
 	 Triple get_field(double x1, double x3);
+	 bool test_poisson_equation(charge_density* rho);
 
 	
 
