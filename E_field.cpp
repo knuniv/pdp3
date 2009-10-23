@@ -416,7 +416,7 @@ void E_field::poisson_equation2(Geometry* geom1, charge_density* ro1)
 		for (i = 1; i < geom1->n_grid_1 -1; i++)
 		{
 			a[i] = (1.0 - 1.0/2.0/(double)i);
-			b[i] = -2.0;
+			b[i] = -2.0 + 2.0*(cos(pi*k/geom1->n_grid_2) - 1)/(geom1->dz*geom1->dz);
 			c[i] = (1.0 + 1.0/2.0/(double)i);
 			d[i] = t_charge_density[i][k]*dr2/epsilon0;
 			c1[i] = (1.0 - 1.0/2.0/(double)i);
@@ -615,7 +615,7 @@ bool E_field::test_poisson_equation(charge_density *rho)
 	int i=0, k=0;
 	double dr = geom1->dr;
 	double dz = geom1->dz;
-	double accur =10e-10;
+	double accur =1e-10;
 	double a=0;
 	bool res =true;
 	double **rho1 = rho->get_ro();
@@ -623,10 +623,6 @@ bool E_field::test_poisson_equation(charge_density *rho)
 	for (i=1;i<geom1->n_grid_1-1;i++)
 		for (k=1;k<geom1->n_grid_2-1;k++)
 		{
-			double t1 = rho1[i][k]/epsilon0;
-			double t2 = (e1[i][k]+e1[i-1][k])/(i*2.0*dr);
-            double t3 = (e1[i][k]-e1[i-1][k])/(dr);
-			double t4 = (e3[i][k]-e3[i][k-1])/dz;
 			a = -rho1[i][k]/epsilon0 - (e1[i][k]+e1[i-1][k])/(i*2.0*dr) - (e1[i][k]-e1[i-1][k])/(dr)-(e3[i][k]-e3[i][k-1])/dz;
 			if (abs(a)>accur)
 				res=false;

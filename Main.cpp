@@ -36,12 +36,12 @@ int main()
 	///////////////////////////////////////////
 //	////////////////////////////////////////
 //	poisson  equetion testing//
-	for(k=0;k<geom1.n_grid_2;k++)
-		rho_new.set_ro_weighting(0,k,1e-7);
+	//for(k=0;k<geom1.n_grid_2;k++)
+	//	rho_new.set_ro_weighting(0,k,1e-7);
 
-	e_field1.poisson_equation2(&geom1,&rho_new);
-	//e_field1.poisson_equation(&geom1,&rho_new);
-	bool res1 = e_field1.test_poisson_equation(&rho_new);
+	//e_field1.poisson_equation2(&geom1,&rho_new);
+	////e_field1.poisson_equation(&geom1,&rho_new);
+	//bool res1 = e_field1.test_poisson_equation(&rho_new);
 //////////////////////////////////////////////////////
 
 ////////////////////////////////////////////////
@@ -90,6 +90,7 @@ int main()
 
 	//solve Poisson equation
 	e_field1.poisson_equation2(&geom1, &rho_new);
+	bool res1 = e_field1.test_poisson_equation(&rho_new);
 	
 	//relaxation period
 	while (time1.current_time < time1.relaxation_time)
