@@ -12,8 +12,8 @@ using namespace std;
 int main() 
 {
 	PML pml1(0.15,0.15, 0.0000001, 0.15);
-	Geometry geom1(127,127, 128, 128, &pml1);
-	Time time1(0,0, 10000e-10,10000e-10,1e-10);
+	Geometry geom1(128,128, 129, 129, &pml1);
+	Time time1(0,0,0,2000e-10,1e-10);
 	E_field e_field1(&geom1);
 	H_field h_field1(&geom1);
 	Fourier four1(0);
@@ -24,7 +24,6 @@ int main()
 	ofstream out_efield("e_field");
 	ofstream out_hfield("h_field");
 	ofstream curr("curr");
-	ofstream rho("rho");
 
 	current current1(&geom1);
 	charge_density rho_new(&geom1);
@@ -35,19 +34,15 @@ int main()
 	h_field1.set_homogeneous_h(0.0, 0.0, 0.0);
 	e_field1.set_fi_on_z();
 	///////////////////////////////////////////
-	//////////////////////////////////////////
-	//poisson  equetion testing//
-	for(k=0;k<geom1.n_grid_2;k++)
-		rho_new.set_ro_weighting(25,k,1e-7);
-
-	e_field1.poisson_equation2(&geom1,&rho_new);
-	bool res1 = e_field1.test_poisson_equation(&rho_new);
+//	////////////////////////////////////////
+//	poisson  equetion testing//
+//	for(k=0;k<geom1.n_grid_2;k++)
+//		rho_new.set_ro_weighting(25,k,1e-7);
+//
+//	e_field1.poisson_equation2(&geom1,&rho_new);
+//	e_field1.poisson_equation(&geom1,&rho_new);
+//	bool res1 = e_field1.test_poisson_equation(&rho_new);
 //////////////////////////////////////////////////////
-						rho<<e_field1.t_charge_density[j][k]<<" ";
-
-
-	rho.close();
-	bool res1 = e_field1.test_poisson_equation(&rho_new);
 
 ////////////////////////////////////////////////
 	geom1.set_epsilon() ;
@@ -96,9 +91,7 @@ int main()
 	//solve Poisson equation
 	e_field1.poisson_equation(&geom1, &rho_new);
 
-	bool res2 = e_field1.test_poisson_equation(&rho_new);
-
-
+	
 	//relaxation period
 	while (time1.current_time < time1.relaxation_time)
 	{
@@ -160,11 +153,12 @@ int main()
 						out_efield<<e_field1.e3[j][k]<<" ";
 						out_hfield<<h_field1.h2[j][k]<<" ";
 						curr<<e_field1.e1[j][k]<<" ";
-						rho<<rho_new.get_ro()[j][k]<<" ";
+						
 				    }
 	    	}
 			out_efield<<"\n"; 
 			out_hfield<<"\n"; 
+	        
 		}
 		time1.current_time = time1.current_time + time1.delta_t;
 		if (!res)
@@ -181,5 +175,5 @@ out_hfield.close();
 out_vel.close();
 out_coord.close();
 curr.close();
-rho.close();
+
 };

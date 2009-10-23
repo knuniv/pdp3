@@ -239,7 +239,7 @@ void Particles::charge_weighting(charge_density* ro1)
 	
 	double value =0;
 	double **temp = ro1->get_ro();
-	int i,k;
+	int i;
 	for(i=0;i<number;i++)
 	{
             // finding number of i and k cell. example: dr = 0.5; r = 0.4; i =0
@@ -520,7 +520,7 @@ void Particles::j_weighting(Time* time1, current *j1, Particles *old_part)
 	double **J1 = j1->get_j1();
 	double **J2 = j1->get_j2();
 	double **J3 = j1->get_j3();
-	int i,k;
+	int i;
 
 
 //////////////////////////////////////////////////////////////
@@ -742,7 +742,7 @@ void Particles::azimuthal_j_weighting(Time* time1, current *this_j)
 	double rho =0; //charge density in cell
 	double current; // j_phi in cell
 	double **temp = this_j->get_j2();
-	int i,k;
+	int i;
 
 			
 	for(i=0;i<number;i++)

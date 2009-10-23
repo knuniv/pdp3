@@ -274,10 +274,6 @@ void E_field::poisson_equation(Geometry* geom1, charge_density* ro1)
 	double** ro=ro1->get_ro();
 
 
-	//call function for cosine transform//
-////////////////////////////////////////////////
-////////////////////////////////////////////////
-
 ///////////////////////////////////////////////
 		//copy charge_density array in to temp array//
 for( i=0;i<(geom1->n_grid_1);i++)
@@ -286,12 +282,17 @@ for( i=0;i<(geom1->n_grid_1);i++)
 		t_charge_density[i][k]= ro[i][k];
 	}
 	
+
+	//call function for cosine transform//
+////////////////////////////////////////////////
+////////////////////////////////////////////////
+
 	int temp=geom1->n_grid_2;
 	
 		for (i=0;i<geom1->n_grid_1;i++)
 		{
-			//four1->fast_cosine_transform(t_charge_density, temp, i, false);
-			four1->fast_fourier_transform(t_charge_density, temp, i, false);
+			four1->fast_cosine_transform(t_charge_density, temp, i, false);
+			//four1->fast_fourier_transform(t_charge_density, temp, i, false);
 		}
 
 		//sweep method//
@@ -299,7 +300,8 @@ for( i=0;i<(geom1->n_grid_1);i++)
 
 	for( k=0;k<(geom1->n_grid_2);k++)
 	{
-			b=2.0+ pow((geom1->dr*pi*k/(geom1->dz*geom1->n_grid_2)),2);
+			//b=2.0+ pow((geom1->dr*pi*k/(geom1->dz*geom1->n_grid_2)),2);
+	    	b = 2.0 - 2.0*(cos(pi*k/geom1->n_grid_2) - 1)/(geom1->dz*geom1->dz);
 			d=geom1->dr*geom1->dr*t_charge_density[0][k]/epsilon0;
 			alpha[1]=4.0/(2.0+b);
 			beta[1]=d/(2.0+b);
@@ -334,8 +336,8 @@ for( i=0;i<(geom1->n_grid_1);i++)
 	for (i=0;i<geom1->n_grid_1;i++)
 		{
 			int temp=geom1->n_grid_2;
-			//four1->fast_cosine_transform(fi, temp,i, true);
-			four1->fast_fourier_transform(fi, temp,i, true);
+			four1->fast_cosine_transform(fi, temp,i, true);
+			//four1->fast_fourier_transform(fi, temp,i, true);
 		}
 ////////////////////////////////////////////////////////////
 
