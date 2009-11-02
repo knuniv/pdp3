@@ -261,7 +261,7 @@ void E_field::set_fi_on_z()
 ///////////////////////////////////////////////////////////////////////////////
 void E_field::poisson_equation(Geometry* geom1, charge_density* ro1)
 {	
-	const double pi = 3.141592;
+	const double pi = 3.14159265358979;
 	int i=0;
 	int k=0;
 	double a=0;
@@ -366,7 +366,7 @@ for( i=0;i<(geom1->n_grid_1);i++)
 ///////////////////////////////////////////////////////////////////////////////
 void E_field::poisson_equation2(Geometry* geom1, charge_density* ro1)
 {	
-	const double pi = 3.141592, epsilon0 = 8.85e-12;
+	const double pi = 3.14159265358979, epsilon0 = 8.85e-12;
 	int i=0;
 	int k=0;
 	double phi0(0.0);
@@ -444,6 +444,7 @@ void E_field::poisson_equation2(Geometry* geom1, charge_density* ro1)
 		}
 ////////////////////////////////////////////////////////////
 	
+
 
 	//calculate electric field//
 ///////////////////////////////////////////////////////////

@@ -3,7 +3,7 @@
 #include "H_field.h"
 #include "Time.h"
 #include "Triple.h"
-#define  pi 3.14159265
+#define  pi 3.14159265358979
 using namespace std;
 //#include "stdafx.h"
 
@@ -67,12 +67,12 @@ Particles::Particles(Particles &cp_particles)
 Particles::~Particles()
 {
 
-    delete [] x1;
-	delete [] x3;
-	delete [] v1;
-	delete [] v2;
-	delete [] v3;
-	delete [] is_alive;
+ //   delete [] x1;
+	//delete [] x3;
+	//delete [] v1;
+	//delete [] v2;
+	//delete [] v3;
+	//delete [] is_alive;
 };
 ///////////////////////////////////////////////////////
 
