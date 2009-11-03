@@ -13,7 +13,7 @@ int main()
 {
 	PML pml1(0.15,0.15, 0.0000001, 0.15);
 	Geometry geom1(128,128, 129, 129, &pml1);
-	Time time1(0,0,0,2000e-10,1e-10);
+	Time time1(0,0,0,200e-10,1e-10);
 	E_field e_field1(&geom1);
 	H_field h_field1(&geom1);
 	Fourier four1(0);
@@ -50,8 +50,8 @@ int main()
     int n_species = 2 ;
 	Particles *new_particles = new Particles[1];
 	Particles *old_particles = new Particles[1];
-	Particles new_electrons("electrons", -1e2, 1, 1, &geom1), old_electrons("electrons", -1e2, 1, 1, &geom1),
-		      new_positrons("positrons", 1e2, 1, 1, &geom1), old_positrons("positrons", 1e2, 1, 1, &geom1);
+	Particles new_electrons("electrons", -1e7, 1, 1, &geom1), old_electrons("electrons", -1e7, 1, 1, &geom1),
+		      new_positrons("positrons", 1e7, 1, 1, &geom1), old_positrons("positrons", 1e7, 1, 1, &geom1);
 
 	new_particles[0] = new_electrons;
 	old_particles[0] = old_electrons;
@@ -143,7 +143,7 @@ int main()
 		out_coord<<new_particles[0].x1[0]<<" "<<new_particles[0].x3[0]<<" ";
 		out_vel<<new_particles[0].v1[0]<<" "<<new_particles[0].v2[0]<<" "<<new_particles[0].v3[0]<<" ";
 		
-		if ((((int)(time1.current_time/time1.delta_t)%1000)==0))
+		if ((((int)(time1.current_time/time1.delta_t))==0))
 		{
 			cout<<time1.current_time<<" ";
 			for(int j=0;(j<geom1.n_grid_1-1);j++)
