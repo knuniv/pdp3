@@ -34,6 +34,7 @@ public:
 	 void boundary_conditions();
 	 Triple get_field(double x1, double x3);
 	 bool test_poisson_equation(charge_density* rho);
+	 void TridiagonalSolve(const double *a, const double *b, double *c, double *d, double *x, unsigned int n);
 
 	
 

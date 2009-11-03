@@ -261,7 +261,7 @@ void E_field::set_fi_on_z()
 ///////////////////////////////////////////////////////////////////////////////
 void E_field::poisson_equation(Geometry* geom1, charge_density* ro1)
 {	
-	const double pi = 3.141592;
+	const double pi = 3.14159265358979;
 	int i=0;
 	int k=0;
 	double a=0;
@@ -366,85 +366,84 @@ for( i=0;i<(geom1->n_grid_1);i++)
 ///////////////////////////////////////////////////////////////////////////////
 void E_field::poisson_equation2(Geometry* geom1, charge_density* ro1)
 {	
-	const double pi = 3.141592;
+	const double pi = 3.14159265358979, epsilon0 = 8.85e-12;
 	int i=0;
 	int k=0;
-	double a=0;
-	double c=0;
-	double b=0;
-	double f=0;
-	double* alpha = new double [geom1->n_grid_1];
-	double* beta = new double [geom1->n_grid_1];
-	double dr2 = geom1->dr*geom1->dr;
+	double phi0(0.0);
+	double *a = new double [geom1->n_grid_1];
+	double *b = new double [geom1->n_grid_1];
+	double *c = new double [geom1->n_grid_1];
+	double *d = new double [geom1->n_grid_1];
+	double *c1 = new double [geom1->n_grid_1];
+	double *d1 = new double [geom1->n_grid_1];
+	double *phi = new double [geom1->n_grid_1];
 	Fourier* four1=0;
+
+	double dr = geom1->dr;
+	double dr2 = geom1->dr*geom1->dr;
+
 	double** ro=ro1->get_ro();
 
-
-	//call function for cosine transform//
-////////////////////////////////////////////////
-////////////////////////////////////////////////
-
-///////////////////////////////////////////////
+	///////////////////////////////////////////////
 		//copy charge_density array in to temp array//
-for( i=0;i<(geom1->n_grid_1);i++)
-	for( k=0;k<(geom1->n_grid_2);k++)
-	{
-		t_charge_density[i][k]= ro[i][k];
-	}
-	
+	for( i=0;i<(geom1->n_grid_1);i++)
+		for( k=0;k<(geom1->n_grid_2);k++)
+		{
+			t_charge_density[i][k]= ro[i][k];
+		}
+
+		//call function for cosine transform//
+////////////////////////////////////////////////
+////////////////////////////////////////////////
+
 	int temp=geom1->n_grid_2;
 	
 		for (i=0;i<geom1->n_grid_1;i++)
 		{
-			//four1->fast_cosine_transform(t_charge_density, temp, i, false);
-			four1->fast_fourier_transform(t_charge_density, temp, i, false);
+			four1->fast_cosine_transform(t_charge_density, temp, i, false);
+			//four1->fast_fourier_transform(t_charge_density, temp, i, false);
 		}
 
-		//sweep method//
-//////////////////////////////////////////////////////////////////
 
-	for( k=0;k<(geom1->n_grid_2);k++)
+		//set coefficients
+	b[0] = 1.0;
+	c[0] = 1.0;
+	for (k = 0; k < geom1->n_grid_2; k++)
 	{
-			c=(cos(2*pi*k/geom1->n_grid_1) - 1.0 - 2.0/dr2);
-
-		double b1 = -1.0;
-		double c1 = 1.0;
-		double f1 = dr2*t_charge_density[0][k]/epsilon0/4.0;
-		alpha[1] = -b1/c1;
-		beta[1] = f1/c1;
-
-			for ( i=1;i<(geom1->n_grid_1-1);i++)
-			  {	
-			//ay-1 + cy + by+1= = f//
-				
-				a = (1.0-1.0/(2.0*(i)))/dr2;
-
-				b = (1.0+1.0/(2.0*(i)))/dr2;
-				f = -t_charge_density[i][k]/epsilon0;
-
-				alpha[i+1] = -b/(alpha[i]*a + c);
-				beta[i+1]  = (f-beta[i]*a)/(alpha[i]*a + c);
-
-			  }
-		   
-				fi[geom1->n_grid_1-2][k]= ((-t_charge_density[0][k]/epsilon0+
-					                      b*fi[geom1->n_grid_1-1][k])-a*beta[geom1->n_grid_1-2])/(a*alpha[geom1->n_grid_1-2]+c);
-
-				for(i=(geom1->n_grid_1-3);i>=0;i--)
-				 {
-					fi[i][k]=beta[i+1]+alpha[i+1]*fi[i+1][k];
-				 }
+		b[0] = 1.0;
+	    c[0] = -1.0;
+		d[0] = dr2/4.0/epsilon0*t_charge_density[0][k];
+		for (i = 1; i < geom1->n_grid_1 -1; i++)
+		{
+			a[i] = (1.0 - 1.0/2.0/(double)i);
+			b[i] = -2.0 + 2.0*(cos(pi*k/geom1->n_grid_2) - 1)/(geom1->dz*geom1->dz);
+			c[i] = (1.0 + 1.0/2.0/(double)i);
+			d[i] = t_charge_density[i][k]*dr2/epsilon0;
+			c1[i] = (1.0 - 1.0/2.0/(double)i);
+			d1[i] = t_charge_density[i][k]*dr2/epsilon0;
+		}
+		a[0] = 0;
+		c[geom1->n_grid_1-2] = 0.0;
+		d[geom1->n_grid_1-2] -= phi0;
+		c1[geom1->n_grid_1-2] = 0.0;
+		d1[geom1->n_grid_1-2] -= phi0;
+		TridiagonalSolve(a, b, c, d, phi, geom1->n_grid_1-1);
+		for (i = 0; i < geom1->n_grid_1 -1; i++)
+		{
+			fi[i][k] = phi[i];
+		}
 	}
 
-	//call function for inverse cosine transform//
+		//call function for inverse cosine transform//
 ////////////////////////////////////////////////////////////
 	for (i=0;i<geom1->n_grid_1;i++)
 		{
 			int temp=geom1->n_grid_2;
-			//four1->fast_cosine_transform(fi, temp,i, true);
-			four1->fast_fourier_transform(fi, temp,i, true);
+			four1->fast_cosine_transform(fi, temp,i, true);
+			//four1->fast_fourier_transform(fi, temp,i, true);
 		}
 ////////////////////////////////////////////////////////////
+	
 
 
 	//calculate electric field//
@@ -460,13 +459,28 @@ for( i=0;i<(geom1->n_grid_1);i++)
 			{
 				e3[i][k]=(fi[i][k]-fi[i][k+1])/geom1->dz;
 			}
-////////////////////////////////////////////////////////////
 
- delete [] alpha;
- delete [] beta;
 }
 /////////////////////////////////////////////////////////////
 
+void E_field::TridiagonalSolve(const double *a, const double *b, double *c, double *d, double *x, unsigned int n)
+{
+	int i;
+ 
+	/* Modify the coefficients. */
+	c[0] /= b[0];				/* Division by zero risk. */
+	d[0] /= b[0];				/* Division by zero would imply a singular matrix. */
+	for(i = 1; i < n; i++){
+		double id = (b[i] - c[i-1] * a[i]);	/* Division by zero risk. */
+		c[i] /= id;				/* Last value calculated is redundant. */
+		d[i] = (d[i] - d[i-1] * a[i])/id;
+	}
+ 
+	/* Now back substitute. */
+	x[n - 1] = d[n - 1];
+	for(i = n - 2; i >= 0; i--)
+		x[i] = d[i] - c[i] * x[i + 1];
+}
 
 
 
@@ -602,7 +616,7 @@ bool E_field::test_poisson_equation(charge_density *rho)
 	int i=0, k=0;
 	double dr = geom1->dr;
 	double dz = geom1->dz;
-	double accur =10e-10;
+	double accur =1e-10;
 	double a=0;
 	bool res =true;
 	double **rho1 = rho->get_ro();
@@ -610,7 +624,7 @@ bool E_field::test_poisson_equation(charge_density *rho)
 	for (i=1;i<geom1->n_grid_1-1;i++)
 		for (k=1;k<geom1->n_grid_2-1;k++)
 		{
-			a = rho1[i][k]/epsilon0 - (e1[i][k]+e1[i-1][k])/(i*2.0*dr) - (e1[i][k]-e1[i-1][k])/(dr)-(e3[i][k]-e3[i][k-1])/dz;
+			a = -rho1[i][k]/epsilon0 - (e1[i][k]+e1[i-1][k])/(i*2.0*dr) - (e1[i][k]-e1[i-1][k])/(dr)-(e3[i][k]-e3[i][k-1])/dz;
 			if (abs(a)>accur)
 				res=false;
 			delta<<a<<" ";

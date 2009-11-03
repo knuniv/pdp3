@@ -12,8 +12,8 @@ using namespace std;
 int main() 
 {
 	PML pml1(0.15,0.15, 0.0000001, 0.15);
-	Geometry geom1(128,128, 129, 129, &pml1);
-	Time time1(0,0,0,200e-10,1e-10);
+	Geometry geom1(1.28,1.28, 129, 129, &pml1);
+	Time time1(0,0,0,10000e-12,1e-12);
 	E_field e_field1(&geom1);
 	H_field h_field1(&geom1);
 	Fourier four1(0);
@@ -36,22 +36,22 @@ int main()
 	///////////////////////////////////////////
 //	////////////////////////////////////////
 //	poisson  equetion testing//
-//	for(k=0;k<geom1.n_grid_2;k++)
-//		rho_new.set_ro_weighting(25,k,1e-7);
-//
-//	e_field1.poisson_equation2(&geom1,&rho_new);
-//	e_field1.poisson_equation(&geom1,&rho_new);
-//	bool res1 = e_field1.test_poisson_equation(&rho_new);
+	//for(k=0;k<geom1.n_grid_2;k++)
+	//	rho_new.set_ro_weighting(20,k,1e-7);
+
+	//e_field1.poisson_equation2(&geom1,&rho_new);
+	////e_field1.poisson_equation(&geom1,&rho_new);
+	//bool res2 = e_field1.test_poisson_equation(&rho_new);
 //////////////////////////////////////////////////////
 
 ////////////////////////////////////////////////
 	geom1.set_epsilon() ;
 //	e_field1.set_sigma();
-    int n_species = 2 ;
+    int n_species = 2;
 	Particles *new_particles = new Particles[1];
 	Particles *old_particles = new Particles[1];
-	Particles new_electrons("electrons", -1e7, 1, 1, &geom1), old_electrons("electrons", -1e7, 1, 1, &geom1),
-		      new_positrons("positrons", 1e7, 1, 1, &geom1), old_positrons("positrons", 1e7, 1, 1, &geom1);
+	Particles new_electrons("electrons", -1e5, 1, 1, &geom1), old_electrons("electrons", -1e5, 1, 1, &geom1),
+		      new_positrons("positrons", 1e5, 1, 1, &geom1), old_positrons("positrons", 1e5, 1, 1, &geom1);
 
 	new_particles[0] = new_electrons;
 	old_particles[0] = old_electrons;
@@ -64,14 +64,14 @@ int main()
 
 
     //two particles test
-	new_particles[0].x1[0] = 16.0001;
-    new_particles[0].x3[0] = 55.0001;
+	new_particles[0].x1[0] = 0.160001;
+    new_particles[0].x3[0] = .550001;
 	new_particles[0].v1[0] = 0.0;
 	new_particles[0].v2[0] = 0.0;
-	new_particles[0].v3[0] = 1.0e6;
+	new_particles[0].v3[0] = 0.0e6;
 
-	new_particles[1].x1[0] = 16.0001;
-    new_particles[1].x3[0] = 65.0001;
+	new_particles[1].x1[0] = 0.160001;
+    new_particles[1].x3[0] = .650001;
 	new_particles[1].v1[0] = 0.0;
 	new_particles[1].v2[0] = 0.0;
 	new_particles[1].v3[0] = 0.0;
@@ -90,7 +90,7 @@ int main()
 
 	//solve Poisson equation
 	e_field1.poisson_equation(&geom1, &rho_new);
-
+	bool res1 = e_field1.test_poisson_equation(&rho_new);
 	
 	//relaxation period
 	while (time1.current_time < time1.relaxation_time)
