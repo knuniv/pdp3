@@ -345,13 +345,13 @@ for( i=0;i<(geom1->n_grid_1);i++)
 	//calculate electric field//
 ///////////////////////////////////////////////////////////
 	for (i=0;i<(geom1->n_grid_1-1);i++)
-		for (k=1;k<(geom1->n_grid_2);k++)
+		for (k=0;k<(geom1->n_grid_2);k++)
 			{
 				e1[i][k]=(fi[i][k]-fi[i+1][k])/geom1->dr;
 			}
 
 	for (i=0;i<(geom1->n_grid_1);i++)
-		for (k=1;k<(geom1->n_grid_2-1);k++)
+		for (k=0;k<(geom1->n_grid_2-1);k++)
 			{
 				e3[i][k]=(fi[i][k]-fi[i][k+1])/geom1->dz;
 			}
