@@ -171,7 +171,7 @@ void E_field::calc_field(H_field* h_field1, Time* time1, current* current1, PML*
 			this->e1[i][k]=this->e1[i][k]*(2.0*geom1->epsilon[i][k]*epsilon0 - geom1->sigma[i][k]*time1->delta_t) / (2.0*geom1->epsilon[i][k]*epsilon0 + geom1->sigma[i][k]*time1->delta_t) - (j1[i][k]+(h_field1->h2[i][k]-h_field1->h2[i][k-1])/geom1->dz)* 2*time1->delta_t/(2.0*geom1->epsilon[i][k]*epsilon0 + geom1->sigma[i][k]*time1->delta_t);
 		}
 /////////////////////////////////////
-	//Ez=- j on axis// // ???????????
+	//Ez=on axis// // ???????????
     for(k=0;k<(geom1->n_grid_2-1);k++)
 		{
 			 i=0;
@@ -301,7 +301,7 @@ for( i=0;i<(geom1->n_grid_1);i++)
 	for( k=0;k<(geom1->n_grid_2);k++)
 	{
 			//b=2.0+ pow((geom1->dr*pi*k/(geom1->dz*geom1->n_grid_2)),2);
-	    	b = 2.0 - 2.0*(cos(pi*k/geom1->n_grid_2) - 1)/(geom1->dz*geom1->dz);
+	    	b = 2.0 - 2.0*(cos(pi*k/geom1->n_grid_2) - 1)*geom1->dr*geom1->dr/(geom1->dz*geom1->dz);
 			d=geom1->dr*geom1->dr*t_charge_density[0][k]/epsilon0;
 			alpha[1]=4.0/(2.0+b);
 			beta[1]=d/(2.0+b);

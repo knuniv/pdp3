@@ -13,7 +13,7 @@ int main()
 {
 	PML pml1(0.15,0.15, 0.0000001, 0.15);
 	Geometry geom1(1.28,1.28, 129, 129, &pml1);
-	Time time1(0,0,0,10000e-12,1e-12);
+	Time time1(0,0,0,2e-12,1e-12);
 	E_field e_field1(&geom1);
 	H_field h_field1(&geom1);
 	Fourier four1(0);
@@ -50,8 +50,8 @@ int main()
     int n_species = 2;
 	Particles *new_particles = new Particles[1];
 	Particles *old_particles = new Particles[1];
-	Particles new_electrons("electrons", -1e5, 1, 1, &geom1), old_electrons("electrons", -1e5, 1, 1, &geom1),
-		      new_positrons("positrons", 1e5, 1, 1, &geom1), old_positrons("positrons", 1e5, 1, 1, &geom1);
+	Particles new_electrons("electrons", -1e7, 1, 1, &geom1), old_electrons("electrons", -1e7, 1, 1, &geom1),
+		      new_positrons("positrons", 1e7, 1, 1, &geom1), old_positrons("positrons", 1e7, 1, 1, &geom1);
 
 	new_particles[0] = new_electrons;
 	old_particles[0] = old_electrons;
@@ -109,7 +109,7 @@ int main()
     while (time1.current_time < time1.end_time)
 	{
         //1. Calculate H field
-		h_field1.calc_field(&e_field1, &time1);
+	//	h_field1.calc_field(&e_field1, &time1);
 
 		//2. Calculate v
 		current1.reset_j();
@@ -132,7 +132,7 @@ int main()
 		}
 
         //4. Calculate E
-        e_field1.calc_field(&h_field1, &time1, &current1, &pml1);
+ //       e_field1.calc_field(&h_field1, &time1, &current1, &pml1);
 		
         //continuity equation
 		rho_new.reset_rho();
