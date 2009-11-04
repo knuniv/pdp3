@@ -13,7 +13,7 @@ int main()
 {
 	PML pml1(0.15,0.15, 0.0000001, 0.15);
 	Geometry geom1(1.28,1.28, 129, 129, &pml1);
-	Time time1(0,0,0,2e-12,1e-12);
+	Time time1(0,0,0,10000e-12,1e-12);
 	E_field e_field1(&geom1);
 	H_field h_field1(&geom1);
 	Fourier four1(0);
@@ -50,8 +50,8 @@ int main()
     int n_species = 2;
 	Particles *new_particles = new Particles[1];
 	Particles *old_particles = new Particles[1];
-	Particles new_electrons("electrons", -1e7, 1, 1, &geom1), old_electrons("electrons", -1e7, 1, 1, &geom1),
-		      new_positrons("positrons", 1e7, 1, 1, &geom1), old_positrons("positrons", 1e7, 1, 1, &geom1);
+	Particles new_electrons("electrons", -1e5, 1, 1, &geom1), old_electrons("electrons", -1e5, 1, 1, &geom1),
+		      new_positrons("positrons", 1e5, 1, 1, &geom1), old_positrons("positrons", 1e5, 1, 1, &geom1);
 
 	new_particles[0] = new_electrons;
 	old_particles[0] = old_electrons;
@@ -64,13 +64,13 @@ int main()
 
 
     //two particles test
-	new_particles[0].x1[0] = 0.160001;
+	new_particles[0].x1[0] = 0.00500000001;
     new_particles[0].x3[0] = .550001;
 	new_particles[0].v1[0] = 0.0;
 	new_particles[0].v2[0] = 0.0;
 	new_particles[0].v3[0] = 0.0e6;
 
-	new_particles[1].x1[0] = 0.160001;
+	new_particles[1].x1[0] = 0.00500000001;
     new_particles[1].x3[0] = .650001;
 	new_particles[1].v1[0] = 0.0;
 	new_particles[1].v2[0] = 0.0;
@@ -89,7 +89,7 @@ int main()
 	}
 
 	//solve Poisson equation
-	e_field1.poisson_equation(&geom1, &rho_new);
+	e_field1.poisson_equation2(&geom1, &rho_new);
 	bool res1 = e_field1.test_poisson_equation(&rho_new);
 	
 	//relaxation period
@@ -109,7 +109,7 @@ int main()
     while (time1.current_time < time1.end_time)
 	{
         //1. Calculate H field
-	//	h_field1.calc_field(&e_field1, &time1);
+		h_field1.calc_field(&e_field1, &time1);
 
 		//2. Calculate v
 		current1.reset_j();
@@ -132,7 +132,7 @@ int main()
 		}
 
         //4. Calculate E
- //       e_field1.calc_field(&h_field1, &time1, &current1, &pml1);
+       e_field1.calc_field(&h_field1, &time1, &current1, &pml1);
 		
         //continuity equation
 		rho_new.reset_rho();
@@ -143,7 +143,7 @@ int main()
 		out_coord<<new_particles[0].x1[0]<<" "<<new_particles[0].x3[0]<<" ";
 		out_vel<<new_particles[0].v1[0]<<" "<<new_particles[0].v2[0]<<" "<<new_particles[0].v3[0]<<" ";
 		
-		if ((((int)(time1.current_time/time1.delta_t))==0))
+		if ((((int)(time1.current_time/time1.delta_t))%1000==0))
 		{
 			cout<<time1.current_time<<" ";
 			for(int j=0;(j<geom1.n_grid_1-1);j++)

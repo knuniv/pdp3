@@ -416,7 +416,8 @@ void E_field::poisson_equation2(Geometry* geom1, charge_density* ro1)
 		for (i = 1; i < geom1->n_grid_1 -1; i++)
 		{
 			a[i] = (1.0 - 1.0/2.0/(double)i);
-			b[i] = -2.0 + 2.0*(cos(pi*k/geom1->n_grid_2) - 1)/(geom1->dz*geom1->dz);
+			b[i] = -2.0 + 2.0*(cos(pi*k/geom1->n_grid_2) - 1)*geom1->dr*geom1->dr/(geom1->dz*geom1->dz);
+			//b[i] = -2.0 + 2.0*(cos(pi*k/geom1->n_grid_2) - 1)/(geom1->dz*geom1->dz);
 			c[i] = (1.0 + 1.0/2.0/(double)i);
 			d[i] = t_charge_density[i][k]*dr2/epsilon0;
 			c1[i] = (1.0 - 1.0/2.0/(double)i);
@@ -443,7 +444,7 @@ void E_field::poisson_equation2(Geometry* geom1, charge_density* ro1)
 			//four1->fast_fourier_transform(fi, temp,i, true);
 		}
 ////////////////////////////////////////////////////////////
-	
+
 
 
 	//calculate electric field//
@@ -459,6 +460,17 @@ void E_field::poisson_equation2(Geometry* geom1, charge_density* ro1)
 			{
 				e3[i][k]=(fi[i][k]-fi[i][k+1])/geom1->dz;
 			}
+
+    ofstream er("er"), ez("ez");
+	for (i=1;i<geom1->n_grid_1-1;i++)
+		for (k=1;k<geom1->n_grid_2-1;k++)
+		{
+
+			er<<e1[i][k]<<" ";
+			ez<<e3[i][k]<<" ";
+		}
+	er.close();
+	ez.close();
 
 }
 /////////////////////////////////////////////////////////////
@@ -513,6 +525,10 @@ Triple E_field::get_field(double x1, double x3)
 	//finding number of cell. example dr=0.5,  x1 = 0.7, i_r =0;!!
 	 i_r = (int)ceil((x1-0.5*dr)/geom1->dr)-1;
 	 k_z = (int)ceil((x3)/geom1->dz)-1;
+	 if (x1==(i_r+1.5)*dr)
+			i_r=i_r+1;
+	 if(x3=(k_z+1)*dz)
+			k_z=k_z+1;
 
 	 vol_1 = pi*dz*dr*dr*(2*i_r+1);
 	 vol_2 = pi*dz*dr*dr*(2*i_r+3);
@@ -542,6 +558,10 @@ Triple E_field::get_field(double x1, double x3)
 //finding number of cell. example dz=0.5,  x3 = 0.7, z_k =0;!!
 	i_r = (int)ceil((x1)/geom1->dr)-1;
 	k_z = (int)ceil((x3-0.5*dz)/geom1->dz)-1;
+	if (x1==(i_r+1.5)*dr)
+			i_r=i_r+1;
+	if(x3==(k_z+1)*dz)
+			k_z=k_z+1;
 ///////////////////////////////////
 
    if(x1>dr)
@@ -578,6 +598,10 @@ Triple E_field::get_field(double x1, double x3)
  //finding number of cell. example dz=0.5,  x3 = 0.7, z_k =1;
 	 i_r = (int)ceil((x1)/geom1->dr)-1;
      k_z = (int)ceil((x3)/geom1->dz)-1;
+	 if (x1==(i_r+1.5)*dr)
+			i_r=i_r+1;
+	if(x3==(k_z+1)*dz)
+			k_z=k_z+1;
 
   if(x1>dr)
 	{
@@ -624,7 +648,7 @@ bool E_field::test_poisson_equation(charge_density *rho)
 	for (i=1;i<geom1->n_grid_1-1;i++)
 		for (k=1;k<geom1->n_grid_2-1;k++)
 		{
-			a = -rho1[i][k]/epsilon0 - (e1[i][k]+e1[i-1][k])/(i*2.0*dr) - (e1[i][k]-e1[i-1][k])/(dr)-(e3[i][k]-e3[i][k-1])/dz;
+			a = rho1[i][k]/epsilon0 - (e1[i][k]+e1[i-1][k])/(i*2.0*dr) - (e1[i][k]-e1[i-1][k])/(dr)-(e3[i][k]-e3[i][k-1])/dz;
 			if (abs(a)>accur)
 				res=false;
 			delta<<a<<" ";
