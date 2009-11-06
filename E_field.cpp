@@ -90,18 +90,18 @@ void E_field::set_homogeneous_efield(double E1, double E2, double E3)
 {
 	////Er////
 	for(int i=0;i<(geom1->n_grid_1-1);i++)
-		for(int k=1;k<(geom1->n_grid_2-1);k++)
+		for(int k=0;k<(geom1->n_grid_2-1);k++)
 		{
 			e1[i][k]= E1;
 		}
 	///Ef////
-	for(int i=1;i<(geom1->n_grid_1-1);i++)
-		for(int k=1;k<(geom1->n_grid_2-1);k++)
+	for(int i=0;i<(geom1->n_grid_1-1);i++)
+		for(int k=0;k<(geom1->n_grid_2-1);k++)
 		{
 			e2[i][k]=E2;
 		}
 	///Ez////
-	for(int i=1;i<(geom1->n_grid_1-1);i++)
+	for(int i=0;i<(geom1->n_grid_1-1);i++)
 		for(int k=0;k<(geom1->n_grid_2-1);k++)
 		{
 			e3[i][k]=E3;
@@ -301,7 +301,7 @@ for( i=0;i<(geom1->n_grid_1);i++)
 	for( k=0;k<(geom1->n_grid_2);k++)
 	{
 			//b=2.0+ pow((geom1->dr*pi*k/(geom1->dz*geom1->n_grid_2)),2);
-	    	b = 2.0 - 2.0*(cos(pi*k/geom1->n_grid_2) - 1)*geom1->dr*geom1->dr/(geom1->dz*geom1->dz);
+	    	b = 2.0 - 2.0*(cos(pi*k/(geom1->n_grid_2-1)) - 1)*geom1->dr*geom1->dr/(geom1->dz*geom1->dz);
 			d=geom1->dr*geom1->dr*t_charge_density[0][k]/epsilon0;
 			alpha[1]=4.0/(2.0+b);
 			beta[1]=d/(2.0+b);
@@ -416,7 +416,7 @@ void E_field::poisson_equation2(Geometry* geom1, charge_density* ro1)
 		for (i = 1; i < geom1->n_grid_1 -1; i++)
 		{
 			a[i] = (1.0 - 1.0/2.0/(double)i);
-			b[i] = -2.0 + 2.0*(cos(pi*k/geom1->n_grid_2) - 1)*geom1->dr*geom1->dr/(geom1->dz*geom1->dz);
+			b[i] = -2.0 + 2.0*(cos(pi*k/(geom1->n_grid_2-1)) - 1)*geom1->dr*geom1->dr/(geom1->dz*geom1->dz);
 			//b[i] = -2.0 + 2.0*(cos(pi*k/geom1->n_grid_2) - 1)/(geom1->dz*geom1->dz);
 			c[i] = (1.0 + 1.0/2.0/(double)i);
 			d[i] = t_charge_density[i][k]*dr2/epsilon0;
@@ -640,7 +640,7 @@ bool E_field::test_poisson_equation(charge_density *rho)
 	int i=0, k=0;
 	double dr = geom1->dr;
 	double dz = geom1->dz;
-	double accur =1e-10;
+	double accur =1e-12;
 	double a=0;
 	bool res =true;
 	double **rho1 = rho->get_ro();

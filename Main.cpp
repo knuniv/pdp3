@@ -30,7 +30,7 @@ int main()
 	charge_density rho_old(&geom1);
 
 	e_field1.boundary_conditions();
-	e_field1.set_homogeneous_efield(0.0, 0.0, 0.0);
+	e_field1.set_homogeneous_efield(0.0, 0.0, 1.0e3);
 	h_field1.set_homogeneous_h(0.0, 0.0, 0.0);
 	e_field1.set_fi_on_z();
 	///////////////////////////////////////////
@@ -47,16 +47,16 @@ int main()
 ////////////////////////////////////////////////
 	geom1.set_epsilon() ;
 //	e_field1.set_sigma();
-    int n_species = 2;
+    int n_species = 1;
 	Particles *new_particles = new Particles[1];
 	Particles *old_particles = new Particles[1];
-	Particles new_electrons("electrons", -1e5, 1, 1, &geom1), old_electrons("electrons", -1e5, 1, 1, &geom1),
+	Particles new_electrons("electrons", -1e1, 1, 1, &geom1), old_electrons("electrons", -1e1, 1, 1, &geom1),
 		      new_positrons("positrons", 1e5, 1, 1, &geom1), old_positrons("positrons", 1e5, 1, 1, &geom1);
 
 	new_particles[0] = new_electrons;
 	old_particles[0] = old_electrons;
-    new_particles[1] = new_positrons;
-    old_particles[1] = old_positrons;
+    //new_particles[1] = new_positrons;
+    //old_particles[1] = old_positrons;
 	//////////////////////
 
 	
@@ -64,17 +64,17 @@ int main()
 
 
     //two particles test
-	new_particles[0].x1[0] = 0.00500000001;
+	new_particles[0].x1[0] = .1500000001;
     new_particles[0].x3[0] = .550001;
 	new_particles[0].v1[0] = 0.0;
 	new_particles[0].v2[0] = 0.0;
 	new_particles[0].v3[0] = 0.0e6;
 
-	new_particles[1].x1[0] = 0.00500000001;
-    new_particles[1].x3[0] = .650001;
-	new_particles[1].v1[0] = 0.0;
-	new_particles[1].v2[0] = 0.0;
-	new_particles[1].v3[0] = 0.0;
+	//new_particles[1].x1[0] = .1500000001;
+ //   new_particles[1].x3[0] = .650001;
+	//new_particles[1].v1[0] = 0.0;
+	//new_particles[1].v2[0] = 0.0;
+	//new_particles[1].v3[0] = 0.0;
     //////////////////////////
 
 
@@ -89,7 +89,7 @@ int main()
 	}
 
 	//solve Poisson equation
-	e_field1.poisson_equation2(&geom1, &rho_new);
+	e_field1.poisson_equation(&geom1, &rho_new);
 	bool res1 = e_field1.test_poisson_equation(&rho_new);
 	
 	//relaxation period
