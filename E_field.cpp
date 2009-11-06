@@ -291,8 +291,9 @@ for( i=0;i<(geom1->n_grid_1);i++)
 	
 		for (i=0;i<geom1->n_grid_1;i++)
 		{
-			four1->fast_cosine_transform(t_charge_density, temp, i, false);
+			//four1->fast_cosine_transform(t_charge_density, temp, i, false);
 			//four1->fast_fourier_transform(t_charge_density, temp, i, false);
+			four1->dct_2(t_charge_density, temp, i, false);
 		}
 
 		//sweep method//
@@ -305,10 +306,8 @@ for( i=0;i<(geom1->n_grid_1);i++)
 			d=geom1->dr*geom1->dr*t_charge_density[0][k]/epsilon0;
 			alpha[1]=4.0/(2.0+b);
 			beta[1]=d/(2.0+b);
-		//double a1 = 0.5;
-		//double c1 = 1.5;
-		//alpha[2] = c1/(a1-b);
-		//beta[2] = (4.0*t_charge_density[1][k]+a1*t_charge_density[0][k]*geom1->dr*geom1->dr)/(4.0*epsilon0*(b-a1));
+		 //alpha[1] =1; 
+		//beta[1] = t_charge_density[0][k]*geom1->dr*geom1->dr/(4.0*epsilon0);
 
 			for ( i=1;i<(geom1->n_grid_1-1);i++)
 			  {	
@@ -336,8 +335,9 @@ for( i=0;i<(geom1->n_grid_1);i++)
 	for (i=0;i<geom1->n_grid_1;i++)
 		{
 			int temp=geom1->n_grid_2;
-			four1->fast_cosine_transform(fi, temp,i, true);
+			//four1->fast_cosine_transform(fi, temp,i, true);
 			//four1->fast_fourier_transform(fi, temp,i, true);
+			four1->dct_2(t_charge_density, temp, i, true);
 		}
 ////////////////////////////////////////////////////////////
 

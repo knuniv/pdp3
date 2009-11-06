@@ -51,7 +51,38 @@ void Fourier::fast_sine_transform(double** a, int lenght_n, int ir, bool inv)
 }
 
 ///////////////////////////////////////////////////
+void Fourier::dct_2(double** a, int lenght_n, int ir, bool inv)
+{
+	int k=0, n=0;
+	double pi =  4.0*atan(1.0);
+	double t_f =0;
+	double* a_t = new double [lenght_n];
+	for (k=0;k<lenght_n;k++)
+	{
+		a_t[k]=a[ir][k];
+	}
+	double sq =  sqrt((double) (lenght_n));
+	for (k=0;k<lenght_n;k++)
+	{
+		t_f=0;
+		for (n=0;n<(lenght_n);n++)
+			{
+				t_f =t_f+ a_t[n]*cos(pi*k*(n+0.5)/(lenght_n));
+			}
+	 a[ir][k]=t_f;
+	}	
 
+	//inverse transform//
+	  if(inv==true)
+	  {
+		  for (k=0;k<lenght_n;k++)
+			  a[ir][k]=a[ir][k]*2.0/(lenght_n-1);
+	  }
+//delete[] a_sinc;
+//a_sinc=0;
+  return;
+ 
+}
 
 void Fourier::fast_cosine_transform(double** a, int lenght_n, int ir, bool inv)
 {
@@ -76,7 +107,7 @@ void Fourier::fast_cosine_transform(double** a, int lenght_n, int ir, bool inv)
 
 		 d_lenght=d_lenght-2;
 	Fourier::fast_fourier_alg(a_sinc, d_lenght);
-
+	
 	  for (k=0;k<lenght_n;k++)
 	  {
 //		  a_sinc[k]=0.5*a_sinc[k];
