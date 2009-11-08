@@ -57,6 +57,7 @@ public:
 	void set_v_0();
 	void set_x_0();
 	double get_gamma(int i);
+	double get_gamma_inv(int i);
 	void velocity_distribution(double therm_vel);
 	void simple_j_weighting(Time* time1, current *j1, double x1_new,double x3_new, double x1_old, double x3_old, int i_n, int k_n);
 	void j_weighting(Time* time1, current *j1, Particles *old_part);
