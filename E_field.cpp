@@ -44,13 +44,7 @@ E_field::E_field(Geometry* geom1_t): geom1(geom1_t), epsilon0(8.85E-12)
 		fi[i]= new double[geom1->n_grid_2];
 	}
 ////////////////////////////////////////
-	//charge_density//
-///////////////////////////////////////
-   t_charge_density = new double*[geom1->n_grid_1];
-	   for (int i=0; i<(geom1->n_grid_1);i++)
-		 {
-			t_charge_density[i] = new double[geom1->n_grid_2];
-		 }
+	
 /////////////////////////////////////
 	   //set zero initial temp ro//
 	for (int i=0; i<(geom1->n_grid_1);i++)
@@ -257,110 +251,6 @@ void E_field::set_fi_on_z()
 			}
 	}
 
-//poisson equation solving//
-///////////////////////////////////////////////////////////////////////////////
-void E_field::poisson_equation(Geometry* geom1, charge_density* ro1)
-{	
-	const double pi = 3.14159265358979;
-	int i=0;
-	int k=0;
-	double a=0;
-	double c=0;
-	double b=0;
-	double d=0;
-	double* alpha = new double [geom1->n_grid_1];
-	double* beta = new double [geom1->n_grid_1];
-	Fourier* four1=0;
-	double** ro=ro1->get_ro();
-
-
-///////////////////////////////////////////////
-		//copy charge_density array in to temp array//
-for( i=0;i<(geom1->n_grid_1);i++)
-	for( k=0;k<(geom1->n_grid_2);k++)
-	{
-		t_charge_density[i][k]= ro[i][k];
-	}
-	
-
-	//call function for cosine transform//
-////////////////////////////////////////////////
-////////////////////////////////////////////////
-
-	int temp=geom1->n_grid_2;
-	
-		for (i=0;i<geom1->n_grid_1;i++)
-		{
-			//four1->fast_cosine_transform(t_charge_density, temp, i, false);
-			//four1->fast_fourier_transform(t_charge_density, temp, i, false);
-			four1->dct_2(t_charge_density, temp, i, false);
-		}
-
-		//sweep method//
-//////////////////////////////////////////////////////////////////
-
-	for( k=0;k<(geom1->n_grid_2);k++)
-	{
-			//b=2.0+ pow((geom1->dr*pi*k/(geom1->dz*geom1->n_grid_2)),2);
-	    	b = 2.0 - 2.0*(cos(pi*k/geom1->n_grid_2) - 1)*geom1->dr*geom1->dr/(geom1->dz*geom1->dz);
-			d=geom1->dr*geom1->dr*t_charge_density[0][k]/epsilon0;
-			alpha[1]=4.0/(2.0+b);
-			beta[1]=d/(2.0+b);
-		 //alpha[1] =1; 
-		//beta[1] = t_charge_density[0][k]*geom1->dr*geom1->dr/(4.0*epsilon0);
-
-			for ( i=1;i<(geom1->n_grid_1-1);i++)
-			  {	
-			//ay-1 - by + cy+1= = -d//
-				
-				a = 1.0-1.0/(2.0*(i));
-				c = 1.0+1.0/(2.0*(i));
-				d = geom1->dr*geom1->dr*t_charge_density[i][k]/epsilon0;
-
-				alpha[i+1] = c/(b-alpha[i]*a);
-				beta[i+1]  = (d+beta[i]*a)/(b-alpha[i]*a);
-
-			  }
-		   
-				//fi[geom1->n_grid_1-2][k]= -d-c*fi[geom1->n_grid_1-1][k]-a*beta[geom1->n_grid_1-2]/(a*alpha[geom1->n_grid_1-2]-b);
-
-				for(i=(geom1->n_grid_1-2);i>=0;i--)
-				 {
-					fi[i][k]=beta[i+1]+alpha[i+1]*fi[i+1][k];
-				 }
-	}
-
-	//call function for inverse cosine transform//
-////////////////////////////////////////////////////////////
-	for (i=0;i<geom1->n_grid_1;i++)
-		{
-			int temp=geom1->n_grid_2;
-			//four1->fast_cosine_transform(fi, temp,i, true);
-			//four1->fast_fourier_transform(fi, temp,i, true);
-			four1->dct_2(t_charge_density, temp, i, true);
-		}
-////////////////////////////////////////////////////////////
-
-
-	//calculate electric field//
-///////////////////////////////////////////////////////////
-	for (i=0;i<(geom1->n_grid_1-1);i++)
-		for (k=0;k<(geom1->n_grid_2);k++)
-			{
-				e1[i][k]=(fi[i][k]-fi[i+1][k])/geom1->dr;
-			}
-
-	for (i=0;i<(geom1->n_grid_1);i++)
-		for (k=0;k<(geom1->n_grid_2-1);k++)
-			{
-				e3[i][k]=(fi[i][k]-fi[i][k+1])/geom1->dz;
-			}
-////////////////////////////////////////////////////////////
-
- delete [] alpha;
- delete [] beta;
-}
-/////////////////////////////////////////////////////////////
 
 //poisson equation solving 2//
 ///////////////////////////////////////////////////////////////////////////////
@@ -635,28 +525,7 @@ Triple E_field::get_field(double x1, double x3)
 
 	return components;
 }
-bool E_field::test_poisson_equation(charge_density *rho)
-{
-	int i=0, k=0;
-	double dr = geom1->dr;
-	double dz = geom1->dz;
-	double accur =1e-10;
-	double a=0;
-	bool res =true;
-	double **rho1 = rho->get_ro();
-	ofstream delta("delta");
-	for (i=1;i<geom1->n_grid_1-1;i++)
-		for (k=1;k<geom1->n_grid_2-1;k++)
-		{
-			a = rho1[i][k]/epsilon0 - (e1[i][k]+e1[i-1][k])/(i*2.0*dr) - (e1[i][k]-e1[i-1][k])/(dr)-(e3[i][k]-e3[i][k-1])/dz;
-			if (abs(a)>accur)
-				res=false;
-			delta<<a<<" ";
-		}
-	delta.close();
-	return res;
 
 
 
 	
-}
