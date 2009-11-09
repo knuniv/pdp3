@@ -14,6 +14,6 @@ public:
 	 void fast_fourier_transform(double**a,int lenght_n,int ir, bool inv);
 	 void fastcosinetransform_old(double** a, int tnn, bool inversefct, int k);
 	 void fastsinetransform_old(double** a, int tnn, bool inversefst, int ir);
-	
+	 void dct_2(double** a, int lenght_n, int ir, bool inv);
 	
 };

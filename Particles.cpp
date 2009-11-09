@@ -104,7 +104,10 @@ double Particles::get_gamma(int i)
 	return pow(1.0 - (v1[i]*v1[i] + v2[i]*v2[i] + v3[i]*v3[i])/c2,-0.5);
 }
 
-
+double Particles::get_gamma_inv(int i)
+{
+	return pow((v1[i]*v1[i] + v2[i]*v2[i] + v3[i]*v3[i])/c2 + 1, 0.5);
+}
 
 void Particles::step_v(E_field *e_fld, H_field *h_fld, Time* t)
 {
@@ -142,7 +145,7 @@ void Particles::step_v(E_field *e_fld, H_field *h_fld, Time* t)
 			//3. Rotation in the magnetic field
 			//u" = u' + 2/(1+B'^2)[(u' + [u'xB'(n)])xB'(n)]
 			//B'(n) = B(n)*q*dt/2/mass/gamma(n)
-			gamma = get_gamma(i);
+			gamma = get_gamma_inv(i);
 			b1 = b1/gamma;
 	        b2 = b2/gamma;
 	        b3 = b3/gamma;
@@ -161,7 +164,7 @@ void Particles::step_v(E_field *e_fld, H_field *h_fld, Time* t)
 			v3[i] = v3[i] + e3;
 
 			//5. Division by relativistic factor
-			gamma = get_gamma(i);
+			gamma = get_gamma_inv(i);
 		    v1[i] = v1[i]/gamma;
 			v2[i] = v2[i]/gamma;
 			v3[i] = v3[i]/gamma;

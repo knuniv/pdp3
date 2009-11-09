@@ -11,12 +11,14 @@
 using namespace std;
 int main() 
 {
+
 	PML pml1(0.15,0.15, 0.0000001, 0.15);
 	Geometry geom1(1.28,1.28, 129, 129, &pml1);
 	Time time1(0,0,0,10000e-12,1e-12);
 	E_field e_field1(&geom1);
 	H_field h_field1(&geom1);
 	Fourier four1(0);
+
 	bool res = true;
 	int  k, i;
     ofstream out_coord("coords");
@@ -28,6 +30,18 @@ int main()
 	current current1(&geom1);
 	charge_density rho_new(&geom1);
 	charge_density rho_old(&geom1);
+
+
+	//////////////////////////////////////
+	double** f_t = new double*[2];
+	f_t[0] =new double [9];
+	for(k=0;k<9;k++)
+		f_t[0][k]=1;
+	f_t[0][1]=1;
+	four1.dct_2(f_t,9,0,false); 
+  // four1.fast_cosine_transform(f_t,9,0,false);
+//////////////////////////////////////
+
 
 	e_field1.boundary_conditions();
 	e_field1.set_homogeneous_efield(0.0, 0.0, 1.0e3);
@@ -90,7 +104,7 @@ int main()
 
 	//solve Poisson equation
 	e_field1.poisson_equation(&geom1, &rho_new);
-	bool res1 = e_field1.test_poisson_equation(&rho_new);
+	//bool res1 = e_field1.test_poisson_equation(&rho_new);
 	
 	//relaxation period
 	while (time1.current_time < time1.relaxation_time)
