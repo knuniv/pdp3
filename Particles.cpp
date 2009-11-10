@@ -184,7 +184,6 @@ void Particles::half_step_coord(Time* t)
 	double half_dz = dz/2.0;
 	double x1_wallX2 = x1_wall*2.0;
 	double x3_wallX2 = x3_wall*2.0;
-	double temp1, temp3;
 	double half_dt = t->delta_t/2.0;
 
 	for( i=0;i<number;i++)
@@ -411,6 +410,36 @@ for (int i=0;i<=j;i++)
 
 delete []v;
 
+}
+
+void Particles::load_spatial_distribution(double n1, double n2)
+{
+	int n;
+	//calculate number of electrons in a big particle
+	double n_in_big = (pi*geom1->first_size*geom1->first_size*geom1->second_size/number*(n2+n1)/2.0);
+	double rand_r;
+	double rand_z;
+	charge *= n_in_big;
+	mass *= n_in_big;
+	for(n = 0; n < number; n++)
+	{
+		rand_r = static_cast<double>(rand()) / RAND_MAX;
+		rand_z = static_cast<double>(rand()) / RAND_MAX;
+		x1[n] = (geom1->first_size - geom1->dr)*rand_r + geom1->dr/2.0;
+		x3[n] = (geom1->second_size - geom1->dz)*sqrt(rand_z) + geom1->dz/2.0;
+	}
+
+}
+
+void Particles::load_velocity_distribution(double v_thermal)
+{
+	int n;
+	for (n=0; n<number; n++)
+	{
+		v1[n] = 0.0;
+		v2[n] = 0.0;
+		v3[n] = 0.0;
+	}
 }
 
 
