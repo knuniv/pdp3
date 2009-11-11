@@ -62,7 +62,7 @@ for( i=0;i<(cyl_geom->n_grid_1);i++)
 	for( k=0;k<(cyl_geom->n_grid_2);k++)
 	{
 			//b=2.0+ pow((geom1->dr*pi*k/(geom1->dz*geom1->n_grid_2)),2);
-	    	b = 2.0 - 2.0*(cos(pi*k/cyl_geom->n_grid_2) - 1)*cyl_geom->dr*cyl_geom->dr/(cyl_geom->dz*cyl_geom->dz);
+	    	b = 2.0 - 2.0*(cos(pi*k/(cyl_geom->n_grid_2-1)) - 1)*cyl_geom->dr*cyl_geom->dr/(cyl_geom->dz*cyl_geom->dz);
 			d=cyl_geom->dr*cyl_geom->dr*t_charge_density[0][k]/epsilon0;
 			alpha[1]=4.0/(2.0+b);
 			beta[1]=d/(2.0+b);

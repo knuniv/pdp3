@@ -5,6 +5,8 @@
 #include "Time.h"
 #include "Particles.h"
 #include "Fourier.h"
+#include "Poisson.h"
+#include "Poisson_neumann.h"
 #include <fstream>
 #include <math.h>
 #define  pi = 3.14159265;
@@ -62,11 +64,11 @@ int main()
 	geom1.set_epsilon() ;
 //	e_field1.set_sigma();
     int n_species = 2;
-	Particles *new_particles = new Particles[1];
-	Particles *old_particles = new Particles[1];
+	Particles *new_particles = new Particles[2];
+	Particles *old_particles = new Particles[2];
 
-	Particles new_electrons("electrons", -1, 1, 100000, &geom1), old_electrons("electrons", -1, 1, 100000, &geom1);
-	Particles new_ions("ions", 1, 1836, 100000, &geom1), old_ions("electrons", 1, 1836, 100000, &geom1);
+	Particles new_electrons("electrons", -1, 1, 10, &geom1), old_electrons("electrons", -1, 1, 10, &geom1);
+	Particles new_ions("ions", 1, 1836, 10, &geom1), old_ions("electrons", 1, 1836, 10, &geom1);
 	new_electrons.load_spatial_distribution(1.6e14, 3.2e14);
 	old_electrons.load_spatial_distribution(1.6e14, 3.2e14);
 	new_electrons.load_velocity_distribution(0.0);
@@ -77,7 +79,7 @@ int main()
 	old_ions.load_velocity_distribution(0.0);
 
 	//Particles new_electrons("electrons", -1e5, 1, 1, &geom1), old_electrons("electrons", -1e5, 1, 1, &geom1),
-	//	      new_positrons("positrons", 1e5, 1, 1, &geom1), old_positrons("positrons", 1e5, 1, 1, &geom1);
+	//	      new_ions("positrons", 1e5, 1, 1, &geom1), old_ions("positrons", 1e5, 1, 1, &geom1);
 
 	new_particles[0] = new_electrons;
 	old_particles[0] = old_electrons;
@@ -115,8 +117,10 @@ int main()
 	}
 
 	//solve Poisson equation
-	e_field1.poisson_equation(&geom1, &rho_new);
-	bool res1 = e_field1.test_poisson_equation(&rho_new);
+	Poisson_neumann poisson1(&geom1);
+
+	poisson1.poisson_solve(&e_field1, &rho_new);
+	bool res1 = poisson1.test_poisson_equation(&e_field1, &rho_new);
 	
 	//relaxation period
 	while (time1.current_time < time1.relaxation_time)
