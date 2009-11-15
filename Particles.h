@@ -4,12 +4,11 @@
 #include "charge_density.h"
 #include"current.h"
 #include "triple.h"
+#include"particles_list.h"
 #include <fstream>
 #include<iostream>
-//#include "stdafx.h"
-//#include "E_field.h"
-//#include "H_field.h"
-
+using namespace std;
+class particles_list;
 class E_field;
 class H_field;
 
@@ -19,7 +18,7 @@ public:
 	Particles(void);
 	Particles(Particles& cp_particles);
 	Particles(char* p_name, double p_charge, double p_mass, int p_number,
-			  Geometry* geom);
+			  Geometry* geom, particles_list* p_list);
 	~Particles();
 public:
 	// The specie name
@@ -49,6 +48,7 @@ public:
 	//created for the purpose of integration 
 	//with exsisting routine of Maxwell equations integration 
 	Geometry* geom1;
+	particles_list* p_list;
 public:
 	void charge_weighting(charge_density* ro1);
 	void step_v(E_field *e_fld, H_field *h_fld, Time* t);
@@ -65,5 +65,6 @@ public:
 	void j_weighting(Time* time1, current *j1, Particles *old_part);
 	void strict_motion_weighting(Time* time1, current *j1, double x1_new,double x3_new, double x1_old, double x3_old);
 	void azimuthal_j_weighting(Time* time1, current *j1);
+	//void add_list(particles_list* in_list);
 	};
 bool continuity_equation(Time *input_time, Geometry *input_geometry, current *input_J, charge_density *rho_start, charge_density *rho_end);

@@ -4,6 +4,7 @@
 #include "Time.h"
 #include "Triple.h"
 #define  pi 3.14159265358979
+
 using namespace std;
 //#include "stdafx.h"
 
@@ -13,7 +14,7 @@ Particles::Particles(void)
 	////////constructor//////
 ////////////////////////////////////////////////
 Particles::Particles(char* p_name, double p_charge, double p_mass, int p_number,
-					 Geometry* geom)  : geom1(geom), c_light(3.0e8), c2(9.0e16) 
+					 Geometry* geom,particles_list* t_p_list)  : geom1(geom),p_list(t_p_list), c_light(3.0e8), c2(9.0e16) 
 {
 	name = p_name;
 	charge = p_charge*1.6e-19;
@@ -29,7 +30,9 @@ Particles::Particles(char* p_name, double p_charge, double p_mass, int p_number,
 	v2 = new double[number];
 	v3 = new double[number];
 	is_alive = new bool[number];
-
+	////////////////////////////////
+	//insert to particles_lists
+	p_list->part_list.push_back(this);
 	
 };
 ///////////////////////////////////////////////////
@@ -1016,6 +1019,8 @@ void Particles:: strict_motion_weighting(Time *time1, current *this_j, double x1
 
 	}
 }
+
+
 bool continuity_equation(Time *input_time, Geometry *input_geometry, current *input_J, charge_density *rho_old, charge_density *rho_new)
 {
 	double **rho_old_array = rho_old->get_ro() ;
