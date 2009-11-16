@@ -546,7 +546,7 @@ void Particles::simple_j_weighting(Time* time1, current *j1, double x1_new,doubl
 }
 
 
-void Particles::j_weighting(Time* time1, current *j1, Particles *old_part)
+void Particles::j_weighting(Time* time1, current *j1, double* x1,double* x3)
 {
 
 	double dr = geom1->dr;
@@ -561,8 +561,8 @@ void Particles::j_weighting(Time* time1, current *j1, Particles *old_part)
 //////////////////////////////////////////////////////////////
 	for (i=0;i<number;i++)
 	{
-	    double x1_old=old_part->x1[i];
-		double x3_old = old_part->x3[i];
+	    double x1_old= x1[i];
+		double x3_old = x3[i];
 		//finding number new and old cells
 		int i_n = (int)ceil((x1[i])/dr)-1;
 		int k_n =(int)ceil((x3[i])/dr)-1;

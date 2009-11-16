@@ -164,7 +164,7 @@ int main()
 			new_particles[k].half_step_coord(&time1);
 			new_particles[k].azimuthal_j_weighting(&time1, &current1);
 			new_particles[k].half_step_coord(&time1);
-			new_particles[k].j_weighting(&time1,&current1,&old_particles[k]);
+		//	new_particles[k].j_weighting(&time1,&current1,&old_particles[k]);
 		}
 
         //4. Calculate E

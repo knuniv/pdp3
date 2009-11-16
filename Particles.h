@@ -62,7 +62,7 @@ public:
 	void load_spatial_distribution(double n1, double n2);
 	void load_velocity_distribution(double v_thermal);
 	void simple_j_weighting(Time* time1, current *j1, double x1_new,double x3_new, double x1_old, double x3_old, int i_n, int k_n);
-	void j_weighting(Time* time1, current *j1, Particles *old_part);
+	void j_weighting(Time* time1, current *j1,double* x1,double* x3);
 	void strict_motion_weighting(Time* time1, current *j1, double x1_new,double x3_new, double x1_old, double x3_old);
 	void azimuthal_j_weighting(Time* time1, current *j1);
 	//void add_list(particles_list* in_list);

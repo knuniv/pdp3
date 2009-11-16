@@ -12,9 +12,11 @@ public:
 	particles_list(int i);
 	~particles_list(void);
 public:
+	vector<Particles*> part_list;
+	double** x1_array;
+	double** x3_array;
 
 public:
-	vector<Particles*> part_list;
 	void charge_weighting(charge_density* ro1);
 	void step_v(E_field *e_fld, H_field *h_fld, Time* t);
 	void half_step_coord(Time* t);
@@ -24,7 +26,10 @@ public:
 	//void velocity_distribution(double therm_vel);
 	//void load_spatial_distribution(double n1, double n2);
 	//void load_velocity_distribution(double v_thermal);
-	void j_weighting(Time* time1, current *j1, Particles *old_part);
+	void j_weighting(Time* time1, current *j1);
 	void azimuthal_j_weighting(Time* time1, current *j1);
+	void create_coord_arrays(void);
+	void copy_coords(void);
+
 
 };
