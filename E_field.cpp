@@ -44,7 +44,14 @@ E_field::E_field(Geometry* geom1_t): geom1(geom1_t), epsilon0(8.85E-12)
 		fi[i]= new double[geom1->n_grid_2];
 	}
 ////////////////////////////////////////
-	
+		//charge_density//
+///////////////////////////////////////
+    t_charge_density = new double*[geom1->n_grid_1];
+    for (int i=0; i<(geom1->n_grid_1);i++)
+	{
+	    t_charge_density[i] = new double[geom1->n_grid_2];
+	}
+/////////////////////////////////////
 /////////////////////////////////////
 	   //set zero initial temp ro//
 	for (int i=0; i<(geom1->n_grid_1);i++)

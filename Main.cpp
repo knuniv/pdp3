@@ -5,6 +5,9 @@
 #include "Time.h"
 #include "Particles.h"
 #include "Fourier.h"
+#include "Poisson.h"
+#include "Poisson_neumann.h"
+#include "particles_list.h"
 #include <fstream>
 #include <math.h>
 #define  pi = 3.14159265;
@@ -14,7 +17,7 @@ int main()
 
 	PML pml1(0.15,0.15, 0.0000001, 0.15);
 	Geometry geom1(1.28,1.28, 129, 129, &pml1);
-	Time time1(0,0,0,10000e-12,1e-12);
+	Time time1(0,0,0,1000e-12,1e-12);
 	E_field e_field1(&geom1);
 	H_field h_field1(&geom1);
 	Fourier four1(0);
@@ -62,15 +65,28 @@ int main()
 	geom1.set_epsilon() ;
 //	e_field1.set_sigma();
     int n_species = 1;
-	Particles *new_particles = new Particles[1];
-	Particles *old_particles = new Particles[1];
-	Particles new_electrons("electrons", -1e1, 1, 1, &geom1), old_electrons("electrons", -1e1, 1, 1, &geom1),
-		      new_positrons("positrons", 1e5, 1, 1, &geom1), old_positrons("positrons", 1e5, 1, 1, &geom1);
+	Particles *new_particles = new Particles[2];
+	Particles *old_particles = new Particles[2];
+	particles_list p_list(0);
+	Particles new_electrons("electrons", -1, 1, 1, &geom1,&p_list), old_electrons("electrons", -1, 1, 1, &geom1,&p_list);
+	Particles new_ions("ions", 1, 1836, 1, &geom1,&p_list), old_ions("electrons", 1, 1836, 1, &geom1,&p_list);
+	p_list.step_v(&e_field1, &h_field1, &time1);
+	//new_electrons.load_spatial_distribution(1.6e14, 3.2e14);
+	//old_electrons.load_spatial_distribution(1.6e14, 3.2e14);
+	//new_electrons.load_velocity_distribution(0.0);
+	//old_electrons.load_velocity_distribution(0.0);
+	//new_ions.load_spatial_distribution(1.6e14, 3.2e14);
+	//old_ions.load_spatial_distribution(1.6e14, 3.2e14);
+	//new_ions.load_velocity_distribution(0.0);
+	//old_ions.load_velocity_distribution(0.0);
+
+	//Particles new_electrons("electrons", -1e5, 1, 1, &geom1), old_electrons("electrons", -1e5, 1, 1, &geom1),
+	//	      new_ions("positrons", 1e5, 1, 1, &geom1), old_ions("positrons", 1e5, 1, 1, &geom1);
 
 	new_particles[0] = new_electrons;
 	old_particles[0] = old_electrons;
-    //new_particles[1] = new_positrons;
-    //old_particles[1] = old_positrons;
+    new_particles[1] = new_ions;
+    old_particles[1] = old_ions;
 	//////////////////////
 
 	
@@ -78,13 +94,13 @@ int main()
 
 
     //two particles test
-	new_particles[0].x1[0] = .1500000001;
+	new_particles[0].x1[0] = 0.1500000001;
     new_particles[0].x3[0] = .550001;
 	new_particles[0].v1[0] = 0.0;
 	new_particles[0].v2[0] = 0.0;
 	new_particles[0].v3[0] = 0.0e6;
 
-	//new_particles[1].x1[0] = .1500000001;
+	new_particles[1].x1[0] = 0.1500000001;
  //   new_particles[1].x3[0] = .650001;
 	//new_particles[1].v1[0] = 0.0;
 	//new_particles[1].v2[0] = 0.0;
@@ -103,8 +119,10 @@ int main()
 	}
 
 	//solve Poisson equation
-	e_field1.poisson_equation(&geom1, &rho_new);
-	//bool res1 = e_field1.test_poisson_equation(&rho_new);
+	Poisson_neumann poisson1(&geom1);
+
+	poisson1.poisson_solve(&e_field1, &rho_new);
+	bool res1 = poisson1.test_poisson_equation(&e_field1, &rho_new);
 	
 	//relaxation period
 	while (time1.current_time < time1.relaxation_time)
@@ -157,7 +175,7 @@ int main()
 		out_coord<<new_particles[0].x1[0]<<" "<<new_particles[0].x3[0]<<" ";
 		out_vel<<new_particles[0].v1[0]<<" "<<new_particles[0].v2[0]<<" "<<new_particles[0].v3[0]<<" ";
 		
-		if ((((int)(time1.current_time/time1.delta_t))%1000==0))
+		if ((((int)(time1.current_time/time1.delta_t))%100==0))
 		{
 			cout<<time1.current_time<<" ";
 			for(int j=0;(j<geom1.n_grid_1-1);j++)
