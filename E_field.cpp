@@ -258,7 +258,6 @@ void E_field::set_fi_on_z()
 			}
 	}
 
-	    	b = 2.0 - 2.0*(cos(pi*k/(geom1->n_grid_2-1)) - 1)*geom1->dr*geom1->dr/(geom1->dz*geom1->dz);
 
 //poisson equation solving 2//
 ///////////////////////////////////////////////////////////////////////////////

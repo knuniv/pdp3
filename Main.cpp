@@ -68,25 +68,27 @@ int main()
 	Particles *new_particles = new Particles[2];
 	Particles *old_particles = new Particles[2];
 	particles_list p_list(0);
-	Particles new_electrons("electrons", -1, 1, 1, &geom1,&p_list), old_electrons("electrons", -1, 1, 1, &geom1,&p_list);
-	Particles new_ions("ions", 1, 1836, 1, &geom1,&p_list), old_ions("electrons", 1, 1836, 1, &geom1,&p_list);
-	p_list.step_v(&e_field1, &h_field1, &time1);
-	//new_electrons.load_spatial_distribution(1.6e14, 3.2e14);
-	//old_electrons.load_spatial_distribution(1.6e14, 3.2e14);
-	//new_electrons.load_velocity_distribution(0.0);
-	//old_electrons.load_velocity_distribution(0.0);
-	//new_ions.load_spatial_distribution(1.6e14, 3.2e14);
-	//old_ions.load_spatial_distribution(1.6e14, 3.2e14);
-	//new_ions.load_velocity_distribution(0.0);
-	//old_ions.load_velocity_distribution(0.0);
+	particles_list p_list_old(0);
+	Particles new_electrons("electrons", -1, 1, 1e5, &geom1,&p_list), old_electrons("electrons", -1, 1, 1e5, &geom1,&p_list_old);
+
+	Particles new_ions("ions", 1, 1836, 1e5, &geom1,&p_list), old_ions("electrons", 1, 1836, 1e5, &geom1,&p_list_old);
+	//p_list.step_v(&e_field1, &h_field1, &time1);
+	new_electrons.load_spatial_distribution(1.6e14, 3.2e14);
+	old_electrons.load_spatial_distribution(1.6e14, 3.2e14);
+	new_electrons.load_velocity_distribution(0.0);
+	old_electrons.load_velocity_distribution(0.0);
+	new_ions.load_spatial_distribution(1.6e14, 3.2e14);
+	old_ions.load_spatial_distribution(1.6e14, 3.2e14);
+	new_ions.load_velocity_distribution(0.0);
+	old_ions.load_velocity_distribution(0.0);
 
 	//Particles new_electrons("electrons", -1e5, 1, 1, &geom1), old_electrons("electrons", -1e5, 1, 1, &geom1),
 	//	      new_ions("positrons", 1e5, 1, 1, &geom1), old_ions("positrons", 1e5, 1, 1, &geom1);
 
-	new_particles[0] = new_electrons;
-	old_particles[0] = old_electrons;
-    new_particles[1] = new_ions;
-    old_particles[1] = old_ions;
+	//new_particles[0] = new_electrons;
+	//old_particles[0] = old_electrons;
+ //   new_particles[1] = new_ions;
+ //   old_particles[1] = old_ions;
 	//////////////////////
 
 	
@@ -94,29 +96,31 @@ int main()
 
 
     //two particles test
-	new_particles[0].x1[0] = 0.1500000001;
-    new_particles[0].x3[0] = .550001;
-	new_particles[0].v1[0] = 0.0;
-	new_particles[0].v2[0] = 0.0;
-	new_particles[0].v3[0] = 0.0e6;
+	//new_particles[0].x1[0] = 0.0066278076171875002;
+ //   new_particles[0].x3[0] = 0.95842972203685850;
+	//new_particles[0].v1[0] = 0.0;
+	//new_particles[0].v2[0] = 0.0;
+	//new_particles[0].v3[0] = 0.0e6;
 
-	new_particles[1].x1[0] = 0.1500000001;
- //   new_particles[1].x3[0] = .650001;
+	//new_particles[1].x1[0] = 0.74797790527343755;
+ //   new_particles[1].x3[0] = 0.88477999104412552;
 	//new_particles[1].v1[0] = 0.0;
 	//new_particles[1].v2[0] = 0.0;
 	//new_particles[1].v3[0] = 0.0;
     //////////////////////////
 
-
+	p_list.azimuthal_j_weighting(&time1, &current1);
+	//p_list.j_weighting(&time1,&current1,&old_particles[k]);
+	p_list.charge_weighting(&rho_new);
 	//0. Half step back
 
 	//weight currents and charges before relaxation period
-	for (k=0; k<n_species; k++)
-	{
-		new_particles[k].azimuthal_j_weighting(&time1, &current1);
-		new_particles[k].j_weighting(&time1,&current1,&old_particles[k]);
-		new_particles[k].charge_weighting(&rho_new);
-	}
+	//for (k=0; k<n_species; k++)
+	//{
+	//	new_particles[k].azimuthal_j_weighting(&time1, &current1);
+	//	new_particles[k].j_weighting(&time1,&current1,&old_particles[k]);
+	//	new_particles[k].charge_weighting(&rho_new);
+	//}
 
 	//solve Poisson equation
 	Poisson_neumann poisson1(&geom1);
