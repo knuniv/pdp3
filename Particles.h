@@ -65,6 +65,6 @@ public:
 	void j_weighting(Time* time1, current *j1,double* x1,double* x3);
 	void strict_motion_weighting(Time* time1, current *j1, double x1_new,double x3_new, double x1_old, double x3_old);
 	void azimuthal_j_weighting(Time* time1, current *j1);
-	//void add_list(particles_list* in_list);
+	double  random_reverse(double vel, int power);
 	};
 bool continuity_equation(Time *input_time, Geometry *input_geometry, current *input_J, charge_density *rho_start, charge_density *rho_end);

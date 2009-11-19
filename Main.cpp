@@ -45,7 +45,7 @@ int main()
   // four1.fast_cosine_transform(f_t,9,0,false);
 //////////////////////////////////////
 
-
+	
 	e_field1.boundary_conditions();
 	e_field1.set_homogeneous_efield(0.0, 0.0, 1.0e3);
 	h_field1.set_homogeneous_h(0.0, 0.0, 0.0);
@@ -81,7 +81,7 @@ int main()
 	old_ions.load_spatial_distribution(1.6e14, 3.2e14);
 	new_ions.load_velocity_distribution(0.0);
 	old_ions.load_velocity_distribution(0.0);
-
+	new_electrons.velocity_distribution(1000);
 	//Particles new_electrons("electrons", -1e5, 1, 1, &geom1), old_electrons("electrons", -1e5, 1, 1, &geom1),
 	//	      new_ions("positrons", 1e5, 1, 1, &geom1), old_ions("positrons", 1e5, 1, 1, &geom1);
 

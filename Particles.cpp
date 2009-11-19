@@ -340,7 +340,6 @@ double ss =0;
 for(i=0;i<number;i++)
 {
  R = (i+0.5)/number;
- double* dss= new double[100000];
 
  // part of numerical integral calculation//
  while (s<R*nr)
@@ -351,14 +350,24 @@ for(i=0;i<number;i++)
 	 s = s+ds;
 	 j=j+1;
  }
+ /////////////////////////
  v[i] = dv*j;
+ ///////////////////////
+for(i=0;i<number;i++)
+{
+
+	v1[i] = v[i]*sin(2.0*pi*random_reverse(i,2));
+	v3[i] = v[i]*cos(2.0*pi*random_reverse(i,2));
+	v2[i] = v[i]*sin(2.0*pi*random_reverse(i,3));
+}
+
 
 }
 ////////////////////////////////////////////////////
 
 //random algorithm (binary)//
 /////////////////////////////////////////////////
-
+random_reverse(2,3);
 int b1 =11349;
  int  bb = b1;
   j=0;
@@ -412,6 +421,24 @@ for (int i=0;i<=j;i++)
 
 
 delete []v;
+
+}
+double Particles::random_reverse(double vel, int power)
+{
+	int int_vel =(int) floor(vel);
+	double ost =0;
+	double r =0;
+	int order =1;
+	while(int_vel>=1)
+	{
+		ost = int_vel % power;
+		
+		r = r + ost*pow((double)power,(-order));
+	
+		int_vel = (int_vel - ost)/power;
+		order = order+1;
+	}
+return r;
 
 }
 
