@@ -17,7 +17,7 @@ int main()
 
 	PML pml1(0.15,0.15, 0.0000001, 0.15);
 	Geometry geom1(1.28,1.28, 129, 129, &pml1);
-	Time time1(0,0,0,1000e-12,1e-12);
+	Time time1(0,0,0,1e-12,1e-12);
 	E_field e_field1(&geom1);
 	H_field h_field1(&geom1);
 	Fourier four1(0);
@@ -26,6 +26,7 @@ int main()
 	int  k, i;
     ofstream out_coord("coords");
 	ofstream out_vel("velocities");
+	ofstream out_vel1("velocities1");
 	ofstream out_efield("e_field");
 	ofstream out_hfield("h_field");
 	ofstream curr("curr");
@@ -68,33 +69,24 @@ int main()
 	Particles *new_particles = new Particles[2];
 	Particles *old_particles = new Particles[2];
 	particles_list p_list(0);
-	particles_list p_list_old(0);
-	Particles new_electrons("electrons", -1, 1, 1e5, &geom1,&p_list), old_electrons("electrons", -1, 1, 1e5, &geom1,&p_list_old);
-
-	Particles new_ions("ions", 1, 1836, 1e5, &geom1,&p_list), old_ions("electrons", 1, 1836, 1e5, &geom1,&p_list_old);
-	//p_list.step_v(&e_field1, &h_field1, &time1);
-	new_electrons.load_spatial_distribution(1.6e14, 3.2e14);
-	old_electrons.load_spatial_distribution(1.6e14, 3.2e14);
-	new_electrons.load_velocity_distribution(0.0);
-	old_electrons.load_velocity_distribution(0.0);
-	new_ions.load_spatial_distribution(1.6e14, 3.2e14);
-	old_ions.load_spatial_distribution(1.6e14, 3.2e14);
-	new_ions.load_velocity_distribution(0.0);
-	old_ions.load_velocity_distribution(0.0);
-	new_electrons.velocity_distribution(1000);
-	//Particles new_electrons("electrons", -1e5, 1, 1, &geom1), old_electrons("electrons", -1e5, 1, 1, &geom1),
-	//	      new_ions("positrons", 1e5, 1, 1, &geom1), old_ions("positrons", 1e5, 1, 1, &geom1);
-
-	//new_particles[0] = new_electrons;
-	//old_particles[0] = old_electrons;
- //   new_particles[1] = new_ions;
- //   old_particles[1] = old_ions;
-	//////////////////////
-
+	Particles electrons("electrons", -1, 1, 1e5, &geom1,&p_list);
+	Particles ions("ions", 1, 1836, 1e5, &geom1,&p_list);
+	p_list.create_coord_arrays();
+	electrons.load_spatial_distribution(1.6e14, 3.2e14);
 	
- 	//////////////////////
+	//electrons.load_velocity_distribution(0.0);
 
+	ions.load_spatial_distribution(1.6e14, 3.2e14);
 
+	//ions.load_velocity_distribution(0.0);
+
+	electrons.velocity_distribution(1000);
+
+	for (i = 0; i< 1e5; i++)
+	{
+		out_vel1<<electrons.v1[i]<<" "<<electrons.v2[i]<<" "<<electrons.v3[i]<<" ";
+	}
+	
     //two particles test
 	//new_particles[0].x1[0] = 0.0066278076171875002;
  //   new_particles[0].x3[0] = 0.95842972203685850;
@@ -108,21 +100,14 @@ int main()
 	//new_particles[1].v2[0] = 0.0;
 	//new_particles[1].v3[0] = 0.0;
     //////////////////////////
-
-	p_list.azimuthal_j_weighting(&time1, &current1);
-	//p_list.j_weighting(&time1,&current1,&old_particles[k]);
-	p_list.charge_weighting(&rho_new);
 	//0. Half step back
 
-	//weight currents and charges before relaxation period
-	//for (k=0; k<n_species; k++)
-	//{
-	//	new_particles[k].azimuthal_j_weighting(&time1, &current1);
-	//	new_particles[k].j_weighting(&time1,&current1,&old_particles[k]);
-	//	new_particles[k].charge_weighting(&rho_new);
-	//}
+	//p_list.azimuthal_j_weighting(&time1, &current1);
+	//p_list.j_weighting(&time1,&current1,);
+	//p_list.charge_weighting(&rho_new);
 
-	//solve Poisson equation
+	//weight currents and charges before relaxation period
+		//solve Poisson equation
 	Poisson_neumann poisson1(&geom1);
 
 	poisson1.poisson_solve(&e_field1, &rho_new);
@@ -150,30 +135,25 @@ int main()
 		//2. Calculate v
 		current1.reset_j();
 		rho_old.reset_rho();
-		for (k=0; k<n_species; k++)
-		{
-			new_particles[k].step_v(&e_field1, &h_field1, &time1);
+		
+			p_list.step_v(&e_field1, &h_field1, &time1);
 
 		//3. Calculate x, calculate J
-			for (i = 0; i< new_particles[k].number; i++)
-			{
-				old_particles[k].x1[i] = new_particles[k].x1[i];
-				old_particles[k].x3[i] = new_particles[k].x3[i];
-			}
-			new_particles[k].charge_weighting(&rho_old);  //continuity equation
-			new_particles[k].half_step_coord(&time1);
-			new_particles[k].azimuthal_j_weighting(&time1, &current1);
-			new_particles[k].half_step_coord(&time1);
-		//	new_particles[k].j_weighting(&time1,&current1,&old_particles[k]);
-		}
+			p_list.copy_coords();
+			p_list.charge_weighting(&rho_old);  //continuity equation
+			p_list.half_step_coord(&time1);
+			p_list.azimuthal_j_weighting(&time1, &current1);
+			p_list.half_step_coord(&time1);
+			p_list.j_weighting(&time1,&current1);
+		
 
         //4. Calculate E
        e_field1.calc_field(&h_field1, &time1, &current1, &pml1);
 		
         //continuity equation
 		rho_new.reset_rho();
-		for (k=0; k<n_species; k++)
-			new_particles[k].charge_weighting(&rho_new);  //continuity equation
+		
+			p_list.charge_weighting(&rho_new);  //continuity equation
 		res =  continuity_equation(&time1, &geom1, &current1, &rho_old, &rho_new); 
 
 		out_coord<<new_particles[0].x1[0]<<" "<<new_particles[0].x3[0]<<" ";
@@ -209,6 +189,7 @@ int main()
 out_efield.close();
 out_hfield.close();
 out_vel.close();
+out_vel1.close();
 out_coord.close();
 curr.close();
 
