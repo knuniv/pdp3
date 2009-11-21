@@ -81,7 +81,7 @@ int main()
 	//ions.load_velocity_distribution(0.0);
 
 	electrons.velocity_distribution(1000);
-
+	ions.velocity_distribution(1000);
 	for (i = 0; i< 1e5; i++)
 	{
 		out_vel1<<electrons.v1[i]<<" "<<electrons.v2[i]<<" "<<electrons.v3[i]<<" ";
@@ -156,8 +156,8 @@ int main()
 			p_list.charge_weighting(&rho_new);  //continuity equation
 		res =  continuity_equation(&time1, &geom1, &current1, &rho_old, &rho_new); 
 
-		out_coord<<new_particles[0].x1[0]<<" "<<new_particles[0].x3[0]<<" ";
-		out_vel<<new_particles[0].v1[0]<<" "<<new_particles[0].v2[0]<<" "<<new_particles[0].v3[0]<<" ";
+//		out_coord<<new_particles[0].x1[0]<<" "<<new_particles[0].x3[0]<<" ";
+//		out_vel<<new_particles[0].v1[0]<<" "<<new_particles[0].v2[0]<<" "<<new_particles[0].v3[0]<<" ";
 		
 		if ((((int)(time1.current_time/time1.delta_t))%100==0))
 		{

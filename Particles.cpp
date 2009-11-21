@@ -353,47 +353,44 @@ for(i=0;i<number;i++)
  /////////////////////////
  v[i] = dv*j;
  ///////////////////////
-for(i=0;i<number;i++)
-{
 
 	v1[i] = v[i]*sin(2.0*pi*random_reverse(i,2));
 	v3[i] = v[i]*cos(2.0*pi*random_reverse(i,2));
 	v2[i] = v[i]*sin(2.0*pi*random_reverse(i,3));
-}
-
 
 }
+
 ////////////////////////////////////////////////////
 
 //random algorithm (binary)//
-/////////////////////////////////////////////////
-random_reverse(2,3);
-int b1 =11349;
- int  bb = b1;
-  j=0;
-  for (int i=0;i<=sizeof(bb)*8;i++)
-  {
-	   bb>>=1;
-	   j=j+1;
-
-	  if(bb==0)
-	  {
-		  break;
-	  }
-
-  }
-
-double res = 0;
-int pass =0;
-for (int i=0;i<=j;i++)
-{
-     pass = b1&(1<<i);
-	
-	if (pass!=0)
-	{
-		res=res+pow(2.0,-(i+1));
-	}
-}		
+///////////////////////////////////////////////
+//random_reverse(2,3);
+//int b1 =11349;
+// int  bb = b1;
+//  j=0;
+//  for (int i=0;i<=sizeof(bb)*8;i++)
+//  {
+//	   bb>>=1;
+//	   j=j+1;
+//
+//	  if(bb==0)
+//	  {
+//		  break;
+//	  }
+//
+//  }
+//
+//double res = 0;
+//int pass =0;
+//for (int i=0;i<=j;i++)
+//{
+//     pass = b1&(1<<i);
+//	
+//	if (pass!=0)
+//	{
+//		res=res+pow(2.0,-(i+1));
+//	}
+//}		
 //////////////////////////////////////////
 
 /////////////////////////////////////////

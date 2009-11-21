@@ -13,8 +13,8 @@ public:
 	~particles_list(void);
 public:
 	vector<Particles*> part_list;
-	double** x1_array;
-	double** x3_array;
+	double** x1_old;
+	double** x3_old;
 
 public:
 	void charge_weighting(charge_density* ro1);
