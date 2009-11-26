@@ -329,7 +329,7 @@ void Particles::velocity_distribution(double therm_vel)
 int i = 0;
 int j=0;
 double R =0; // number from [0;1]
-double dv = 0.005; // velocity step in calculation integral
+double dv = 0.05; // velocity step in calculation integral
 double s =0; 
 double ds =0;
 double* v = new double [number]; //velocity vector
@@ -446,8 +446,8 @@ void Particles::load_spatial_distribution(double n1, double n2)
 	double n_in_big = (pi*geom1->first_size*geom1->first_size*geom1->second_size/number*(n2+n1)/2.0);
 	double rand_r;
 	double rand_z;
-	charge *= n_in_big;
-	mass *= n_in_big;
+	//charge *= n_in_big;
+	//mass *= n_in_big;
 	for(n = 0; n < number; n++)
 	{
 		rand_r = static_cast<double>(rand() + 1) / (RAND_MAX + 1);
@@ -570,7 +570,7 @@ void Particles::simple_j_weighting(Time* time1, current *j1, double x1_new,doubl
 }
 
 
-void Particles::j_weighting(Time* time1, current *j1, double* x1,double* x3)
+void Particles::j_weighting(Time* time1, current *j1, double* x1_o,double* x3_o)
 {
 
 	double dr = geom1->dr;
@@ -585,8 +585,8 @@ void Particles::j_weighting(Time* time1, current *j1, double* x1,double* x3)
 //////////////////////////////////////////////////////////////
 	for (i=0;i<number;i++)
 	{
-	    double x1_old= x1[i];
-		double x3_old = x3[i];
+	    double x1_old= x1_o[i];
+		double x3_old = x3_o[i];
 		//finding number new and old cells
 		int i_n = (int)ceil((x1[i])/dr)-1;
 		int k_n =(int)ceil((x3[i])/dr)-1;

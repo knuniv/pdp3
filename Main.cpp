@@ -17,7 +17,7 @@ int main()
 
 	PML pml1(0.15,0.15, 0.0000001, 0.15);
 	Geometry geom1(1.28,1.28, 129, 129, &pml1);
-	Time time1(0,0,0,1e-12,1e-12);
+	Time time1(0,0,0,20000e-12,1e-10);
 	E_field e_field1(&geom1);
 	H_field h_field1(&geom1);
 	Fourier four1(0);
@@ -69,8 +69,8 @@ int main()
 	Particles *new_particles = new Particles[2];
 	Particles *old_particles = new Particles[2];
 	particles_list p_list(0);
-	Particles electrons("electrons", -1, 1, 1e5, &geom1,&p_list);
-	Particles ions("ions", 1, 1836, 1e5, &geom1,&p_list);
+	Particles electrons("electrons", -1, 1, 5, &geom1,&p_list);
+	Particles ions("ions", 1, 1836, 5, &geom1,&p_list);
 	p_list.create_coord_arrays();
 	electrons.load_spatial_distribution(1.6e14, 3.2e14);
 	
@@ -80,9 +80,9 @@ int main()
 
 	//ions.load_velocity_distribution(0.0);
 
-	electrons.velocity_distribution(1000);
-	ions.velocity_distribution(1000);
-	for (i = 0; i< 1e5; i++)
+	electrons.velocity_distribution(1000000);
+	ions.velocity_distribution(100000);
+	for (i = 0; i< 2; i++)
 	{
 		out_vel1<<electrons.v1[i]<<" "<<electrons.v2[i]<<" "<<electrons.v3[i]<<" ";
 	}
@@ -181,10 +181,7 @@ int main()
 			break;
  	out_coord<<"\n";
 	out_vel<<"\n";
-
 	}
-
-	//particle1.velocity_distribution(1E5);
 
 out_efield.close();
 out_hfield.close();
