@@ -6,7 +6,6 @@
 #define  pi 3.14159265358979
 
 using namespace std;
-//#include "stdafx.h"
 
 Particles::Particles(void)
 {
@@ -593,9 +592,13 @@ void Particles::j_weighting(Time* time1, current *j1, double* x1_o,double* x3_o)
 		int i_o = (int)ceil((x1_old)/dr)-1;
 		int k_o =(int)ceil((x3_old)/dr)-1;
 		if (x1_old==(i_o+1)*dr)
-			i_o=i_o+1;
+			i_o=i_n;
 		if(x3_old==(k_o+1)*dz)
-			k_o=k_o+1;
+			k_o=k_n;
+		if (x1_new==(i_n+1)*dr)
+			i_n=i_o;
+		if(x3_new==(k_n+1)*dz)
+			k_n=k_o;
 	    int res_cell = abs(i_n-i_o) + abs(k_n-k_o); 
 		if ((x1[i]==x1_old)||(x3[i]==x3_old))
 		{
@@ -1069,6 +1072,5 @@ bool continuity_equation(Time *input_time, Geometry *input_geometry, current *in
 			}
 		}
 	return ok;
-	/*return delta_rho -(J3[i][k] - J3[i][k-1])/input_geometry->dz  +
-		(J1[i][k] + J1[i-1][k])/input_geometry->dr + (J1[i][k] + J1[i-1][k])/(i+0.5)/input_geometry->dr ;*/
+
 }

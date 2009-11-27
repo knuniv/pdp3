@@ -17,7 +17,7 @@ int main()
 
 	PML pml1(0.15,0.15, 0.0000001, 0.15);
 	Geometry geom1(1.28,1.28, 129, 129, &pml1);
-	Time time1(0,0,0,20000e-12,1e-10);
+	Time time1(0,0,0,20000e-12,1e-12);
 	E_field e_field1(&geom1);
 	H_field h_field1(&geom1);
 	Fourier four1(0);
@@ -36,19 +36,8 @@ int main()
 	charge_density rho_old(&geom1);
 
 
-	//////////////////////////////////////
-	double** f_t = new double*[2];
-	f_t[0] =new double [9];
-	for(k=0;k<9;k++)
-		f_t[0][k]=1;
-	f_t[0][1]=1;
-	four1.dct_2(f_t,9,0,false); 
-  // four1.fast_cosine_transform(f_t,9,0,false);
-//////////////////////////////////////
-
-	
 	e_field1.boundary_conditions();
-	e_field1.set_homogeneous_efield(0.0, 0.0, 1.0e3);
+	e_field1.set_homogeneous_efield(0.0, 0.0, 0);
 	h_field1.set_homogeneous_h(0.0, 0.0, 0.0);
 	e_field1.set_fi_on_z();
 	///////////////////////////////////////////
@@ -69,8 +58,8 @@ int main()
 	Particles *new_particles = new Particles[2];
 	Particles *old_particles = new Particles[2];
 	particles_list p_list(0);
-	Particles electrons("electrons", -1, 1, 5, &geom1,&p_list);
-	Particles ions("ions", 1, 1836, 5, &geom1,&p_list);
+	Particles electrons("electrons", -1, 1, 1e4, &geom1,&p_list);
+	Particles ions("ions", 1, 1836, 1e4, &geom1,&p_list);
 	p_list.create_coord_arrays();
 	electrons.load_spatial_distribution(1.6e14, 3.2e14);
 	
@@ -79,10 +68,10 @@ int main()
 	ions.load_spatial_distribution(1.6e14, 3.2e14);
 
 	//ions.load_velocity_distribution(0.0);
-
+	
 	electrons.velocity_distribution(1000000);
 	ions.velocity_distribution(100000);
-	for (i = 0; i< 2; i++)
+	for (i = 0; i< 1; i++)
 	{
 		out_vel1<<electrons.v1[i]<<" "<<electrons.v2[i]<<" "<<electrons.v3[i]<<" ";
 	}
@@ -159,7 +148,7 @@ int main()
 //		out_coord<<new_particles[0].x1[0]<<" "<<new_particles[0].x3[0]<<" ";
 //		out_vel<<new_particles[0].v1[0]<<" "<<new_particles[0].v2[0]<<" "<<new_particles[0].v3[0]<<" ";
 		
-		if ((((int)(time1.current_time/time1.delta_t))%100==0))
+		if ((((int)(time1.current_time/time1.delta_t))%1==0))
 		{
 			cout<<time1.current_time<<" ";
 			for(int j=0;(j<geom1.n_grid_1-1);j++)

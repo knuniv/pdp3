@@ -444,11 +444,7 @@ Triple E_field::get_field(double x1, double x3)
 	//finding number of cell. example dr=0.5,  x1 = 0.7, i_r =0;!!
 	 i_r = (int)ceil((x1-0.5*dr)/geom1->dr)-1;
 	 k_z = (int)ceil((x3)/geom1->dz)-1;
-	 if (x1==(i_r+1.5)*dr)
-			i_r=i_r+1;
-	 if(x3=(k_z+1)*dz)
-			k_z=k_z+1;
-
+	
 	 vol_1 = pi*dz*dr*dr*(2*i_r+1);
 	 vol_2 = pi*dz*dr*dr*(2*i_r+3);
 	 dz1 = (k_z+1)*dz-x3;
@@ -477,10 +473,7 @@ Triple E_field::get_field(double x1, double x3)
 //finding number of cell. example dz=0.5,  x3 = 0.7, z_k =0;!!
 	i_r = (int)ceil((x1)/geom1->dr)-1;
 	k_z = (int)ceil((x3-0.5*dz)/geom1->dz)-1;
-	if (x1==(i_r+1.5)*dr)
-			i_r=i_r+1;
-	if(x3==(k_z+1)*dz)
-			k_z=k_z+1;
+
 ///////////////////////////////////
 
    if(x1>dr)
@@ -517,11 +510,7 @@ Triple E_field::get_field(double x1, double x3)
  //finding number of cell. example dz=0.5,  x3 = 0.7, z_k =1;
 	 i_r = (int)ceil((x1)/geom1->dr)-1;
      k_z = (int)ceil((x3)/geom1->dz)-1;
-	 if (x1==(i_r+1.5)*dr)
-			i_r=i_r+1;
-	if(x3==(k_z+1)*dz)
-			k_z=k_z+1;
-
+	
   if(x1>dr)
 	{
 		vol_1 = pi*dz*dr*dr*2*i_r;
