@@ -595,9 +595,9 @@ void Particles::j_weighting(Time* time1, current *j1, double* x1_o,double* x3_o)
 			i_o=i_n;
 		if(x3_old==(k_o+1)*dz)
 			k_o=k_n;
-		if (x1_new==(i_n+1)*dr)
+		if (x1[i]==(i_n+1)*dr)
 			i_n=i_o;
-		if(x3_new==(k_n+1)*dz)
+		if(x3[i]==(k_n+1)*dz)
 			k_n=k_o;
 	    int res_cell = abs(i_n-i_o) + abs(k_n-k_o); 
 		if ((x1[i]==x1_old)||(x3[i]==x3_old))
