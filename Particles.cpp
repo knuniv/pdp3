@@ -445,14 +445,16 @@ void Particles::load_spatial_distribution(double n1, double n2)
 	double n_in_big = (pi*geom1->first_size*geom1->first_size*geom1->second_size/number*(n2+n1)/2.0);
 	double rand_r;
 	double rand_z;
+	double dr = geom1->dr*1.00000001;
+	double dz = geom1->dz*1.00000001;
 	//charge *= n_in_big;
 	//mass *= n_in_big;
 	for(n = 0; n < number; n++)
 	{
-		rand_r = static_cast<double>(rand() + 1) / (RAND_MAX + 1);
-		rand_z = static_cast<double>(rand() + 1) / (RAND_MAX + 1);
-		x1[n] = (geom1->first_size - geom1->dr)*rand_r + geom1->dr/2.0;
-		x3[n] = (geom1->second_size - geom1->dz)*sqrt(rand_z) + geom1->dz/2.0;
+		rand_r = random_reverse(n,5);
+		rand_z = random_reverse(n,7);
+		x1[n] = (geom1->first_size - dr)*sqrt(rand_r) + dr/2.0;
+		x3[n] = (geom1->second_size - dz)*sqrt(rand_z) + dz/2.0;
 	}
 
 }

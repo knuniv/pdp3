@@ -17,7 +17,7 @@ int main()
 
 	PML pml1(0.15,0.15, 0.0000001, 0.15);
 	Geometry geom1(1.28,1.28, 129, 129, &pml1);
-	Time time1(0,0,0,20000e-12,1e-12);
+	Time time1(0,0,0,10000e-12,1e-12);
 	E_field e_field1(&geom1);
 	H_field h_field1(&geom1);
 	Fourier four1(0);
@@ -58,14 +58,19 @@ int main()
 	Particles *new_particles = new Particles[2];
 	Particles *old_particles = new Particles[2];
 	particles_list p_list(0);
-	Particles electrons("electrons", -1, 1, 1e4, &geom1,&p_list);
-	Particles ions("ions", 1, 1836, 1e4, &geom1,&p_list);
+	Particles electrons("electrons", -1, 1, 1e5, &geom1,&p_list);
+	Particles ions("ions", 1, 1836, 1e5, &geom1,&p_list);
 	p_list.create_coord_arrays();
 	electrons.load_spatial_distribution(1.6e14, 3.2e14);
+
+
 	
 	//electrons.load_velocity_distribution(0.0);
 
 	ions.load_spatial_distribution(1.6e14, 3.2e14);
+
+		for (i=0; i< 10; i++)
+		out_coord<<ions.x1[i]<<" "<<ions.x3[i]<<" ";
 
 	//ions.load_velocity_distribution(0.0);
 	
@@ -93,10 +98,15 @@ int main()
 
 	//p_list.azimuthal_j_weighting(&time1, &current1);
 	//p_list.j_weighting(&time1,&current1,);
-	//p_list.charge_weighting(&rho_new);
+	p_list.charge_weighting(&rho_new);
 
 	//weight currents and charges before relaxation period
 		//solve Poisson equation
+
+	//for(int j=0;(j<geom1.n_grid_1-1);j++)
+ //     for(int k=0;k<(geom1.n_grid_2-1);k++)
+	//	curr<<rho_new.get_ro()[j][k]<<" ";
+						
 	Poisson_neumann poisson1(&geom1);
 
 	poisson1.poisson_solve(&e_field1, &rho_new);
@@ -148,7 +158,7 @@ int main()
 //		out_coord<<new_particles[0].x1[0]<<" "<<new_particles[0].x3[0]<<" ";
 //		out_vel<<new_particles[0].v1[0]<<" "<<new_particles[0].v2[0]<<" "<<new_particles[0].v3[0]<<" ";
 		
-		if ((((int)(time1.current_time/time1.delta_t))%1==0))
+		if ((((int)(time1.current_time/time1.delta_t))%100==0))
 		{
 			cout<<time1.current_time<<" ";
 			for(int j=0;(j<geom1.n_grid_1-1);j++)
@@ -157,7 +167,7 @@ int main()
 					{
 						out_efield<<e_field1.e3[j][k]<<" ";
 						out_hfield<<h_field1.h2[j][k]<<" ";
-						curr<<e_field1.e1[j][k]<<" ";
+						curr<<rho_new.get_ro()[j][k]<<" ";
 						
 				    }
 	    	}
