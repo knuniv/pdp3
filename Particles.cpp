@@ -567,7 +567,93 @@ void Particles::simple_j_weighting(Time* time1, current *j1, double x1_new,doubl
 	
 	//}
 }
+void Particles::simple_constrho_j_weighting(Time* time1, current *j1, double x1_new,double x3_new, double x1_old, double x3_old, int i_n, int k_n)
+{
+	double dr = geom1->dr;
+	double dz = geom1->dz;
+	double wj = 0;
+	double delta_t = time1->delta_t;
 
+		// distance of particle moving//
+		double delta_r = x1_new - x1_old;
+		double delta_z = x3_new - x3_old;
+
+		// if i cell is not equal 0 
+		if (i_n>=1)
+		{
+		///////////////////////////////////
+		// equation y = k*x+b;//
+		// finding k & b//
+		double k = delta_r/delta_z;
+		double b = x1_old-dr/2.0;
+//		double r0 = (i_n+0.5)*dr;
+	    //calculate current jz in [i,k] cell//
+	//	wj = particle_rho*pi*delta_z/(delta_t*2*pi*i_n*dr*dr) * (r0*r0 - b*b -a*a*delta_z*delta_z/3.0 - a*b*delta_z); 
+		// set new weighting current value 
+		j1->set_j3(i_n,k_n, wj);
+
+        //calculate current in [i+1,k] cell//
+	//	wj = particle_rho*pi*delta_z/(delta_t*2*pi*(i_n+1)*dr*dr) * (a*a*delta_z*delta_z/3.0 + a*b*delta_z+b*b-r0*r0); 
+		// set new weighting current value 
+		j1->set_j3(i_n+1,k_n, wj);
+		
+		///////////////////////////////////
+	    //calculate current jr in [i,k] cell//
+		// equation y = k*x+b;//
+		// finding k & b//
+		 k = -delta_z/delta_r;
+		 double r0 = (i_n+0.5)*dr;
+		 double r1 =  x1_old;
+		 b= (k_n+1.0)*dz - x3_old;
+
+        //weighting jr in [i][k] cell
+//		wj = charge/(2*pi*r0*dz*dz*dr*delta_t) *();
+		j1->set_j1(i_n,k_n, wj);
+
+          b= x3_old- k_n*dz;;
+         //weighting jr in [i][k+1] cell
+	//	 wj = charge/(2*pi*r0*dz*dz*dr*delta_t) * ();
+		j1->set_j1(i_n, k_n+1, wj);
+		}
+		// if i cell is equal 0 
+		else
+		{
+///////////////////////////////////
+		// equation y = k*x+b;//
+		// finding k & b//
+		double k = delta_r/delta_z;
+		double b = x1_old;
+	    //calculate current jz in [i,k] cell//
+	//	wj = charge/(2.0*dr*dz*delta_t*pi*dr*dr/4.0) * (dr*delta_z - k*delta_z*delta_z/2.0 - delta_z*b ); 
+		// set new weighting current value 
+		j1->set_j3(i_n,k_n, wj);
+
+        //calculate current in [i+1,k] cell//
+	//	wj = charge/(2.0*dr*dz*delta_t*2.0*pi*dr*dr) * (k*delta_z*delta_z/2.0 + delta_z*dr +delta_z*b); 
+		// set new weighting current value 
+		j1->set_j3(i_n+1,k_n, wj);
+		
+		///////////////////////////////////
+	    //calculate current jr in [i,k] cell//
+		// equation y = k*x+b;//
+		// finding k & b//
+		 k = -delta_z/delta_r;
+		 double r0 = (i_n+0.5)*dr;
+		 double r1 =  x1_old;
+		 b= (k_n+1.0)*dz - x3_old;
+
+        //weighting jr in [i][k] cell
+		wj = charge/(2*pi*r0*dz*dz*dr*delta_t) *(r0*k*delta_r+k/2.0 * delta_r*(x1_old+delta_r/2.0)+0.5*delta_r*(b-k*(2*r0+r1))+ delta_r*(b-k*r1)*(4*r0*r0-dr*dr)/(8*x1_old*(x1_old+delta_r)) + (k*(r0*r0/2.0-dr*dr/8.0))*log((x1_old+delta_r)/x1_old));
+		j1->set_j1(i_n,k_n, wj);
+
+          b= x3_old- k_n*dz;;
+         //weighting jr in [i][k+1] cell
+		 wj = charge/(2*pi*r0*dz*dz*dr*delta_t) * (-r0*k*delta_r - k/2.0*delta_r*(x1_old+delta_r/2.0)+0.5*delta_r*(b+k*(2*r0+r1))+ delta_r*(b+k*r1)*(4*r0*r0-dr*dr)/(8*x1_old*(x1_old+delta_r)) - (k*(r0*r0/2.0-dr*dr/8.0))*log((x1_old+delta_r)/x1_old));
+		j1->set_j1(i_n, k_n+1, wj);
+		}
+	
+	//}
+}
 
 void Particles::j_weighting(Time* time1, current *j1, double* x1_o,double* x3_o)
 {
