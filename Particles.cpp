@@ -447,8 +447,8 @@ void Particles::load_spatial_distribution(double n1, double n2)
 	double rand_z;
 	double dr = geom1->dr*1.00000001;
 	double dz = geom1->dz*1.00000001;
-	//charge *= n_in_big;
-	//mass *= n_in_big;
+	charge *= n_in_big;
+	mass *= n_in_big;
 	for(n = 0; n < number; n++)
 	{
 		rand_r = random_reverse(n,2);
@@ -1145,7 +1145,7 @@ bool continuity_equation(Time *input_time, Geometry *input_geometry, current *in
 	double delta_rho = 1.0/(input_geometry->dz*4.0*3.1415*input_geometry->dr*input_geometry->dr) ;
 	int i, k;
 	bool ok = true;
-	double res, tolerance = 1e-10 ;
+	double res, tolerance = 1e-4 ;
 	for (i=1;i<input_geometry->n_grid_1-1;i++)
 
 		for (k=1;k<input_geometry->n_grid_2-1;k++)

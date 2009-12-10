@@ -10,6 +10,7 @@
 #include "particles_list.h"
 #include <fstream>
 #include <math.h>
+#include "Boundary_Maxwell_conditions.h"
 #define  pi = 3.14159265;
 using namespace std;
 int main() 
@@ -17,11 +18,12 @@ int main()
 
 	PML pml1(0.15,0.15, 0.0000001, 0.15);
 	Geometry geom1(1.28,1.28, 129, 129, &pml1);
-	Time time1(0,0,0,1e-12,1e-12);
+	Time time1(0,0,0,10000e-12,1e-12);
 	E_field e_field1(&geom1);
 	H_field h_field1(&geom1);
 	Fourier four1(0);
-
+	Boundary_Maxwell_conditions maxwell_rad(&e_field1);
+	maxwell_rad.specify_initial_field(&geom1,0,0,0);
 	bool res = true;
 	int  k, i;
     ofstream out_coord("coords");
@@ -58,16 +60,16 @@ int main()
 	Particles *new_particles = new Particles[2];
 	Particles *old_particles = new Particles[2];
 	particles_list p_list(0);
-	Particles electrons("electrons", -1, 1, 1e6, &geom1,&p_list);
-	Particles ions("ions", 0, 1836, 1e6, &geom1,&p_list);
+	Particles electrons("electrons", -0, 1, 1e0, &geom1,&p_list);
+	Particles ions("ions", 0, 1836, 1e0, &geom1,&p_list);
 	p_list.create_coord_arrays();
-	electrons.load_spatial_distribution(1.6e14, 3.2e14);
+	electrons.load_spatial_distribution(0e14, 6.4e14);
 
 
 	
 	//electrons.load_velocity_distribution(0.0);
 
-	ions.load_spatial_distribution(1.6e14, 3.2e14);
+	ions.load_spatial_distribution(0e14, 6.4e14);
 
 		for (i=0; i< 10; i++)
 		out_coord<<ions.x1[i]<<" "<<ions.x3[i]<<" ";
@@ -128,6 +130,8 @@ int main()
      
     while (time1.current_time < time1.end_time)
 	{
+		//radiation  source
+		maxwell_rad.radiation_source(&geom1,0.2,1e9/6.28,0,time1.current_time);
         //1. Calculate H field
 		h_field1.calc_field(&e_field1, &time1);
 
@@ -147,7 +151,7 @@ int main()
 		
 
         //4. Calculate E
-       e_field1.calc_field(&h_field1, &time1, &current1, &pml1);
+       e_field1.calc_field(&h_field1, &time1, &current1);
 		
         //continuity equation
 		rho_new.reset_rho();
@@ -158,14 +162,14 @@ int main()
 //		out_coord<<new_particles[0].x1[0]<<" "<<new_particles[0].x3[0]<<" ";
 //		out_vel<<new_particles[0].v1[0]<<" "<<new_particles[0].v2[0]<<" "<<new_particles[0].v3[0]<<" ";
 		
-		if ((((int)(time1.current_time/time1.delta_t))%100==0))
+		if ((((int)(time1.current_time/time1.delta_t))%1000==0))
 		{
 			cout<<time1.current_time<<" ";
 			for(int j=0;(j<geom1.n_grid_1-1);j++)
 			{
 				for(int k=0;k<(geom1.n_grid_2-1);k++)
 					{
-						out_efield<<e_field1.e3[j][k]<<" ";
+						out_efield<<e_field1.e1[j][k]<<" ";
 						out_hfield<<h_field1.h2[j][k]<<" ";
 						curr<<rho_new.get_ro()[j][k]<<" ";
 						
