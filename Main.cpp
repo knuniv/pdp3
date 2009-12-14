@@ -17,7 +17,7 @@ int main()
 {
 
 	PML pml1(0.15,0.15, 0.0000001, 0.15);
-	Geometry geom1(1.28,1.28, 129, 129, &pml1);
+	Geometry geom1(0.8,0.8, 129, 129, &pml1);
 	Time time1(0,0,0,10000e-12,1e-12);
 	E_field e_field1(&geom1);
 	H_field h_field1(&geom1);
@@ -60,24 +60,24 @@ int main()
 	Particles *new_particles = new Particles[2];
 	Particles *old_particles = new Particles[2];
 	particles_list p_list(0);
-	Particles electrons("electrons", -0, 1, 1e0, &geom1,&p_list);
-	Particles ions("ions", 0, 1836, 1e0, &geom1,&p_list);
+	Particles electrons("electrons", -1, 1, 1e6, &geom1,&p_list);
+	Particles ions("ions", 1, 1836, 1e6, &geom1,&p_list);
 	p_list.create_coord_arrays();
-	electrons.load_spatial_distribution(0e14, 6.4e14);
+	electrons.load_spatial_distribution(0e14, 2.5e15);
 
 
 	
 	//electrons.load_velocity_distribution(0.0);
 
-	ions.load_spatial_distribution(0e14, 6.4e14);
+	ions.load_spatial_distribution(0e14, 2.5e15);
 
 		for (i=0; i< 10; i++)
 		out_coord<<ions.x1[i]<<" "<<ions.x3[i]<<" ";
 
 	//ions.load_velocity_distribution(0.0);
 	
-	electrons.velocity_distribution(1000000);
-	ions.velocity_distribution(100000);
+	electrons.velocity_distribution(1e4);
+	ions.velocity_distribution(1e3);
 	for (i = 0; i< 1; i++)
 	{
 		out_vel1<<electrons.v1[i]<<" "<<electrons.v2[i]<<" "<<electrons.v3[i]<<" ";
@@ -162,14 +162,14 @@ int main()
 //		out_coord<<new_particles[0].x1[0]<<" "<<new_particles[0].x3[0]<<" ";
 //		out_vel<<new_particles[0].v1[0]<<" "<<new_particles[0].v2[0]<<" "<<new_particles[0].v3[0]<<" ";
 		
-		if ((((int)(time1.current_time/time1.delta_t))%1000==0))
+		if ((((int)(time1.current_time/time1.delta_t))%100==0))
 		{
 			cout<<time1.current_time<<" ";
 			for(int j=0;(j<geom1.n_grid_1-1);j++)
 			{
 				for(int k=0;k<(geom1.n_grid_2-1);k++)
 					{
-						out_efield<<e_field1.e1[j][k]<<" ";
+						out_efield<<e_field1.e3[j][k]<<" ";
 						out_hfield<<h_field1.h2[j][k]<<" ";
 						curr<<rho_new.get_ro()[j][k]<<" ";
 						
@@ -181,7 +181,8 @@ int main()
 		}
 		time1.current_time = time1.current_time + time1.delta_t;
 		if (!res)
-			break;
+			//break;
+			cout<<"Error:"<<time1.current_time<<"! ";
  	out_coord<<"\n";
 	out_vel<<"\n";
 	}
