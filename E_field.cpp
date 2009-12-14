@@ -241,7 +241,7 @@ void E_field::calc_field(H_field* h_field1, Time* time1, current* current1)
 			e1[i][k]=e1[i][k]-(j1[i][k])*time1->delta_t/epsilon0;
 		}
 
-	//Ez=- j on axis//
+	//Ez on axis//
     for(k=0;k<(geom1->n_grid_2-1);k++)
 		{
 			 i=0;

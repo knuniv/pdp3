@@ -131,7 +131,7 @@ int main()
     while (time1.current_time < time1.end_time)
 	{
 		//radiation  source
-		maxwell_rad.radiation_source(&geom1,0.2,1e9/6.28,0,time1.current_time);
+		maxwell_rad.radiation_source(&geom1,0.2,2e9,0,time1.current_time);
         //1. Calculate H field
 		h_field1.calc_field(&e_field1, &time1);
 
