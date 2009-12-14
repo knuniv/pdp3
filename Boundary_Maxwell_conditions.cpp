@@ -40,7 +40,7 @@ void Boundary_Maxwell_conditions::radiation_source(Geometry* cyl_geom,double reg
 		case 0:
     		   {
 				for (i=0;i<i_max;i++)
-					e_fld->e1[i][0]=e_fld->e1[i][0]*cos(2*pi*frequency*time);
+					e_fld->e1[i][0]=1e3*sin(2*pi*frequency*time);
 			   }
 	   break;
 	   // H electromagnetic wave 
