@@ -17,7 +17,7 @@ int main()
 {
 
 	PML pml1(0.15,0.15, 0.0000001, 0.15);
-	Geometry geom1(0.8,0.8, 129, 129, &pml1);
+	Geometry geom1(0.4,0.8, 65, 129, &pml1);
 	Time time1(0,0,0,10000e-12,1e-12);
 	E_field e_field1(&geom1);
 	H_field h_field1(&geom1);
@@ -63,13 +63,13 @@ int main()
 	Particles electrons("electrons", -1, 1, 1e6, &geom1,&p_list);
 	Particles ions("ions", 1, 1836, 1e6, &geom1,&p_list);
 	p_list.create_coord_arrays();
-	electrons.load_spatial_distribution(0e14, 2.5e15);
+	electrons.load_spatial_distribution(2e16, 8e16);
 
 
 	
 	//electrons.load_velocity_distribution(0.0);
 
-	ions.load_spatial_distribution(0e14, 2.5e15);
+	ions.load_spatial_distribution(2e16, 8e16);
 
 		for (i=0; i< 10; i++)
 		out_coord<<ions.x1[i]<<" "<<ions.x3[i]<<" ";
@@ -131,7 +131,7 @@ int main()
     while (time1.current_time < time1.end_time)
 	{
 		//radiation  source
-		maxwell_rad.radiation_source(&geom1,0.2,2e9,0,time1.current_time);
+		maxwell_rad.radiation_source(&geom1,0.4,2e9,0,time1.current_time);
         //1. Calculate H field
 		h_field1.calc_field(&e_field1, &time1);
 

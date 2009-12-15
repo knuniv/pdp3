@@ -338,7 +338,9 @@ double ss =0;
 
 for(i=0;i<number;i++)
 {
+ 
  R = (i+0.5)/number;
+ R = (R+0.05)/(1.05);
 
  // part of numerical integral calculation//
  while (s<R*nr)
@@ -449,12 +451,14 @@ void Particles::load_spatial_distribution(double n1, double n2)
 	double dz = geom1->dz*1.00000001;
 	charge *= n_in_big;
 	mass *= n_in_big;
+	double dn = n2 - n1;
 	for(n = 0; n < number; n++)
 	{
 		rand_r = random_reverse(n,2);
 		rand_z = random_reverse(number - 1 - n,7);
 		x1[n] = (geom1->first_size - dr)*sqrt(rand_r) + dr/2.0;
-		x3[n] = (geom1->second_size - dz)*sqrt(rand_z) + dz/2.0;
+		//x3[n] = (geom1->second_size - dz)*sqrt(rand_z) + dz/2.0;
+		x3[n] = (geom1->second_size - dz)/dn*(sqrt(n1*n1 + rand_z*(2*n1*dn + dn*dn)) - n1) + dz/2.0;
 	}
 
 }
