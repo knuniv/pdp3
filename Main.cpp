@@ -17,8 +17,8 @@ int main()
 {
 
 	PML pml1(0.15,0.15, 0.0000001, 0.15);
-	Geometry geom1(0.8,0.8, 129, 129, &pml1);
-	Time time1(0,0,0,10000e-12,1e-12);
+	Geometry geom1(0.4,0.8, 129, 129, &pml1);
+	Time time1(0,0,0,1000e-12,1e-12);
 	E_field e_field1(&geom1);
 	H_field h_field1(&geom1);
 	Fourier four1(0);
@@ -78,7 +78,7 @@ int main()
 	
 	electrons.velocity_distribution(1e4);
 	ions.velocity_distribution(1e3);
-	for (i = 0; i< 1; i++)
+	for (i = 0; i< electrons.number; i++)
 	{
 		out_vel1<<electrons.v1[i]<<" "<<electrons.v2[i]<<" "<<electrons.v3[i]<<" ";
 	}
