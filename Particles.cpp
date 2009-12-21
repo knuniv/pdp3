@@ -340,8 +340,6 @@ for(i=0;i<number;i++)
 {
  
  R = (i+0.5)/number;
- R = (R+0.05)/(1.05);
-
  // part of numerical integral calculation//
  while (s<R*nr)
  {
