@@ -17,7 +17,7 @@ int main()
 
 	PML pml1(0.15,0.15, 0.0000001, 0.15);
 	Geometry geom1(1.28,1.28, 129, 129, &pml1);
-	Time time1(0,0,0,20000e-12,1e-12);
+	Time time1(0,0,0,200e-12,1e-12);
 	E_field e_field1(&geom1);
 	H_field h_field1(&geom1);
 	Fourier four1(0);
