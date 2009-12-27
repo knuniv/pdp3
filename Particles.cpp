@@ -328,7 +328,7 @@ void Particles::velocity_distribution(double therm_vel)
 int i = 0;
 int j=0;
 double R =0; // number from [0;1]
-double dv = 0.05; // velocity step in calculation integral
+double dv = therm_vel/1e7; // velocity step in calculation integral
 double s =0; 
 double ds =0;
 double* v = new double [number]; //velocity vector
@@ -338,8 +338,8 @@ double ss =0;
 
 for(i=0;i<number;i++)
 {
+ 
  R = (i+0.5)/number;
-
  // part of numerical integral calculation//
  while (s<R*nr)
  {
@@ -361,57 +361,6 @@ for(i=0;i<number;i++)
 
 ////////////////////////////////////////////////////
 
-//random algorithm (binary)//
-///////////////////////////////////////////////
-//random_reverse(2,3);
-//int b1 =11349;
-// int  bb = b1;
-//  j=0;
-//  for (int i=0;i<=sizeof(bb)*8;i++)
-//  {
-//	   bb>>=1;
-//	   j=j+1;
-//
-//	  if(bb==0)
-//	  {
-//		  break;
-//	  }
-//
-//  }
-//
-//double res = 0;
-//int pass =0;
-//for (int i=0;i<=j;i++)
-//{
-//     pass = b1&(1<<i);
-//	
-//	if (pass!=0)
-//	{
-//		res=res+pow(2.0,-(i+1));
-//	}
-//}		
-//////////////////////////////////////////
-
-/////////////////////////////////////////
- //random algorithm (ternary)// 
-//int N =223;
-//// int  bb = 0;
-// int j=1;
-// int aa =0;
-// double res =0;
-////  for (int i=4;i<=N;i++)
-// // {
-//	  bb = N;
-//	  while(bb>=1)
-//	  {
-////		aa = bb % 3;
-//		res = res + aa*pow(3.0, -j);
-//		j=j+1;
-////		bb = bb / 3;
-//	  }
-	 
-
-//  }
 ///////////////////////////////////////////
 
 
@@ -445,14 +394,18 @@ void Particles::load_spatial_distribution(double n1, double n2)
 	double n_in_big = (pi*geom1->first_size*geom1->first_size*geom1->second_size/number*(n2+n1)/2.0);
 	double rand_r;
 	double rand_z;
-	//charge *= n_in_big;
-	//mass *= n_in_big;
+	double dr = geom1->dr*1.00000001;
+	double dz = geom1->dz*1.00000001;
+	charge *= n_in_big;
+	mass *= n_in_big;
+	double dn = n2 - n1;
 	for(n = 0; n < number; n++)
 	{
-		rand_r = static_cast<double>(rand() + 1) / (RAND_MAX + 1);
-		rand_z = static_cast<double>(rand() + 1) / (RAND_MAX + 1);
-		x1[n] = (geom1->first_size - geom1->dr)*rand_r + geom1->dr/2.0;
-		x3[n] = (geom1->second_size - geom1->dz)*sqrt(rand_z) + geom1->dz/2.0;
+		rand_r = random_reverse(n,2);
+		rand_z = random_reverse(number - 1 - n,7);
+		x1[n] = (geom1->first_size - dr)*sqrt(rand_r) + dr/2.0;
+		//x3[n] = (geom1->second_size - dz)*sqrt(rand_z) + dz/2.0;
+		x3[n] = (geom1->second_size - dz)/dn*(sqrt(n1*n1 + rand_z*(2*n1*dn + dn*dn)) - n1) + dz/2.0;
 	}
 
 }
@@ -567,7 +520,93 @@ void Particles::simple_j_weighting(Time* time1, current *j1, double x1_new,doubl
 	
 	//}
 }
+void Particles::simple_constrho_j_weighting(Time* time1, current *j1, double x1_new,double x3_new, double x1_old, double x3_old, int i_n, int k_n)
+{
+	double dr = geom1->dr;
+	double dz = geom1->dz;
+	double wj = 0;
+	double delta_t = time1->delta_t;
 
+		// distance of particle moving//
+		double delta_r = x1_new - x1_old;
+		double delta_z = x3_new - x3_old;
+
+		// if i cell is not equal 0 
+		if (i_n>=1)
+		{
+		///////////////////////////////////
+		// equation y = k*x+b;//
+		// finding k & b//
+		double k = delta_r/delta_z;
+		double b = x1_old-dr/2.0;
+//		double r0 = (i_n+0.5)*dr;
+	    //calculate current jz in [i,k] cell//
+	//	wj = particle_rho*pi*delta_z/(delta_t*2*pi*i_n*dr*dr) * (r0*r0 - b*b -a*a*delta_z*delta_z/3.0 - a*b*delta_z); 
+		// set new weighting current value 
+		j1->set_j3(i_n,k_n, wj);
+
+        //calculate current in [i+1,k] cell//
+	//	wj = particle_rho*pi*delta_z/(delta_t*2*pi*(i_n+1)*dr*dr) * (a*a*delta_z*delta_z/3.0 + a*b*delta_z+b*b-r0*r0); 
+		// set new weighting current value 
+		j1->set_j3(i_n+1,k_n, wj);
+		
+		///////////////////////////////////
+	    //calculate current jr in [i,k] cell//
+		// equation y = k*x+b;//
+		// finding k & b//
+		 k = -delta_z/delta_r;
+		 double r0 = (i_n+0.5)*dr;
+		 double r1 =  x1_old;
+		 b= (k_n+1.0)*dz - x3_old;
+
+        //weighting jr in [i][k] cell
+//		wj = charge/(2*pi*r0*dz*dz*dr*delta_t) *();
+		j1->set_j1(i_n,k_n, wj);
+
+          b= x3_old- k_n*dz;;
+         //weighting jr in [i][k+1] cell
+	//	 wj = charge/(2*pi*r0*dz*dz*dr*delta_t) * ();
+		j1->set_j1(i_n, k_n+1, wj);
+		}
+		// if i cell is equal 0 
+		else
+		{
+///////////////////////////////////
+		// equation y = k*x+b;//
+		// finding k & b//
+		double k = delta_r/delta_z;
+		double b = x1_old;
+	    //calculate current jz in [i,k] cell//
+	//	wj = charge/(2.0*dr*dz*delta_t*pi*dr*dr/4.0) * (dr*delta_z - k*delta_z*delta_z/2.0 - delta_z*b ); 
+		// set new weighting current value 
+		j1->set_j3(i_n,k_n, wj);
+
+        //calculate current in [i+1,k] cell//
+	//	wj = charge/(2.0*dr*dz*delta_t*2.0*pi*dr*dr) * (k*delta_z*delta_z/2.0 + delta_z*dr +delta_z*b); 
+		// set new weighting current value 
+		j1->set_j3(i_n+1,k_n, wj);
+		
+		///////////////////////////////////
+	    //calculate current jr in [i,k] cell//
+		// equation y = k*x+b;//
+		// finding k & b//
+		 k = -delta_z/delta_r;
+		 double r0 = (i_n+0.5)*dr;
+		 double r1 =  x1_old;
+		 b= (k_n+1.0)*dz - x3_old;
+
+        //weighting jr in [i][k] cell
+		wj = charge/(2*pi*r0*dz*dz*dr*delta_t) *(r0*k*delta_r+k/2.0 * delta_r*(x1_old+delta_r/2.0)+0.5*delta_r*(b-k*(2*r0+r1))+ delta_r*(b-k*r1)*(4*r0*r0-dr*dr)/(8*x1_old*(x1_old+delta_r)) + (k*(r0*r0/2.0-dr*dr/8.0))*log((x1_old+delta_r)/x1_old));
+		j1->set_j1(i_n,k_n, wj);
+
+          b= x3_old- k_n*dz;;
+         //weighting jr in [i][k+1] cell
+		 wj = charge/(2*pi*r0*dz*dz*dr*delta_t) * (-r0*k*delta_r - k/2.0*delta_r*(x1_old+delta_r/2.0)+0.5*delta_r*(b+k*(2*r0+r1))+ delta_r*(b+k*r1)*(4*r0*r0-dr*dr)/(8*x1_old*(x1_old+delta_r)) - (k*(r0*r0/2.0-dr*dr/8.0))*log((x1_old+delta_r)/x1_old));
+		j1->set_j1(i_n, k_n+1, wj);
+		}
+	
+	//}
+}
 
 void Particles::j_weighting(Time* time1, current *j1, double* x1_o,double* x3_o)
 {
@@ -595,9 +634,9 @@ void Particles::j_weighting(Time* time1, current *j1, double* x1_o,double* x3_o)
 			i_o=i_n;
 		if(x3_old==(k_o+1)*dz)
 			k_o=k_n;
-		if (x1_new==(i_n+1)*dr)
+		if (x1[i]==(i_n+1)*dr)
 			i_n=i_o;
-		if(x3_new==(k_n+1)*dz)
+		if(x3[i]==(k_n+1)*dz)
 			k_n=k_o;
 	    int res_cell = abs(i_n-i_o) + abs(k_n-k_o); 
 		if ((x1[i]==x1_old)||(x3[i]==x3_old))
@@ -1057,7 +1096,7 @@ bool continuity_equation(Time *input_time, Geometry *input_geometry, current *in
 	double delta_rho = 1.0/(input_geometry->dz*4.0*3.1415*input_geometry->dr*input_geometry->dr) ;
 	int i, k;
 	bool ok = true;
-	double res, tolerance = 1e-10 ;
+	double res, tolerance = 1e-4 ;
 	for (i=1;i<input_geometry->n_grid_1-1;i++)
 
 		for (k=1;k<input_geometry->n_grid_2-1;k++)
