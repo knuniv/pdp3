@@ -17,8 +17,8 @@ int main()
 {
 
 	PML pml1(0.15,0.15, 0.0000001, 0.15);
-	Geometry geom1(0.4,0.8, 129, 129, &pml1);
-	Time time1(0,0,0,1000e-12,1e-12);
+	Geometry geom1(0.4,1.6, 129, 513, &pml1);
+	Time time1(0,0,0,10000e-12,1e-12);
 	E_field e_field1(&geom1);
 	H_field h_field1(&geom1);
 	Fourier four1(0);
@@ -60,8 +60,8 @@ int main()
 	Particles *new_particles = new Particles[2];
 	Particles *old_particles = new Particles[2];
 	particles_list p_list(0);
-	Particles electrons("electrons", -1, 1, 1e6, &geom1,&p_list);
-	Particles ions("ions", 1, 1836, 1e6, &geom1,&p_list);
+	Particles electrons("electrons", -1, 1, 0*1e6, &geom1,&p_list);
+	Particles ions("ions", 1, 1836, 0*1e6, &geom1,&p_list);
 	p_list.create_coord_arrays();
 	electrons.load_spatial_distribution(2e16, 8e16);
 
@@ -131,7 +131,8 @@ int main()
     while (time1.current_time < time1.end_time)
 	{
 		//radiation  source
-		maxwell_rad.radiation_source(&geom1,0.4,2e9,0,time1.current_time);
+		//maxwell_rad.radiation_source(&geom1,0.4,2e9,0,time1.current_time);
+		
         //1. Calculate H field
 		h_field1.calc_field(&e_field1, &time1);
 
@@ -151,6 +152,7 @@ int main()
 		
 
         //4. Calculate E
+	   maxwell_rad.probe_mode_exitation(&geom1,&current1, 0.5, 5e8, time1.current_time);
        e_field1.calc_field(&h_field1, &time1, &current1);
 		
         //continuity equation
@@ -169,7 +171,7 @@ int main()
 			{
 				for(int k=0;k<(geom1.n_grid_2-1);k++)
 					{
-						out_efield<<e_field1.e3[j][k]<<" ";
+						out_efield<<e_field1.e1[j][k]<<" ";
 						out_hfield<<h_field1.h2[j][k]<<" ";
 						curr<<rho_new.get_ro()[j][k]<<" ";
 						
