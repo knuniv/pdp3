@@ -17,7 +17,7 @@ int main()
 {
 
 	PML pml1(0.15,0.15, 0.0000001, 0.15);
-	Geometry geom1(0.4,1.6, 129, 513, &pml1);
+	Geometry geom1(0.4,3.2, 129, 1025, &pml1);
 	Time time1(0,0,0,10000e-12,1e-12);
 	E_field e_field1(&geom1);
 	H_field h_field1(&geom1);
@@ -29,8 +29,7 @@ int main()
     ofstream out_coord("coords");
 	ofstream out_vel("velocities");
 	ofstream out_vel1("velocities1");
-	ofstream out_efield1("e1_field");
-    ofstream out_efield3("e3_field");
+	ofstream out_efield("e_field");
 	ofstream out_hfield("h_field");
 	ofstream curr("curr");
 
@@ -153,8 +152,9 @@ int main()
 		
 
         //4. Calculate E
-	   maxwell_rad.probe_mode_exitation(&geom1,&current1, 0.5, 5e8, time1.current_time);
+	   maxwell_rad.probe_mode_exitation(&geom1,&current1, 0.5, 3e8, time1.current_time);
        e_field1.calc_field(&h_field1, &time1, &current1);
+	   maxwell_rad.probe_mode_exitation(&geom1,&current1, 0.5, 3e8, time1.current_time);
 		
         //continuity equation
 		rho_new.reset_rho();
@@ -165,7 +165,7 @@ int main()
 //		out_coord<<new_particles[0].x1[0]<<" "<<new_particles[0].x3[0]<<" ";
 //		out_vel<<new_particles[0].v1[0]<<" "<<new_particles[0].v2[0]<<" "<<new_particles[0].v3[0]<<" ";
 		
-		if ((((int)(time1.current_time/time1.delta_t))%10==0))
+		if ((((int)(time1.current_time/time1.delta_t))%100==0))
 		{
 			cout<<time1.current_time<<" ";
 			for(int j=0;(j<geom1.n_grid_1-1);j++)
@@ -173,14 +173,12 @@ int main()
 				for(int k=0;k<(geom1.n_grid_2-1);k++)
 					{
 						out_efield<<e_field1.e1[j][k]<<" ";
-						out_efield3<<e_field1.e3[j][k]<<" ";
 						out_hfield<<h_field1.h2[j][k]<<" ";
 						curr<<rho_new.get_ro()[j][k]<<" ";
 						
 				    }
 	    	}
-			out_efield1<<"\n"; 
-			out_efield3<<"\n"; 
+			out_efield<<"\n"; 
 			out_hfield<<"\n"; 
 	        
 		}
@@ -192,8 +190,7 @@ int main()
 	out_vel<<"\n";
 	}
 
-out_efield1.close();
-out_efield3.close();
+out_efield.close();
 out_hfield.close();
 out_vel.close();
 out_vel1.close();
