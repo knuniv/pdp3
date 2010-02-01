@@ -83,18 +83,7 @@ int main()
 		out_vel1<<electrons.v1[i]<<" "<<electrons.v2[i]<<" "<<electrons.v3[i]<<" ";
 	}
 	
-    //two particles test
-	//new_particles[0].x1[0] = 0.0066278076171875002;
- //   new_particles[0].x3[0] = 0.95842972203685850;
-	//new_particles[0].v1[0] = 0.0;
-	//new_particles[0].v2[0] = 0.0;
-	//new_particles[0].v3[0] = 0.0e6;
-
-	//new_particles[1].x1[0] = 0.74797790527343755;
- //   new_particles[1].x3[0] = 0.88477999104412552;
-	//new_particles[1].v1[0] = 0.0;
-	//new_particles[1].v2[0] = 0.0;
-	//new_particles[1].v3[0] = 0.0;
+    
     //////////////////////////
 	//0. Half step back
 
@@ -174,7 +163,7 @@ int main()
 					{
 						out_efield<<e_field1.e1[j][k]<<" ";
 						out_hfield<<h_field1.h2[j][k]<<" ";
-						curr<<rho_new.get_ro()[j][k]<<" ";
+						//curr<<rho_new.get_ro()[j][k]<<" ";
 						
 				    }
 	    	}
