@@ -29,7 +29,8 @@ int main()
     ofstream out_coord("coords");
 	ofstream out_vel("velocities");
 	ofstream out_vel1("velocities1");
-	ofstream out_efield("e_field");
+	ofstream out_e1field("e1_field");
+	ofstream out_e3field("e3_field");
 	ofstream out_hfield("h_field");
 	ofstream curr("curr");
 
@@ -161,13 +162,15 @@ int main()
 			{
 				for(int k=0;k<(geom1.n_grid_2-1);k++)
 					{
-						out_efield<<e_field1.e1[j][k]<<" ";
+						out_e1field<<e_field1.e1[j][k]<<" ";
+						out_e3field<<e_field1.e3[j][k]<<" ";
 						out_hfield<<h_field1.h2[j][k]<<" ";
 						//curr<<rho_new.get_ro()[j][k]<<" ";
 						
 				    }
 	    	}
-			out_efield<<"\n"; 
+			out_e1field<<"\n"; 
+			out_e3field<<"\n";
 			out_hfield<<"\n"; 
 	        
 		}
@@ -179,7 +182,8 @@ int main()
 	out_vel<<"\n";
 	}
 
-out_efield.close();
+out_e1field.close();
+out_e3field.close();
 out_hfield.close();
 out_vel.close();
 out_vel1.close();
