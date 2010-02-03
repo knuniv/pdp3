@@ -614,9 +614,9 @@ void Particles::j_weighting(Time* time1, current *j1, double* x1_o,double* x3_o)
 	double dr = geom1->dr;
 	double dz = geom1->dz;
 
-	double **J1 = j1->get_j1();
-	double **J2 = j1->get_j2();
-	double **J3 = j1->get_j3();
+	//double **J1 = j1->get_j1();
+	//double **J2 = j1->get_j2();
+	//double **J3 = j1->get_j3();
 	int i;
 
 

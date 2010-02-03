@@ -141,8 +141,9 @@ int main()
 		
 
         //4. Calculate E
-	   maxwell_rad.probe_mode_exitation(&geom1,&current1, 0.2, 3e8, time1.current_time);
+	   maxwell_rad.probe_mode_exitation(&geom1,&current1, 0.5, 3e8, time1.current_time);
        e_field1.calc_field(&h_field1, &time1, &current1);
+	   maxwell_rad.probe_mode_exitation(&geom1,&current1, 0.5, 3e8, time1.current_time);
 		
         //continuity equation
 		rho_new.reset_rho();
