@@ -16,8 +16,17 @@ using namespace std;
 int main() 
 {
 
-	PML pml1(0.15,0.15, 0.0000001, 0.15);
-	Geometry geom1(0.4,3.2, 129, 1025, &pml1);
+	PML pml1(0.3,0.0, 0.2, 0.0000001, 0.15);
+	Geometry geom1(0.4,3.2, 129, 129, &pml1);
+	///////////////////////////////////////////
+	ofstream pml("pml");
+	for(int i=0;i<geom1.n_grid_1;i++)
+		for(int k=0;k<geom1.n_grid_2;k++)
+		{
+			pml<<geom1.sigma[i][k]<<" ";
+		}
+		pml.close();
+	///////////////////////////////////////////
 	Time time1(0,0,0,10000e-12,1e-12);
 	E_field e_field1(&geom1);
 	H_field h_field1(&geom1);
@@ -155,7 +164,7 @@ int main()
 //		out_coord<<new_particles[0].x1[0]<<" "<<new_particles[0].x3[0]<<" ";
 //		out_vel<<new_particles[0].v1[0]<<" "<<new_particles[0].v2[0]<<" "<<new_particles[0].v3[0]<<" ";
 		
-		if ((((int)(time1.current_time/time1.delta_t))%100==0))
+		if  ((((int)(time1.current_time/time1.delta_t))%100==0))
 		{
 			cout<<time1.current_time<<" ";
 			for(int j=0;(j<geom1.n_grid_1-1);j++)
