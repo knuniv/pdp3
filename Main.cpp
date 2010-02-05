@@ -16,18 +16,10 @@ using namespace std;
 int main() 
 {
 
-	PML pml1(0.3,0.0, 0.2, 0.0000001, 0.15);
-	Geometry geom1(0.4,3.2, 129, 129, &pml1);
-	///////////////////////////////////////////
-	ofstream pml("pml");
-	for(int i=0;i<geom1.n_grid_1;i++)
-		for(int k=0;k<geom1.n_grid_2;k++)
-		{
-			pml<<geom1.sigma[i][k]<<" ";
-		}
-		pml.close();
-	///////////////////////////////////////////
-	Time time1(0,0,0,10000e-12,1e-12);
+	PML pml1(0.0,0.15, 0.0, 0.00001, 2);
+	Geometry geom1(0.4,6.4, 129, 2049, &pml1);
+
+	Time time1(0,0,0,100000e-12,1e-12);
 	E_field e_field1(&geom1);
 	H_field h_field1(&geom1);
 	Fourier four1(0);
@@ -152,7 +144,7 @@ int main()
 
         //4. Calculate E
 	   maxwell_rad.probe_mode_exitation(&geom1,&current1, 0.5, 3e8, time1.current_time);
-       e_field1.calc_field(&h_field1, &time1, &current1);
+       e_field1.calc_field(&h_field1, &time1, &current1, &pml1);
 	   maxwell_rad.probe_mode_exitation(&geom1,&current1, 0.5, 3e8, time1.current_time);
 		
         //continuity equation
