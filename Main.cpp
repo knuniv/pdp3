@@ -11,6 +11,7 @@
 #include <fstream>
 #include <math.h>
 #include "Boundary_Maxwell_conditions.h"
+#include "input_output_class.h"
 #define  pi = 3.14159265;
 using namespace std;
 int main() 
@@ -31,18 +32,12 @@ int main()
 	E_field e_field1(&geom1);
 	H_field h_field1(&geom1);
 	Fourier four1(0);
+	input_output_class out_class;
 	Boundary_Maxwell_conditions maxwell_rad(&e_field1);
 	maxwell_rad.specify_initial_field(&geom1,0,0,0);
 	bool res = true;
 	int  k, i;
-    ofstream out_coord("coords");
-	ofstream out_vel("velocities");
-	ofstream out_vel1("velocities1");
-	ofstream out_e1field("e1_field");
-	ofstream out_e3field("e3_field");
-	ofstream out_hfield("h_field");
-	ofstream curr("curr");
-
+   
 	current current1(&geom1);
 	charge_density rho_new(&geom1);
 	charge_density rho_old(&geom1);
@@ -82,16 +77,16 @@ int main()
 	ions.load_spatial_distribution(2e16, 8e16);
 
 		for (i=0; i< 10; i++)
-		out_coord<<ions.x1[i]<<" "<<ions.x3[i]<<" ";
+		//out_coord<<ions.x1[i]<<" "<<ions.x3[i]<<" ";
 
 	//ions.load_velocity_distribution(0.0);
 	
 	electrons.velocity_distribution(1e4);
 	ions.velocity_distribution(1e3);
-	for (i = 0; i< electrons.number; i++)
-	{
-		out_vel1<<electrons.v1[i]<<" "<<electrons.v2[i]<<" "<<electrons.v3[i]<<" ";
-	}
+	//for (i = 0; i< electrons.number; i++)
+	//{
+	//	out_vel1<<electrons.v1[i]<<" "<<electrons.v2[i]<<" "<<electrons.v3[i]<<" ";
+	//}
 	
     
     //////////////////////////
@@ -104,9 +99,9 @@ int main()
 	//weight currents and charges before relaxation period
 		//solve Poisson equation
 
-	for(int j=0;(j<geom1.n_grid_1-1);j++)
+	/*for(int j=0;(j<geom1.n_grid_1-1);j++)
       for(int k=0;k<(geom1.n_grid_2-1);k++)
-		curr<<rho_new.get_ro()[j][k]<<" ";
+		curr<<rho_new.get_ro()[j][k]<<" ";*/
 						
 	Poisson_neumann poisson1(&geom1);
 
@@ -167,36 +162,15 @@ int main()
 		if  ((((int)(time1.current_time/time1.delta_t))%100==0))
 		{
 			cout<<time1.current_time<<" ";
-			for(int j=0;(j<geom1.n_grid_1-1);j++)
-			{
-				for(int k=0;k<(geom1.n_grid_2-1);k++)
-					{
-						out_e1field<<e_field1.e1[j][k]<<" ";
-						out_e3field<<e_field1.e3[j][k]<<" ";
-						out_hfield<<h_field1.h2[j][k]<<" ";
-						//curr<<rho_new.get_ro()[j][k]<<" ";
-						
-				    }
-	    	}
-			out_e1field<<"\n"; 
-			out_e3field<<"\n";
-			out_hfield<<"\n"; 
-	        
+			
+			out_class.out_data("e1",e_field1.e1,2,128,1048);       
 		}
 		time1.current_time = time1.current_time + time1.delta_t;
 		if (!res)
 			//break;
 			cout<<"Error:"<<time1.current_time<<"! ";
- 	out_coord<<"\n";
-	out_vel<<"\n";
+
 	}
 
-out_e1field.close();
-out_e3field.close();
-out_hfield.close();
-out_vel.close();
-out_vel1.close();
-out_coord.close();
-curr.close();
 
 };
