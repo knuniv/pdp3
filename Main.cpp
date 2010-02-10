@@ -17,7 +17,7 @@ using namespace std;
 int main() 
 {
 
-	PML pml1(0.0,0.15, 0.0, 0.00001, 2);
+	PML pml1(0.0,0.15, 0.0, 0.00001, 1);
 	Geometry geom1(0.4,6.4, 129, 2049, &pml1);
 
 	Time time1(0,0,0,100000e-12,1e-12);
@@ -57,16 +57,16 @@ int main()
 	Particles *new_particles = new Particles[2];
 	Particles *old_particles = new Particles[2];
 	particles_list p_list(0);
-	Particles electrons("electrons", -1, 1, 0*1e6, &geom1,&p_list);
-	Particles ions("ions", 1, 1836, 0*1e6, &geom1,&p_list);
+	Particles electrons("electrons", -1, 1, 1e6, &geom1,&p_list);
+	Particles ions("ions", 1, 1836, 1e6, &geom1,&p_list);
 	p_list.create_coord_arrays();
-	electrons.load_spatial_distribution(2e16, 8e16);
+	electrons.load_spatial_distribution(0e16, 2.2e15);
 
 
 	
 	//electrons.load_velocity_distribution(0.0);
 
-	ions.load_spatial_distribution(2e16, 8e16);
+	ions.load_spatial_distribution(0e16, 2.2e15);
 
 		for (i=0; i< 10; i++)
 		//out_coord<<ions.x1[i]<<" "<<ions.x3[i]<<" ";
@@ -155,7 +155,9 @@ int main()
 		{
 			cout<<time1.current_time<<" ";
 			
-			out_class.out_data("e1",e_field1.e1,2,128,1048);       
+			//out_class.out_data("e1",e_field1.e1,100,128,2048);
+			out_class.out_data("e3",e_field1.e3,100,128,2048);
+			out_class.out_data("h2",h_field1.h2,100,128,2048);
 		}
 		time1.current_time = time1.current_time + time1.delta_t;
 		if (!res)
