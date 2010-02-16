@@ -429,22 +429,13 @@ void Particles::simple_j_weighting(Time* time1, current *j1, double x1_new,doubl
 	double wj = 0;
 	double delta_t = time1->delta_t;
 
-	////defining number of cell
-	//int i_n = (int)ceil((x1_new)/dr)-1;
-	//int k_n =(int)ceil((x3_new)/dr)-1;
-	//int i_o = (int)ceil((x1_old)/dr)-1;
-	//int k_o =(int)ceil((x3_old)/dr)-1;
-// cheking 
-	//if ((i_n !=i_o)&&(k_n!=k_o))
-	//{
-	//
-	//}
-	//else
-	//{
+
 		// distance of particle moving//
 		double delta_r = x1_new - x1_old;
 		double delta_z = x3_new - x3_old;
-
+		
+		if ((delta_r==0)||(delta_z==0))
+			return;
 		// if i cell is not equal 0 
 		if (i_n>=1)
 		{
