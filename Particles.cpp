@@ -387,7 +387,7 @@ return r;
 
 }
 
-void Particles::load_spatial_distribution(double n1, double n2)
+void Particles::load_spatial_distribution(double n1, double n2, double left_plasma_boundary)
 {
 	int n;
 	//calculate number of electrons in a big particle
@@ -405,7 +405,8 @@ void Particles::load_spatial_distribution(double n1, double n2)
 		rand_z = random_reverse(number - 1 - n,7);
 		x1[n] = (geom1->first_size - dr)*sqrt(rand_r) + dr/2.0;
 		//x3[n] = (geom1->second_size - dz)*sqrt(rand_z) + dz/2.0;
-		x3[n] = (geom1->second_size - dz)/dn*(sqrt(n1*n1 + rand_z*(2*n1*dn + dn*dn)) - n1) + dz/2.0;
+		x3[n] = (geom1->second_size - left_plasma_boundary - dz)/dn*(sqrt(n1*n1 + rand_z*(2*n1*dn + dn*dn)) - n1) +
+			    left_plasma_boundary + dz/2.0;
 	}
 
 }

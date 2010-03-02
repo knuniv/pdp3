@@ -17,8 +17,9 @@ using namespace std;
 int main() 
 {
 
-	PML pml1(0.0,0.15, 0.0, 0.00001, 1);
+	PML pml1(0.0,0.0, 0.0, 0.00001, 1);
 	Geometry geom1(0.4,6.4, 129, 2049, &pml1);
+	double left_plasma_boundary = geom1.second_size*0.2;
 
 	Time time1(0,0,0,100000e-12,1e-12);
 	E_field e_field1(&geom1);
@@ -60,13 +61,11 @@ int main()
 	Particles electrons("electrons", -1, 1, 1e6, &geom1,&p_list);
 	Particles ions("ions", 1, 1836, 1e6, &geom1,&p_list);
 	p_list.create_coord_arrays();
-	electrons.load_spatial_distribution(0e16, 2.2e15);
+	electrons.load_spatial_distribution(0e16, 2.2e15, left_plasma_boundary);
 
-
-	
 	//electrons.load_velocity_distribution(0.0);
 
-	ions.load_spatial_distribution(0e16, 2.2e15);
+	ions.load_spatial_distribution(0e16, 2.2e15, left_plasma_boundary);
 
 		for (i=0; i< 10; i++)
 		//out_coord<<ions.x1[i]<<" "<<ions.x3[i]<<" ";
@@ -75,18 +74,15 @@ int main()
 	
 	electrons.velocity_distribution(1e4);
 	ions.velocity_distribution(1e3);
-	//for (i = 0; i< electrons.number; i++)
-	//{
-	//	out_vel1<<electrons.v1[i]<<" "<<electrons.v2[i]<<" "<<electrons.v3[i]<<" ";
-	//}
-	
-    
+	   
     //////////////////////////
 	//0. Half step back
 
 	//p_list.azimuthal_j_weighting(&time1, &current1);
 	//p_list.j_weighting(&time1,&current1,);
 	p_list.charge_weighting(&rho_new);
+	//electrons.charge_weighting(&rho_new);
+	//out_class.out_data("rho",rho_new.get_ro(),1,128,2048);
 
 	//weight currents and charges before relaxation period
 		//solve Poisson equation
@@ -140,7 +136,7 @@ int main()
         //4. Calculate E
 	   maxwell_rad.probe_mode_exitation(&geom1,&current1, 0.5, 3e8, time1.current_time);
        e_field1.calc_field(&h_field1, &time1, &current1, &pml1);
-	   maxwell_rad.probe_mode_exitation(&geom1,&current1, 0.5, 3e8, time1.current_time);
+	  // maxwell_rad.probe_mode_exitation(&geom1,&current1, 0.5, 3e8, time1.current_time);
 		
         //continuity equation
 		rho_new.reset_rho();
@@ -156,6 +152,7 @@ int main()
 			cout<<time1.current_time<<" ";
 			
 			//out_class.out_data("e1",e_field1.e1,100,128,2048);
+			out_class.out_data("rho",rho_new.get_ro(),100,128,2048);
 			out_class.out_data("e3",e_field1.e3,100,128,2048);
 			out_class.out_data("h2",h_field1.h2,100,128,2048);
 		}
