@@ -35,7 +35,6 @@ int main()
 	charge_density rho_new(&geom1);
 	charge_density rho_old(&geom1);
 
-
 	e_field1.boundary_conditions();
 	e_field1.set_homogeneous_efield(0.0, 0.0, 0);
 	h_field1.set_homogeneous_h(0.0, 0.0, 0.0);
@@ -54,9 +53,6 @@ int main()
 ////////////////////////////////////////////////
 	geom1.set_epsilon() ;
 //	e_field1.set_sigma();
-    int n_species = 1;
-	Particles *new_particles = new Particles[2];
-	Particles *old_particles = new Particles[2];
 	particles_list p_list(0);
 	Particles electrons("electrons", -1, 1, 1e6, &geom1,&p_list);
 	Particles ions("ions", 1, 1836, 1e6, &geom1,&p_list);
@@ -70,10 +66,9 @@ int main()
 		for (i=0; i< 10; i++)
 		//out_coord<<ions.x1[i]<<" "<<ions.x3[i]<<" ";
 
-	//ions.load_velocity_distribution(0.0);
-	
-	electrons.velocity_distribution(1e4);
-	ions.velocity_distribution(1e3);
+
+	electrons.velocity_distribution(2e3);
+	ions.velocity_distribution(1e1);
 	   
     //////////////////////////
 	//0. Half step back
@@ -119,8 +114,8 @@ int main()
 		h_field1.calc_field(&e_field1, &time1);
 
 		//2. Calculate v
-		current1.reset_j();
-		rho_old.reset_rho();
+			current1.reset_j();
+			rho_old.reset_rho();
 		
 			p_list.step_v(&e_field1, &h_field1, &time1);
 
@@ -134,7 +129,7 @@ int main()
 		
 
         //4. Calculate E
-	   maxwell_rad.probe_mode_exitation(&geom1,&current1, 0.5, 3e8, time1.current_time);
+	//   maxwell_rad.probe_mode_exitation(&geom1,&current1, 0.5, 3e8, time1.current_time);
        e_field1.calc_field(&h_field1, &time1, &current1, &pml1);
 	  // maxwell_rad.probe_mode_exitation(&geom1,&current1, 0.5, 3e8, time1.current_time);
 		
