@@ -335,25 +335,27 @@ double* v = new double [number]; //velocity vector
 double nr = sqrt(pi/2.0)* pow(therm_vel, 3);
 
 double ss =0;
+double const1 = 2*therm_vel*therm_vel;
+double temp1;
 
 for(i=0;i<number;i++)
 {
  
- R = (i+0.5)/number;
+ R = (double)(i)/(double)number;
  // part of numerical integral calculation//
  while (s<R*nr)
  {
-
-	 ds = dv*j*dv*j * exp(-dv*j*dv*j / (2*therm_vel*therm_vel) ) * dv;
-	 ss  = (dv*j*dv*j * exp(-(dv*j*dv*j)/(2*therm_vel*therm_vel)));
+	 temp1 = dv*j*dv*j;
+	 ds = temp1 * exp(-temp1 / const1 ) * dv;
 	 s = s+ds;
 	 j=j+1;
  }
  /////////////////////////
  v[i] = dv*j;
  ///////////////////////
-
-	v1[i] = v[i]*sin(2.0*pi*random_reverse(i,2));
+	//double R_fi = (number-i)/double(number);
+	//v1[i] = v[i]*sin(2.0*pi*R_fi);
+	v1[i] = v[i];//*sin(2.0*pi*random_reverse(i,2));
 	v3[i] = v[i]*cos(2.0*pi*random_reverse(i,2));
 	v2[i] = v[i]*sin(2.0*pi*random_reverse(i,3));
 
@@ -1088,7 +1090,7 @@ bool continuity_equation(Time *input_time, Geometry *input_geometry, current *in
 	double delta_rho = 1.0/(input_geometry->dz*4.0*3.1415*input_geometry->dr*input_geometry->dr) ;
 	int i, k;
 	bool ok = true;
-	double res, tolerance = 1e-4 ;
+	double res, tolerance = 1e-3 ;
 	for (i=1;i<input_geometry->n_grid_1-1;i++)
 
 		for (k=1;k<input_geometry->n_grid_2-1;k++)
