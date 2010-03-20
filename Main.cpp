@@ -54,8 +54,8 @@ int main()
 	geom1.set_epsilon() ;
 //	e_field1.set_sigma();
 	particles_list p_list(0);
-	Particles electrons("electrons", -1, 1, 1e6, &geom1,&p_list);
-	Particles ions("ions", 1, 1836, 1e6, &geom1,&p_list);
+	Particles electrons("electrons", -1, 1, 1e5, &geom1,&p_list);
+	Particles ions("ions", 1, 1836, 1e5, &geom1,&p_list);
 	p_list.create_coord_arrays();
 	electrons.load_spatial_distribution(2e16, 8e16, left_plasma_boundary);
 
@@ -67,7 +67,7 @@ int main()
 		//out_coord<<ions.x1[i]<<" "<<ions.x3[i]<<" ";
 
 
-	electrons.velocity_distribution(1e3);
+	electrons.velocity_distribution_v2(1e3);
 	ions.velocity_distribution(1e3);
 	ofstream out_vel("velocities");
 	for (i = 0; i< electrons.number; i++)
