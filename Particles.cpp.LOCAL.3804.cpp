@@ -3,9 +3,9 @@
 #include "H_field.h"
 #include "Time.h"
 #include "Triple.h"
-#define  pi 3.14159265358979
-
+#define  pi 3.14159265
 using namespace std;
+//#include "stdafx.h"
 
 Particles::Particles(void)
 {
@@ -13,7 +13,7 @@ Particles::Particles(void)
 	////////constructor//////
 ////////////////////////////////////////////////
 Particles::Particles(char* p_name, double p_charge, double p_mass, int p_number,
-					 Geometry* geom,particles_list* t_p_list)  : geom1(geom),p_list(t_p_list), c_light(3.0e8), c2(9.0e16) 
+					 Geometry* geom)  : geom1(geom), c_light(3.0e8), c2(9.0e16) 
 {
 	name = p_name;
 	charge = p_charge*1.6e-19;
@@ -24,21 +24,18 @@ Particles::Particles(char* p_name, double p_charge, double p_mass, int p_number,
 
 	x1 = new double[number];
 	x3 = new double[number];
-	x3 = new double[number];
 	v1 = new double[number];
 	v2 = new double[number];
 	v3 = new double[number];
 	is_alive = new bool[number];
-	////////////////////////////////
-	//insert to particles_lists
-	p_list->part_list.push_back(this);
+
 	
 };
 ///////////////////////////////////////////////////
 
 //////////////////////////////////////////////////
 //copy constructor//
-Particles::Particles(Particles &cp_particles)
+Particles::Particles(const Particles &cp_particles)
 {
 	name = new char[strlen(cp_particles.name)];
 	strcpy(name,cp_particles.name);
@@ -69,12 +66,12 @@ Particles::Particles(Particles &cp_particles)
 Particles::~Particles()
 {
 
- //   delete [] x1;
-	//delete [] x3;
-	//delete [] v1;
-	//delete [] v2;
-	//delete [] v3;
-	//delete [] is_alive;
+    delete [] x1;
+	delete [] x3;
+	delete [] v1;
+	delete [] v2;
+	delete [] v3;
+	delete [] is_alive;
 };
 ///////////////////////////////////////////////////////
 
@@ -106,24 +103,19 @@ double Particles::get_gamma(int i)
 	return pow(1.0 - (v1[i]*v1[i] + v2[i]*v2[i] + v3[i]*v3[i])/c2,-0.5);
 }
 
-double Particles::get_gamma_inv(int i)
-{
-	return pow((v1[i]*v1[i] + v2[i]*v2[i] + v3[i]*v3[i])/c2 + 1, 0.5);
-}
 
-void Particles::step_v(E_field *e_fld, H_field *h_fld, Time* t)
+
+void Particles::step_v(Triple E_compon, Triple B_compon, Time* t)
 {
 	int i;
 	double gamma, b1, b2, b3, e1, e2, e3, vv1, vv2, vv3;
 	const double mu0 = 1e-6;
-	Triple E_compon(0.0, 0.0, 0.0), B_compon(0.0, 0.0, 0.0);
 	double const1 = charge*t->delta_t/2.0/mass, const2;
-	if (t->current_time == t->start_time) const1 = const1/2.0;
 	for( i=0;i<number;i++)
 		//if (is_alive[i])
 		{
-			E_compon = e_fld->get_field(x1[i],x3[i]);
-	        B_compon = h_fld->get_field(x1[i],x3[i]);
+//			E_compon = e_fld->get_field(x1[i],x3[i]);
+//	        B_compon = h_fld->get_field(x1[i],x3[i]);
 			e1 = E_compon.first*const1;
 	        e2 = E_compon.second*const1;
 	        e3 = E_compon.third*const1;
@@ -147,7 +139,7 @@ void Particles::step_v(E_field *e_fld, H_field *h_fld, Time* t)
 			//3. Rotation in the magnetic field
 			//u" = u' + 2/(1+B'^2)[(u' + [u'xB'(n)])xB'(n)]
 			//B'(n) = B(n)*q*dt/2/mass/gamma(n)
-			gamma = get_gamma_inv(i);
+			gamma = get_gamma(i);
 			b1 = b1/gamma;
 	        b2 = b2/gamma;
 	        b3 = b3/gamma;
@@ -166,7 +158,7 @@ void Particles::step_v(E_field *e_fld, H_field *h_fld, Time* t)
 			v3[i] = v3[i] + e3;
 
 			//5. Division by relativistic factor
-			gamma = get_gamma_inv(i);
+			gamma = get_gamma(i);
 		    v1[i] = v1[i]/gamma;
 			v2[i] = v2[i]/gamma;
 			v3[i] = v3[i]/gamma;
@@ -175,7 +167,7 @@ void Particles::step_v(E_field *e_fld, H_field *h_fld, Time* t)
 
 }
 
-void Particles::half_step_coord(Time* t)
+void Particles::step_coord(Time* t)
 {
 	int i;
 	double dr = geom1->dr;
@@ -186,13 +178,12 @@ void Particles::half_step_coord(Time* t)
 	double half_dz = dz/2.0;
 	double x1_wallX2 = x1_wall*2.0;
 	double x3_wallX2 = x3_wall*2.0;
-	double half_dt = t->delta_t/2.0;
 
 	for( i=0;i<number;i++)
 		if (is_alive[i])
 		{	
-			x1[i] = x1[i] + v1[i]*half_dt; 
-            x3[i] = x3[i] + v3[i]*half_dt;
+			x1[i] = x1[i] + v1[i]*t->delta_t;
+            x3[i] = x3[i] + v3[i]*t->delta_t;
 
 			if (x1[i] > x1_wall)
 			{
@@ -243,7 +234,13 @@ void Particles::charge_weighting(charge_density* ro1)
 	
 	double value =0;
 	double **temp = ro1->get_ro();
-	int i;
+	int i,k;
+
+	for (i=0;i<geom1->n_grid_1;i++)
+		for (k=0;k<geom1->n_grid_2;k++)
+			//ro1->set_ro_weighting(i,k,-temp[i][k]);
+			temp[i][k] = 0.0;
+			
 	for(i=0;i<number;i++)
 	{
             // finding number of i and k cell. example: dr = 0.5; r = 0.4; i =0
@@ -328,160 +325,90 @@ void Particles::velocity_distribution(double therm_vel)
 int i = 0;
 int j=0;
 double R =0; // number from [0;1]
-double dv = therm_vel/1e7; // velocity step in calculation integral
+double dv = 0.005; // velocity step in calculation integral
 double s =0; 
 double ds =0;
 double* v = new double [number]; //velocity vector
 double nr = sqrt(pi/2.0)* pow(therm_vel, 3);
 
 double ss =0;
-double const1 = 2*therm_vel*therm_vel;
-double temp1;
 
 for(i=0;i<number;i++)
 {
- 
- R = (double)(i)/(double)number;
- 
+ R = (i+0.5)/number;
+ double* dss= new double[100000];
+
  // part of numerical integral calculation//
  while (s<R*nr)
  {
-	 temp1 = dv*j*dv*j;
-	 ds = temp1 * exp(-temp1 / const1 ) * dv;
+
+	 ds = dv*j*dv*j * exp(-dv*j*dv*j / (2*therm_vel*therm_vel) ) * dv;
+	 ss  = (dv*j*dv*j * exp(-(dv*j*dv*j)/(2*therm_vel*therm_vel)));
 	 s = s+ds;
 	 j=j+1;
  }
- /////////////////////////
  v[i] = dv*j;
- ///////////////////////
-	//double R_fi = (number-i)/double(number);
-	//v1[i] = v[i]*sin(2.0*pi*R_fi);
-	v1[i] = v[i];//*sin(2.0*pi*random_reverse(i,2));
-	v3[i] = v[i]*cos(2.0*pi*random_reverse(i,2));
-	v2[i] = v[i]*sin(2.0*pi*random_reverse(i,3));
 
 }
-
 ////////////////////////////////////////////////////
 
+//random algorithm (binary)//
+/////////////////////////////////////////////////
+
+int b1 =11349;
+ int  bb = b1;
+  j=0;
+  for (int i=0;i<=sizeof(bb)*8;i++)
+  {
+	   bb>>=1;
+	   j=j+1;
+
+	  if(bb==0)
+	  {
+		  break;
+	  }
+
+  }
+
+double res = 0;
+int pass =0;
+for (int i=0;i<=j;i++)
+{
+     pass = b1&(1<<i);
+	
+	if (pass!=0)
+	{
+		res=res+pow(2.0,-(i+1));
+	}
+}		
+//////////////////////////////////////////
+
+/////////////////////////////////////////
+ //random algorithm (ternary)// 
+//int N =223;
+//// int  bb = 0;
+// int j=1;
+// int aa =0;
+// double res =0;
+////  for (int i=4;i<=N;i++)
+// // {
+//	  bb = N;
+//	  while(bb>=1)
+//	  {
+////		aa = bb % 3;
+//		res = res + aa*pow(3.0, -j);
+//		j=j+1;
+////		bb = bb / 3;
+//	  }
+	 
+
+//  }
 ///////////////////////////////////////////
 
 
 
 delete []v;
 
-}
-//////////////////////////////////////////////////////
-void Particles::velocity_distribution_v2(double therm_vel)
-{
-int i = 0;
-int j=0;
-double R =0; // number from [0;1]
-double dv = therm_vel/1e7; // velocity step in calculation integral
-double cutoff_vel = 4.0*therm_vel; //cutoff velocity
-int lenght_arr = (int)cutoff_vel/dv;
-double s =0; 
-double ds =0;
-double* integ_array = new double [lenght_arr];
-
-double const1 = 2*therm_vel*therm_vel;
-double temp1;
- // part of numerical integral calculation//
- while (i<lenght_arr)
- {
-	 temp1 = dv*i*dv*i;
-	 ds = temp1 * exp(-temp1 / const1 ) * dv;
-	 s=s+ds;
-	 integ_array[i] = s;
-	 i=i+1;
- }
- ///////////////////////////////////////
-
-for(int i_n=0;i_n<number;i_n++)
-{
- R = (double)(i_n)/(double)number;
- double f_v = R * sqrt(pi/2.0)* pow(therm_vel, 3);
- //binary search//
- i=0;
- j=lenght_arr;
- int k=0;
-while(i<=j) 
-{
-	k = i + (j-i)/2;
-	if(f_v>integ_array[k])
-		i=k+1;
-	else if (f_v<integ_array[k])
-		j=k-1;
-	else 
-		break;
-}
-/////////////////////////////////////////////////
-
-double  v = dv*k;
- //////////////////////////////////////////////
-	//double R_fi = (number-i)/double(number);
-	//v1[i] = v[i]*sin(2.0*pi*R_fi);
-	v1[i_n] = v;//*sin(2.0*pi*random_reverse(i,2));
-	v3[i_n] = v*cos(2.0*pi*random_reverse(i,2));
-	v2[i_n] = v*sin(2.0*pi*random_reverse(i,3));
-
-}
-delete []integ_array;
-}
-
-//////////////////////////////////////////////////
-double Particles::random_reverse(double vel, int power)
-{
-	int int_vel =(int) floor(vel);
-	double ost =0;
-	double r =0;
-	int order =1;
-	while(int_vel>=1)
-	{
-		ost = int_vel % power;
-		
-		r = r + ost*pow((double)power,(-order));
-	
-		int_vel = (int_vel - ost)/power;
-		order = order+1;
-	}
-return r;
-
-}
-
-void Particles::load_spatial_distribution(double n1, double n2, double left_plasma_boundary)
-{
-	int n;
-	//calculate number of electrons in a big particle
-	double n_in_big = (pi*geom1->first_size*geom1->first_size*geom1->second_size/number*(n2+n1)/2.0);
-	double rand_r;
-	double rand_z;
-	double dr = geom1->dr*1.00000001;
-	double dz = geom1->dz*1.00000001;
-	charge *= n_in_big;
-	mass *= n_in_big;
-	double dn = n2 - n1;
-	for(n = 0; n < number; n++)
-	{
-		rand_r = random_reverse(n,2);
-		rand_z = random_reverse(number - 1 - n,7);
-		x1[n] = (geom1->first_size - dr)*sqrt(rand_r) + dr/2.0;
-		//x3[n] = (geom1->second_size - dz)*sqrt(rand_z) + dz/2.0;
-		x3[n] = (geom1->second_size - left_plasma_boundary - dz)/dn*(sqrt(n1*n1 + rand_z*(2*n1*dn + dn*dn)) - n1) +
-			    left_plasma_boundary + dz/2.0;
-	}
-
-}
-
-void Particles::load_velocity_distribution(double v_thermal)
-{
-	int n;
-	for (n=0; n<number; n++)
-	{
-		v1[n] = 0.0;
-		v2[n] = 0.0;
-		v3[n] = 0.0;
-	}
 }
 
 
@@ -492,13 +419,22 @@ void Particles::simple_j_weighting(Time* time1, current *j1, double x1_new,doubl
 	double wj = 0;
 	double delta_t = time1->delta_t;
 
-
+	////defining number of cell
+	//int i_n = (int)ceil((x1_new)/dr)-1;
+	//int k_n =(int)ceil((x3_new)/dr)-1;
+	//int i_o = (int)ceil((x1_old)/dr)-1;
+	//int k_o =(int)ceil((x3_old)/dr)-1;
+// cheking 
+	//if ((i_n !=i_o)&&(k_n!=k_o))
+	//{
+	//
+	//}
+	//else
+	//{
 		// distance of particle moving//
 		double delta_r = x1_new - x1_old;
 		double delta_z = x3_new - x3_old;
-		
-		if ((delta_r==0)||(delta_z==0))
-			return;
+
 		// if i cell is not equal 0 
 		if (i_n>=1)
 		{
@@ -574,124 +510,52 @@ void Particles::simple_j_weighting(Time* time1, current *j1, double x1_new,doubl
 	
 	//}
 }
-void Particles::simple_constrho_j_weighting(Time* time1, current *j1, double x1_new,double x3_new, double x1_old, double x3_old, int i_n, int k_n)
-{
-	double dr = geom1->dr;
-	double dz = geom1->dz;
-	double wj = 0;
-	double delta_t = time1->delta_t;
 
-		// distance of particle moving//
-		double delta_r = x1_new - x1_old;
-		double delta_z = x3_new - x3_old;
 
-		// if i cell is not equal 0 
-		if (i_n>=1)
-		{
-		///////////////////////////////////
-		// equation y = k*x+b;//
-		// finding k & b//
-		double k = delta_r/delta_z;
-		double b = x1_old-dr/2.0;
-//		double r0 = (i_n+0.5)*dr;
-	    //calculate current jz in [i,k] cell//
-	//	wj = particle_rho*pi*delta_z/(delta_t*2*pi*i_n*dr*dr) * (r0*r0 - b*b -a*a*delta_z*delta_z/3.0 - a*b*delta_z); 
-		// set new weighting current value 
-		j1->set_j3(i_n,k_n, wj);
-
-        //calculate current in [i+1,k] cell//
-	//	wj = particle_rho*pi*delta_z/(delta_t*2*pi*(i_n+1)*dr*dr) * (a*a*delta_z*delta_z/3.0 + a*b*delta_z+b*b-r0*r0); 
-		// set new weighting current value 
-		j1->set_j3(i_n+1,k_n, wj);
-		
-		///////////////////////////////////
-	    //calculate current jr in [i,k] cell//
-		// equation y = k*x+b;//
-		// finding k & b//
-		 k = -delta_z/delta_r;
-		 double r0 = (i_n+0.5)*dr;
-		 double r1 =  x1_old;
-		 b= (k_n+1.0)*dz - x3_old;
-
-        //weighting jr in [i][k] cell
-//		wj = charge/(2*pi*r0*dz*dz*dr*delta_t) *();
-		j1->set_j1(i_n,k_n, wj);
-
-          b= x3_old- k_n*dz;;
-         //weighting jr in [i][k+1] cell
-	//	 wj = charge/(2*pi*r0*dz*dz*dr*delta_t) * ();
-		j1->set_j1(i_n, k_n+1, wj);
-		}
-		// if i cell is equal 0 
-		else
-		{
-///////////////////////////////////
-		// equation y = k*x+b;//
-		// finding k & b//
-		double k = delta_r/delta_z;
-		double b = x1_old;
-	    //calculate current jz in [i,k] cell//
-	//	wj = charge/(2.0*dr*dz*delta_t*pi*dr*dr/4.0) * (dr*delta_z - k*delta_z*delta_z/2.0 - delta_z*b ); 
-		// set new weighting current value 
-		j1->set_j3(i_n,k_n, wj);
-
-        //calculate current in [i+1,k] cell//
-	//	wj = charge/(2.0*dr*dz*delta_t*2.0*pi*dr*dr) * (k*delta_z*delta_z/2.0 + delta_z*dr +delta_z*b); 
-		// set new weighting current value 
-		j1->set_j3(i_n+1,k_n, wj);
-		
-		///////////////////////////////////
-	    //calculate current jr in [i,k] cell//
-		// equation y = k*x+b;//
-		// finding k & b//
-		 k = -delta_z/delta_r;
-		 double r0 = (i_n+0.5)*dr;
-		 double r1 =  x1_old;
-		 b= (k_n+1.0)*dz - x3_old;
-
-        //weighting jr in [i][k] cell
-		wj = charge/(2*pi*r0*dz*dz*dr*delta_t) *(r0*k*delta_r+k/2.0 * delta_r*(x1_old+delta_r/2.0)+0.5*delta_r*(b-k*(2*r0+r1))+ delta_r*(b-k*r1)*(4*r0*r0-dr*dr)/(8*x1_old*(x1_old+delta_r)) + (k*(r0*r0/2.0-dr*dr/8.0))*log((x1_old+delta_r)/x1_old));
-		j1->set_j1(i_n,k_n, wj);
-
-          b= x3_old- k_n*dz;;
-         //weighting jr in [i][k+1] cell
-		 wj = charge/(2*pi*r0*dz*dz*dr*delta_t) * (-r0*k*delta_r - k/2.0*delta_r*(x1_old+delta_r/2.0)+0.5*delta_r*(b+k*(2*r0+r1))+ delta_r*(b+k*r1)*(4*r0*r0-dr*dr)/(8*x1_old*(x1_old+delta_r)) - (k*(r0*r0/2.0-dr*dr/8.0))*log((x1_old+delta_r)/x1_old));
-		j1->set_j1(i_n, k_n+1, wj);
-		}
-	
-	//}
-}
-
-void Particles::j_weighting(Time* time1, current *j1, double* x1_o,double* x3_o)
+void Particles::j_weighting(Time* time1, current *j1, Particles *old_part)
 {
 
 	double dr = geom1->dr;
 	double dz = geom1->dz;
+   	double **J1 = j1->get_j1();
+	double **J2 = j1->get_j2();
+	double **J3 = j1->get_j3();
+	int i,k;
 
-	//double **J1 = j1->get_j1();
-	//double **J2 = j1->get_j2();
-	//double **J3 = j1->get_j3();
-	int i;
 
+	//////////////////////////////////////
+	   //initialization//
+
+	for (i=0; i<(geom1->n_grid_1-1);i++)
+		for (k=0; k<(geom1->n_grid_2-1);k++)
+		{
+			J1[i][k]=0;
+			J2[i][k]=0;
+			J3[i][k]=0;
+		}
+	 for (i=0; i<(geom1->n_grid_1-1);i++)
+		J1[i][geom1->n_grid_2-1]=0;
+
+	 for(k=0;k<(geom1->n_grid_2);k++)
+		J2[geom1->n_grid_1-1][k]=0;
+
+	 for(i=0;i<(geom1->n_grid_1);i++)
+		J3[i][geom1->n_grid_2-1]=0;
+
+	 for(k=0;k<(geom1->n_grid_2-1);k++)
+		J3[geom1->n_grid_1-1][k]=0;
 
 //////////////////////////////////////////////////////////////
 	for (i=0;i<number;i++)
 	{
-	    double x1_old= x1_o[i];
-		double x3_old = x3_o[i];
+	    double x1_old=old_part->x1[i];
+		double x3_old = old_part->x3[i];
+
 		//finding number new and old cells
 		int i_n = (int)ceil((x1[i])/dr)-1;
 		int k_n =(int)ceil((x3[i])/dr)-1;
 		int i_o = (int)ceil((x1_old)/dr)-1;
 		int k_o =(int)ceil((x3_old)/dr)-1;
-		if (x1_old==(i_o+1)*dr)
-			i_o=i_n;
-		if(x3_old==(k_o+1)*dz)
-			k_o=k_n;
-		if (x1[i]==(i_n+1)*dr)
-			i_n=i_o;
-		if(x3[i]==(k_n+1)*dz)
-			k_n=k_o;
 	    int res_cell = abs(i_n-i_o) + abs(k_n-k_o); 
 		if ((x1[i]==x1_old)||(x3[i]==x3_old))
 		{
@@ -719,7 +583,7 @@ void Particles::j_weighting(Time* time1, current *j1, double* x1_o,double* x3_o)
 						double z_boundary = x3[i] + delta_r/a;
 
 						simple_j_weighting(time1,j1, r_boundary,z_boundary ,x1_old,x3_old, i_n+1,k_n);
-	   					simple_j_weighting(time1,j1, x1[i],x3[i], r_boundary,z_boundary, i_n, k_n);
+						simple_j_weighting(time1,j1, x1[i],x3[i], r_boundary,z_boundary, i_n, k_n);
 					}
 				else 
 					{
@@ -764,15 +628,15 @@ void Particles::j_weighting(Time* time1, current *j1, double* x1_o,double* x3_o)
 		case 2:
 	{
 			/// case, when particle move from [i-1] cell to [i] cell
-		if (i_o<i_n)
+			if (i_o<i_n)
 			/////////////////////////////////////////////////////////////////
 			{
 			   // case, when particle move from [i-1][k-1] -> [i][k] cell
-			if(k_o<k_n)
+				if(k_o<k_n)
 					{
 						double a = (x1[i] - x1_old)/(x3[i] - x3_old);
 						double r1 = i_n*dr;
-					double delta_z1 = (r1 - x1_old)/a;
+						double delta_z1 = (r1 - x1_old)/a;
 						double z1 = x3_old + delta_z1;
 						double z2 = k_n*dz;
 						double delta_r2 = (z2-x3_old)*a;
@@ -808,7 +672,7 @@ void Particles::j_weighting(Time* time1, current *j1, double* x1_o,double* x3_o)
 								simple_j_weighting(time1, j1, x1[i], x3[i], r2, z2, i_n, k_n);
 							}
 						else if (z1<(k_n+1)*dz)
-						{
+							{
 								simple_j_weighting(time1, j1, r2, z2 ,x1_old, x3_old, i_n-1, k_n+1);
 								simple_j_weighting(time1, j1, r1, z1, r2, z2,i_n-1, k_n);
 								simple_j_weighting(time1, j1, x1[i], x3[i], r1, z1, i_n, k_n);
@@ -824,12 +688,12 @@ void Particles::j_weighting(Time* time1, current *j1, double* x1_o,double* x3_o)
 					{
 						double a = (x1[i] - x1_old)/(x3[i] - x3_old);
 						double r1 = (i_n+1)*dr;
-					double delta_z1 = -(x1_old-r1)/a;
+						double delta_z1 = -(x1_old-r1)/a;
 						double z1 = x3_old + delta_z1;
 
 						double z2 = k_n*dz;
 						double delta_r2 = -(z2-x3_old)*a;
-					double r2 = x1_old- delta_r2;
+						double r2 = x1_old- delta_r2;
 					
 						if (z1<(k_n)*dz)
 						{
@@ -869,7 +733,7 @@ void Particles::j_weighting(Time* time1, current *j1, double* x1_o,double* x3_o)
 							simple_j_weighting(time1, j1, r1, z1, r2, z2,i_n+1, k_n);
 							simple_j_weighting(time1, j1, x1[i], x3[i], r1, z1, i_n, k_n);
 						}
-		     }
+			     }
 			 }
        	} //close case;
         break;
@@ -896,9 +760,13 @@ void Particles::azimuthal_j_weighting(Time* time1, current *this_j)
 	
 	double rho =0; //charge density in cell
 	double current; // j_phi in cell
-	double **temp = this_j->get_j2();
-	int i;
+	double **temp = this_j->get_j1();
+	int i,k;
 
+	for (i=0;i<geom1->n_grid_1;i++)
+		for (k=0;k<geom1->n_grid_2;k++)
+			//ro1->set_ro_weighting(i,k,-temp[i][k]);
+			temp[i][k] = 0.0;
 			
 	for(i=0;i<number;i++)
 	{
@@ -1139,8 +1007,6 @@ void Particles:: strict_motion_weighting(Time *time1, current *this_j, double x1
 
 	}
 }
-
-
 bool continuity_equation(Time *input_time, Geometry *input_geometry, current *input_J, charge_density *rho_old, charge_density *rho_new)
 {
 	double **rho_old_array = rho_old->get_ro() ;
@@ -1150,7 +1016,7 @@ bool continuity_equation(Time *input_time, Geometry *input_geometry, current *in
 	double delta_rho = 1.0/(input_geometry->dz*4.0*3.1415*input_geometry->dr*input_geometry->dr) ;
 	int i, k;
 	bool ok = true;
-	double res, tolerance = 1e-3 ;
+	double res, tolerance = 1e-10 ;
 	for (i=1;i<input_geometry->n_grid_1-1;i++)
 
 		for (k=1;k<input_geometry->n_grid_2-1;k++)
@@ -1165,5 +1031,6 @@ bool continuity_equation(Time *input_time, Geometry *input_geometry, current *in
 			}
 		}
 	return ok;
-
+	/*return delta_rho -(J3[i][k] - J3[i][k-1])/input_geometry->dz  +
+		(J1[i][k] + J1[i-1][k])/input_geometry->dr + (J1[i][k] + J1[i-1][k])/(i+0.5)/input_geometry->dr ;*/
 }
