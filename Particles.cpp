@@ -342,6 +342,7 @@ for(i=0;i<number;i++)
 {
  
  R = (double)(i)/(double)number;
+ 
  // part of numerical integral calculation//
  while (s<R*nr)
  {
