@@ -378,7 +378,7 @@ int i = 0;
 int j=0;
 double R =0; // number from [0;1]
 double dv = therm_vel/1e7; // velocity step in calculation integral
-double cutoff_vel = 4.0*therm_vel; //cutoff velocity
+double cutoff_vel = 12.0*therm_vel; //cutoff velocity
 int lenght_arr = (int)cutoff_vel/dv;
 double s =0; 
 double ds =0;
@@ -389,8 +389,9 @@ double temp1;
  // part of numerical integral calculation//
  while (i<lenght_arr)
  {
-	 temp1 = dv*i*dv*i;
-	 ds = temp1 * exp(-temp1 / const1 ) * dv;
+	 /*temp1 = dv*i*dv*i;
+	 ds = temp1 * exp(-temp1 / const1 ) * dv;*/
+	ds = exp(-dv*i*dv*i/const1)*dv;
 	 s=s+ds;
 	 integ_array[i] = s;
 	 i=i+1;
@@ -399,31 +400,75 @@ double temp1;
 
 for(int i_n=0;i_n<number;i_n++)
 {
- R = (double)(i_n)/(double)number;
- double f_v = R * sqrt(pi/2.0)* pow(therm_vel, 3);
+ double Rr = random_reverse(i_n,3);
+ double Rfi = random_reverse(i_n,5);
+ double Rz = random_reverse(i_n,7);
+ double t_z = sqrt(pi/2.0)*therm_vel;
+ //R = rand()/(double)32768;
+ double f_vr = Rr*t_z;
+ double f_vfi = Rfi*t_z;
+ double f_vz = Rz*t_z;
+  int sign =1;
+ if (i_n%2==1)
+	 sign =-1;
+
  //binary search//
+ ///////////////////////////////////
  i=0;
  j=lenght_arr;
  int k=0;
 while(i<=j) 
 {
 	k = i + (j-i)/2;
-	if(f_v>integ_array[k])
+	if(f_vr>integ_array[k])
 		i=k+1;
-	else if (f_v<integ_array[k])
+	else if (f_vr<integ_array[k])
 		j=k-1;
 	else 
 		break;
 }
-/////////////////////////////////////////////////
+v1[i_n]=dv*k*sign;
+////////////////////////////////////////
 
-double  v = dv*k;
+i=0;
+ j=lenght_arr;
+  k=0;
+while(i<=j) 
+{
+	k = i + (j-i)/2;
+	if(f_vfi>integ_array[k])
+		i=k+1;
+	else if (f_vfi<integ_array[k])
+		j=k-1;
+	else 
+		break;
+}
+v2[i_n]=dv*k*sign;
+///////////////////////////////////////////////
+
+i=0;
+ j=lenght_arr;
+  k=0;
+while(i<=j) 
+{
+	k = i + (j-i)/2;
+	if(f_vz>integ_array[k])
+		i=k+1;
+	else if (f_vz<integ_array[k])
+		j=k-1;
+	else 
+		break;
+}
+v3[i_n]=dv*k*sign;
+
  //////////////////////////////////////////////
 	//double R_fi = (number-i)/double(number);
 	//v1[i] = v[i]*sin(2.0*pi*R_fi);
-	v1[i_n] = v;//*sin(2.0*pi*random_reverse(i,2));
-	v3[i_n] = v*cos(2.0*pi*random_reverse(i,2));
-	v2[i_n] = v*sin(2.0*pi*random_reverse(i,3));
+	//v1[i_n] = v;//*sin(2.0*pi*random_reverse(i,2));
+	//v3[i_n] = v*cos(pi*(rand()/32768 - 0.5));//*sin(2.0*pi*random_reverse(i,3));
+	////v3[i_n] = v*cos(2.0*pi*random_reverse(i,2));
+	////v2[i_n] = v*sin(2.0*pi*random_reverse(i,3));
+	//v2[i_n] = v*sin(-pi/2 + pi*rand()/32768);
 
 }
 delete []integ_array;

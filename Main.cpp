@@ -21,7 +21,7 @@ int main()
 	Geometry geom1(0.4,0.8, 65, 129, &pml1);
 	double left_plasma_boundary = geom1.second_size*0.0;
 
-	Time time1(0,0,0,0e-12,1e-12);
+	Time time1(0,0,0,100000e-12,1e-12);
 	E_field e_field1(&geom1);
 	H_field h_field1(&geom1);
 	Fourier four1(0);
@@ -54,8 +54,8 @@ int main()
 	geom1.set_epsilon() ;
 //	e_field1.set_sigma();
 	particles_list p_list(0);
-	Particles electrons("electrons", -1, 1, 1e5, &geom1,&p_list);
-	Particles ions("ions", 1, 1836, 1e5, &geom1,&p_list);
+	Particles electrons("electrons", -1, 1, 1e6, &geom1,&p_list);
+	Particles ions("ions", 1, 1836, 1e6, &geom1,&p_list);
 	p_list.create_coord_arrays();
 	electrons.load_spatial_distribution(2e16, 8e16, left_plasma_boundary);
 
@@ -68,7 +68,7 @@ int main()
 
 
 	electrons.velocity_distribution_v2(1e3);
-	ions.velocity_distribution(1e3);
+	ions.velocity_distribution_v2(1e3);
 	ofstream out_vel("velocities");
 	for (i = 0; i< electrons.number; i++)
 	{
