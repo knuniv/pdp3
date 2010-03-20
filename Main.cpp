@@ -54,8 +54,8 @@ int main()
 	geom1.set_epsilon() ;
 //	e_field1.set_sigma();
 	particles_list p_list(0);
-	Particles electrons("electrons", -1, 1, 1e6, &geom1,&p_list);
-	Particles ions("ions", 1, 1836, 1e6, &geom1,&p_list);
+	Particles electrons("electrons", -1, 1, 1e7, &geom1,&p_list);
+	Particles ions("ions", 1, 1836, 1e3, &geom1,&p_list);
 	p_list.create_coord_arrays();
 	electrons.load_spatial_distribution(2e16, 8e16, left_plasma_boundary);
 
