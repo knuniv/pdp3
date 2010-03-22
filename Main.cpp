@@ -18,8 +18,8 @@ int main()
 {
 
 	PML pml1(0.0,0.0, 0.0, 0.00001, 1);
-	Geometry geom1(0.4,0.8, 65, 129, &pml1);
-	double left_plasma_boundary = geom1.second_size*0.0;
+	Geometry geom1(0.4,6.4, 128, 2049, &pml1);
+	double left_plasma_boundary = geom1.second_size*0.2;
 
 	Time time1(0,0,0,100000e-12,1e-12);
 	E_field e_field1(&geom1);
@@ -57,24 +57,12 @@ int main()
 	Particles electrons("electrons", -1, 1, 1e6, &geom1,&p_list);
 	Particles ions("ions", 1, 1836, 1e6, &geom1,&p_list);
 	p_list.create_coord_arrays();
-	electrons.load_spatial_distribution(2e16, 8e16, left_plasma_boundary);
 
-	//electrons.load_velocity_distribution(0.0);
+	electrons.load_spatial_distribution(0e16, 2.2e15, left_plasma_boundary);
+	ions.load_spatial_distribution(0e16, 2.2e15, left_plasma_boundary);
 
-	ions.load_spatial_distribution(2e16, 8e16, left_plasma_boundary);
-
-		for (i=0; i< 10; i++)
-		//out_coord<<ions.x1[i]<<" "<<ions.x3[i]<<" ";
-
-
-	electrons.velocity_distribution_v2(1e3);
+	electrons.velocity_distribution_v2(1e4);
 	ions.velocity_distribution_v2(1e3);
-	ofstream out_vel("velocities");
-	for (i = 0; i< electrons.number; i++)
-	{
-		out_vel<<electrons.v1[i]<<" "<<electrons.v2[i]<<" "<<electrons.v3[i]<<" ";
-	}
-	out_vel.close();
 	   
     //////////////////////////
 	//0. Half step back
@@ -135,9 +123,8 @@ int main()
 		
 
         //4. Calculate E
-	//   maxwell_rad.probe_mode_exitation(&geom1,&current1, 0.5, 3e8, time1.current_time);
+	   maxwell_rad.probe_mode_exitation(&geom1,&current1, 0.5, 3e8, time1.current_time);
        e_field1.calc_field(&h_field1, &time1, &current1, &pml1);
-	  // maxwell_rad.probe_mode_exitation(&geom1,&current1, 0.5, 3e8, time1.current_time);
 		
         //continuity equation
 		rho_new.reset_rho();
