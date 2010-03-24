@@ -726,9 +726,9 @@ void Particles::j_weighting(Time* time1, current *j1, double* x1_o,double* x3_o)
 		double x3_old = x3_o[i];
 		//finding number new and old cells
 		int i_n = (int)ceil((x1[i])/dr)-1;
-		int k_n =(int)ceil((x3[i])/dr)-1;
+		int k_n =(int)ceil((x3[i])/dz)-1;
 		int i_o = (int)ceil((x1_old)/dr)-1;
-		int k_o =(int)ceil((x3_old)/dr)-1;
+		int k_o =(int)ceil((x3_old)/dz)-1;
 		if (x1_old==(i_o+1)*dr)
 			i_o=i_n;
 		if(x3_old==(k_o+1)*dz)
