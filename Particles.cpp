@@ -1205,8 +1205,8 @@ bool continuity_equation(Time *input_time, Geometry *input_geometry, current *in
 			{
 				ok = false;
 				std::cout<<i<<" "<<k;
-			    i = input_geometry->n_grid_1;
-				break;
+			   // i = input_geometry->n_grid_1;
+				
 			}
 		}
 	return ok;

@@ -18,7 +18,7 @@ int main()
 {
 
 	PML pml1(0.0,0.0, 0.0, 0.00001, 1);
-	Geometry geom1(0.4,6.4, 128, 2049, &pml1);
+	Geometry geom1(0.4,6.4, 129, 2049, &pml1);
 	double left_plasma_boundary = geom1.second_size*0.2;
 
 	Time time1(0,0,0,100000e-12,1e-12);
