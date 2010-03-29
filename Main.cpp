@@ -63,6 +63,15 @@ int main()
 
 	electrons.velocity_distribution_v2(1e4);
 	ions.velocity_distribution_v2(1e3);
+	//ofstream out_vel("velocities");
+	//ofstream out_coords("coords");
+	//for (i = 0; i< electrons.number; i++)
+	//{
+	//	out_vel<<electrons.v1[i]<<" "<<electrons.v2[i]<<" "<<electrons.v3[i]<<" ";
+	//	out_coords<<electrons.x1[i]<<" "<<electrons.x3[i]<<" ";
+	//}
+	//out_vel.close();
+	//out_coords.close();
 	   
     //////////////////////////
 	//0. Half step back

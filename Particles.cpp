@@ -509,7 +509,7 @@ void Particles::load_spatial_distribution(double n1, double n2, double left_plas
 	for(n = 0; n < number; n++)
 	{
 		rand_r = random_reverse(n,2);
-		rand_z = random_reverse(number - 1 - n,7);
+		rand_z = random_reverse(number - 1 - n,11);
 		x1[n] = (geom1->first_size - dr)*sqrt(rand_r) + dr/2.0;
 		//x3[n] = (geom1->second_size - dz)*sqrt(rand_z) + dz/2.0;
 		x3[n] = (geom1->second_size - left_plasma_boundary - dz)/dn*(sqrt(n1*n1 + rand_z*(2*n1*dn + dn*dn)) - n1) +
