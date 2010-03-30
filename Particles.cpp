@@ -1035,9 +1035,9 @@ void Particles:: strict_motion_weighting(Time *time1, current *this_j, double x1
 	double dz = geom1->dz;
 	//defining number of cell
 	int i_n = (int)ceil((x1_new)/dr)-1;
-	int k_n =(int)ceil((x3_new)/dr)-1;
+	int k_n =(int)ceil((x3_new)/dz)-1;
 	int i_o = (int)ceil((x1_old)/dr)-1;
-	int k_o =(int)ceil((x3_old)/dr)-1;
+	int k_o =(int)ceil((x3_old)/dz)-1;
 
 	//stirct axis motion
 //////////////////////////////////////////
