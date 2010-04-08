@@ -189,7 +189,7 @@ void Particles::half_step_coord(Time* t)
 	double half_dt = t->delta_t/2.0;
 
 	for( i=0;i<number;i++)
-		if (is_alive[i])
+		//if (is_alive[i])
 		{	
 			x1[i] = x1[i] + v1[i]*half_dt; 
             x3[i] = x3[i] + v3[i]*half_dt;
