@@ -151,8 +151,8 @@ int main()
 			cout<<time1.current_time<<" ";
 			
 			//out_class.out_data("e1",e_field1.e1,100,128,2048);
-			out_class.out_data("rho",rho_new.get_ro(),100,geom1.n_grid_1-1,geom1.n_grid_2-1);
-			out_class.out_data("e3",e_field1.e3,100,geom1.n_grid_1-1,geom1.n_grid_2-1);
+			out_class.out_data("rho",rho_new.get_ro(),100,geom1.n_grid_1,geom1.n_grid_2);
+			out_class.out_data("e1",e_field1.e3,100,geom1.n_grid_1-1,geom1.n_grid_2-1);
 			out_class.out_data("h2",h_field1.h2,100,geom1.n_grid_1-1,geom1.n_grid_2-1);
 		}
 		time1.current_time = time1.current_time + time1.delta_t;

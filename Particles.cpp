@@ -508,7 +508,7 @@ void Particles::load_spatial_distribution(double n1, double n2, double left_plas
 	double dn = n2 - n1;
 	for(n = 0; n < number; n++)
 	{
-		rand_r = random_reverse(n,2);
+		rand_r = random_reverse(n,13);		
 		rand_z = random_reverse(number - 1 - n,11);
 		x1[n] = (geom1->first_size - dr)*sqrt(rand_r) + dr/2.0;
 		//x3[n] = (geom1->second_size - dz)*sqrt(rand_z) + dz/2.0;
@@ -1035,9 +1035,9 @@ void Particles:: strict_motion_weighting(Time *time1, current *this_j, double x1
 	double dz = geom1->dz;
 	//defining number of cell
 	int i_n = (int)ceil((x1_new)/dr)-1;
-	int k_n =(int)ceil((x3_new)/dr)-1;
+	int k_n =(int)ceil((x3_new)/dz)-1;
 	int i_o = (int)ceil((x1_old)/dr)-1;
-	int k_o =(int)ceil((x3_old)/dr)-1;
+	int k_o =(int)ceil((x3_old)/dz)-1;
 
 	//stirct axis motion
 //////////////////////////////////////////
