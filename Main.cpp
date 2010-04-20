@@ -18,7 +18,7 @@ int main()
 {
 
 	PML pml1(0.0,0.0, 0.0, 0.00001, 1);
-	Geometry geom1(0.4,6.4, 129, 2049, &pml1);
+	Geometry geom1(0.2,6.4, 129, 4097, &pml1);
 	double left_plasma_boundary = geom1.second_size*0.2;
 
 	Time time1(0,0,0,100000e-12,1e-12);
@@ -58,8 +58,8 @@ int main()
 	Particles ions("ions", 1, 1836, 1e6, &geom1,&p_list);
 	p_list.create_coord_arrays();
 
-	electrons.load_spatial_distribution(0e16, 2.2e15, left_plasma_boundary);
-	ions.load_spatial_distribution(0e16, 2.2e15, left_plasma_boundary);
+	electrons.load_spatial_distribution(0e16, 5.0e16, left_plasma_boundary);
+	ions.load_spatial_distribution(0e16,5.0e16, left_plasma_boundary);
 
 	electrons.velocity_distribution_v2(1e4);
 	ions.velocity_distribution_v2(1e3);
@@ -134,7 +134,7 @@ int main()
 		
 
         //4. Calculate E
-	   maxwell_rad.probe_mode_exitation(&geom1,&current1, 0.5, 3e8, time1.current_time);
+	   maxwell_rad.probe_mode_exitation(&geom1,&current1, 0.2,1.4e9, time1.current_time);
        e_field1.calc_field(&h_field1, &time1, &current1, &pml1);
 		
         //continuity equation
@@ -146,13 +146,13 @@ int main()
 //		out_coord<<new_particles[0].x1[0]<<" "<<new_particles[0].x3[0]<<" ";
 //		out_vel<<new_particles[0].v1[0]<<" "<<new_particles[0].v2[0]<<" "<<new_particles[0].v3[0]<<" ";
 		
-		if  ((((int)(time1.current_time/time1.delta_t))%100==0))
+		if  ((((int)(time1.current_time/time1.delta_t))%50==0))
 		{
 			cout<<time1.current_time<<" ";
 			
 			//out_class.out_data("e1",e_field1.e1,100,128,2048);
-			out_class.out_data("rho",rho_new.get_ro(),100,geom1.n_grid_1,geom1.n_grid_2);
-			out_class.out_data("e1",e_field1.e3,100,geom1.n_grid_1-1,geom1.n_grid_2-1);
+		//	out_class.out_data("rho",rho_new.get_ro(),100,geom1.n_grid_1,geom1.n_grid_2);
+			out_class.out_data("e3",e_field1.e3,100,geom1.n_grid_1-1,geom1.n_grid_2-1);
 			out_class.out_data("h2",h_field1.h2,100,geom1.n_grid_1-1,geom1.n_grid_2-1);
 		}
 		time1.current_time = time1.current_time + time1.delta_t;

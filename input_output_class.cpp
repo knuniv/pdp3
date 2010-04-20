@@ -21,8 +21,10 @@ void input_output_class::out_data(char* comp_name, double** out_value, int numbe
 	strcpy(st_name,comp_name);
 	char str_int [50]; 
 	itoa(i,str_int,10);
-	strcat(st_name, str_int);
-	ofstream out_val(st_name);
+	char path[50] = "e:/Plazma/pdp3_result/";
+	
+	strcat(path,st_name);
+	ofstream out_val(path,ios::app);
 	}
 	//char add_i = static_cast<char>(i);//
 //sprintf(str_int,"%d",i);
@@ -37,7 +39,9 @@ void input_output_class::out_data(char* comp_name, double** out_value, int numbe
 	char str_int [50]; 
 	itoa(i,str_int,10);
 	strcat(st_name, str_int);
-	ofstream out_val(st_name,ios::app);
+	char path[50] = "e:/Plazma/pdp3_result/";
+	strcat(path,st_name);
+	ofstream out_val(path,ios::app);
 	// write  values  into file 
 	for (int i=0; i<r_step;i++)
 	{
