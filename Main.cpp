@@ -18,10 +18,10 @@ int main()
 {
 
 	PML pml1(0.0,0.0, 0.0, 0.00001, 1);
-	Geometry geom1(0.2,6.4, 129, 4097, &pml1);
+	Geometry geom1(0.2,1.6, 513, 4097, &pml1);
 	double left_plasma_boundary = geom1.second_size*0.2;
 
-	Time time1(0,0,0,100000e-12,1e-12);
+	Time time1(0,0,0,100000e-12,0.5e-12);
 	E_field e_field1(&geom1);
 	H_field h_field1(&geom1);
 	Fourier four1(0);
@@ -61,8 +61,8 @@ int main()
 	electrons.load_spatial_distribution(0e16, 5.0e16, left_plasma_boundary);
 	ions.load_spatial_distribution(0e16,5.0e16, left_plasma_boundary);
 
-	electrons.velocity_distribution_v2(1e4);
-	ions.velocity_distribution_v2(1e3);
+	electrons.velocity_distribution_v2(5e4);
+	ions.velocity_distribution_v2(5e4);
 	ofstream out_vel("velocities");
 	ofstream out_coords("coords");
 	for (i = 0; i< electrons.number; i++)
@@ -134,7 +134,7 @@ int main()
 		
 
         //4. Calculate E
-	   maxwell_rad.probe_mode_exitation(&geom1,&current1, 0.2,1.4e9, time1.current_time);
+	   maxwell_rad.probe_mode_exitation(&geom1,&current1, 0.02,1.4e9, time1.current_time);
        e_field1.calc_field(&h_field1, &time1, &current1, &pml1);
 		
         //continuity equation
