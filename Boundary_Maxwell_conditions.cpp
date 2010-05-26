@@ -55,8 +55,7 @@ void Boundary_Maxwell_conditions::radiation_source(Geometry* cyl_geom,double reg
 void  Boundary_Maxwell_conditions::probe_mode_exitation(Geometry* cyl_geom, current* j_input, double probe_lenght, double frequency,double time)
 {
 	int k_max =0, k=0;
-	int k_start =0;
-		0;
+	int k_start =1800;
 	k_max = (int) (probe_lenght/cyl_geom->dz)+k_start;
 	double pi = 3.1415926;
 	double dz = cyl_geom->dz;
@@ -67,7 +66,7 @@ void  Boundary_Maxwell_conditions::probe_mode_exitation(Geometry* cyl_geom, curr
 		k_max=3*10e8*time/dz;*/
 		for (k=k_start;k<k_max;k++)
 		{
-			j_p[0][k]=5e8*sin(2*pi*frequency*time)*sin(pi*dz*(k-k_start)/(probe_lenght));
+			j_p[0][k]=6e7*sin(2*pi*frequency*time)*sin(pi*dz*(k-k_start)/(probe_lenght));
 			//e_fld->e1[0][k]=1e3*sin(2*pi*frequency*time)*sin(pi*dz*k/(0.5*3e8/frequency));
 		}
 	/*}*/
