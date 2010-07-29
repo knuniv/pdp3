@@ -189,7 +189,7 @@ void E_field::calc_field(H_field* h_field1, Time* time1, current* current1, PML*
 			 koef_e = (2.0*geom1->epsilon[i][k]*epsilon0 - geom1->sigma[i][k]*time1->delta_t) / (2.0*geom1->epsilon[i][k]*epsilon0 + geom1->sigma[i][k]*time1->delta_t);
 			 koef_h =  2*time1->delta_t/(2.0*geom1->epsilon[i][k]*epsilon0 + geom1->sigma[i][k]*time1->delta_t);
 	
-			 e3[i][k]=e3[i][k]*koef_e - (j3[i][k]-2.0/dr*h2[i][k])*koef_h;
+			 e3[i][k]=e3[i][k]*koef_e - (j3[i][k]-4.0/dr*h2[i][k])*koef_h;
 		}
 
 	for( i=1;i<(geom1->n_grid_1-1);i++)

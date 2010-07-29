@@ -12,13 +12,14 @@
 #include <math.h>
 #include "Boundary_Maxwell_conditions.h"
 #include "input_output_class.h"
+#include "Beam.h"
 #define  pi = 3.14159265;
 using namespace std;
 int main() 
 {
 
 	PML pml1(0.0,0.15, 0.0, 0.000001, 0.07);
-	Geometry geom1(0.2,6.3534*2.0, 129, 4097, &pml1);
+	Geometry geom1(0.2,6.3534/2.0, 129, 1025, &pml1);
 	double left_plasma_boundary = geom1.second_size*0.35;
 
 	Time time1(0,0,0,100000e-12,1e-12);
@@ -39,7 +40,9 @@ int main()
 	e_field1.set_homogeneous_efield(0.0, 0.0, 0);
 	h_field1.set_homogeneous_h(0.0, 0.0, 0.0);
 	e_field1.set_fi_on_z();
-	///////////////////////////////////////////
+
+	/////////////////////////////////////////////
+	
 //	////////////////////////////////////////
 //	poisson  equetion testing//
 	//for(k=0;k<geom1.n_grid_2;k++)
@@ -54,6 +57,11 @@ int main()
 	geom1.set_epsilon() ;
 //	e_field1.set_sigma();
 	particles_list p_list(0);
+	///////////////////////////////////////////
+	// beam part
+	Beam electron_beam("electron_beam", -1, 1, 1e5, &geom1,&p_list,1e-8,0.02);
+	electron_beam.calc_init_param(1e13,5e7);
+	///////////////////////////////////////////
 	Particles electrons("electrons", -1, 1, 0e6, &geom1,&p_list);
 	Particles ions("ions", 1, 1836, 0e6, &geom1,&p_list);
 	p_list.create_coord_arrays();
@@ -109,6 +117,9 @@ int main()
        
 	}
 	time1.current_time = 0.0 ;
+
+	//variable for out_class function
+	int step_number= 0;
      
     while (time1.current_time < time1.end_time)
 	{
@@ -134,7 +145,7 @@ int main()
 		
 
         //4. Calculate E
-	   maxwell_rad.probe_mode_exitation(&geom1,&current1, 1,7e8, time1.current_time);
+	  // maxwell_rad.probe_mode_exitation(&geom1,&current1, 1,7e8, time1.current_time);
        e_field1.calc_field(&h_field1, &time1, &current1, &pml1);
 		
         //continuity equation
@@ -142,19 +153,21 @@ int main()
 		
 			p_list.charge_weighting(&rho_new);  //continuity equation
 		res =  continuity_equation(&time1, &geom1, &current1, &rho_old, &rho_new); 
+		electron_beam.beam_inject(1e14,5e7,&time1);
 
-//		out_coord<<new_particles[0].x1[0]<<" "<<new_particles[0].x3[0]<<" ";
-//		out_vel<<new_particles[0].v1[0]<<" "<<new_particles[0].v2[0]<<" "<<new_particles[0].v3[0]<<" ";
-		
+			
 		if  ((((int)(time1.current_time/time1.delta_t))%50==0))
 		{
 			cout<<time1.current_time<<" ";
-			
+		
 			//out_class.out_data("e1",e_field1.e1,100,128,2048);
 		//	out_class.out_data("rho",rho_new.get_ro(),100,geom1.n_grid_1,geom1.n_grid_2);
-			out_class.out_data("e3",e_field1.e3,100,geom1.n_grid_1-1,geom1.n_grid_2-1);
-			out_class.out_data("j3",current1.get_j3(),100,geom1.n_grid_1-1,geom1.n_grid_2-1);
+			out_class.out_data("e3",e_field1.e3,step_number,100,geom1.n_grid_1-1,geom1.n_grid_2-1);
+			out_class.out_coord("coords",electron_beam.x1,electron_beam.x3,step_number,100,electron_beam.number);
+			out_class.out_data("rho",rho_new.get_ro(),step_number,100,geom1.n_grid_1-1,geom1.n_grid_2-1);
+				step_number=step_number+1;
 		}
+	
 		time1.current_time = time1.current_time + time1.delta_t;
 		if (!res)
 			//break;

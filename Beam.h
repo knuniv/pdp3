@@ -13,6 +13,6 @@ public:
 	double duration; //beam duration
 	double radius; //beam radius
 public:
-	double calc_init_param(double n_b,double b_vel);
+	void calc_init_param(double n_b,double b_vel);
 	void beam_inject(double n_b,double b_vel, Time* time);
 };

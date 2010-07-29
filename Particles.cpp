@@ -120,7 +120,7 @@ void Particles::step_v(E_field *e_fld, H_field *h_fld, Time* t)
 	double const1 = charge*t->delta_t/2.0/mass, const2;
 	if (t->current_time == t->start_time) const1 = const1/2.0;
 	for( i=0;i<number;i++)
-		//if (is_alive[i])
+		if (is_alive[i])
 		{
 			E_compon = e_fld->get_field(x1[i],x3[i]);
 	        B_compon = h_fld->get_field(x1[i],x3[i]);
@@ -189,7 +189,7 @@ void Particles::half_step_coord(Time* t)
 	double half_dt = t->delta_t/2.0;
 
 	for( i=0;i<number;i++)
-		//if (is_alive[i])
+		if (is_alive[i])
 		{	
 			x1[i] = x1[i] + v1[i]*half_dt; 
             x3[i] = x3[i] + v3[i]*half_dt;
@@ -245,6 +245,7 @@ void Particles::charge_weighting(charge_density* ro1)
 	double **temp = ro1->get_ro();
 	int i;
 	for(i=0;i<number;i++)
+		if (is_alive[i])
 	{
             // finding number of i and k cell. example: dr = 0.5; r = 0.4; i =0
 		////////////////////////////
@@ -721,7 +722,8 @@ void Particles::j_weighting(Time* time1, current *j1, double* x1_o,double* x3_o)
 
 //////////////////////////////////////////////////////////////
 	for (i=0;i<number;i++)
-	{
+		if (is_alive[i])
+		{
 	    double x1_old= x1_o[i];
 		double x3_old = x3_o[i];
 		//finding number new and old cells
@@ -946,6 +948,7 @@ void Particles::azimuthal_j_weighting(Time* time1, current *this_j)
 
 			
 	for(i=0;i<number;i++)
+		if (is_alive[i])
 	{
             // finding number of i and k cell. example: dr = 0.5; r = 0.4; i =0
 		////////////////////////////

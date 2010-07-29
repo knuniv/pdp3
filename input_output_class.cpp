@@ -7,37 +7,31 @@ input_output_class::input_output_class(void)
 input_output_class::~input_output_class(void)
 {
 }
-void input_output_class::out_data(char* comp_name, double** out_value, int number, int r_step,int z_step)
+void input_output_class::out_data(char* comp_name, double** out_value,int step_number, int number, int r_step,int z_step)
 {
 	//static variable for defining number of function calling
-    static int count =0;
+    //static int count =0;
 	//static variable. increase text file name
-	static int i=0;
-  	if (count/number==i)
-	{
-		i=i+1;
-	//char operations
-	char st_name[50];
-	strcpy(st_name,comp_name);
-	char str_int [50]; 
-	itoa(i,str_int,10);
-	char path[50] = "e:/Plazma/pdp3_result/";
-	
-	strcat(path,st_name);
-	ofstream out_val(path,ios::app);
-	}
-	//char add_i = static_cast<char>(i);//
-//sprintf(str_int,"%d",i);
-	 /*char *add_i= new  char [10];
-	 memset(add_i,'\0',10); 
-	 itoa(i,add_i,30);
-	strcat(comp_name, add_i);*/
-	//st_name=st_name+str_int;
+	int inc_value = 0;
+ // 	if (step_number/number)
+	//{
+	//	i=i+1;
+	////char operations
+	//char st_name[50];
+	//strcpy(st_name,comp_name);
+	//char str_int [50]; 
+	//itoa(i,str_int,10);
+	//char path[50] = "e:/Plazma/pdp3_result/";
+	//
+	//strcat(path,st_name);
+	//ofstream out_val(path,ios::app);
+	//}
 
+   inc_value = step_number/number;
 		char st_name[50];
 	strcpy(st_name,comp_name);
 	char str_int [50]; 
-	itoa(i,str_int,10);
+	itoa(inc_value,str_int,10);
 	strcat(st_name, str_int);
 	char path[50] = "e:/Plazma/pdp3_result/";
 	strcat(path,st_name);
@@ -50,7 +44,44 @@ void input_output_class::out_data(char* comp_name, double** out_value, int numbe
 		out_val<<out_value[i][k]<<" ";
 	}
 	}
+	out_val.close();
+}
+
+/////
+void input_output_class::out_coord(char* comp_name, double* coord_r, double* coord_z,int step_number, int number, int particles_number)
+{
+	//static variable for defining number of function calling
+    //static int count =0;
+		//static variable. increase text file name
+	int inc_value = 0;
+  	/*if (step_number/number)
+	{
+		i=i+1;
+	char st_name[50];
+	strcpy(st_name,comp_name);
+	char str_int [50]; 
+	itoa(i,str_int,10);
+	char path[50] = "e:/Plazma/pdp3_result/";
 	
-	count = count+1;
+	strcat(path,st_name);
+	ofstream out_val(path,ios::app);
+	}*/
+	inc_value = step_number/number;
+	char st_name[50];
+	strcpy(st_name,comp_name);
+	char str_int [50]; 
+	itoa(inc_value,str_int,10);
+	strcat(st_name, str_int);
+	char path[50] = "e:/Plazma/pdp3_result/";
+	strcat(path,st_name);
+	ofstream out_val(path,ios::app);
+	// write  values  into file 
+	for (int i=0; i<particles_number;i++)
+	
+	{
+		out_val<<coord_r[i]<<" ";
+		out_val<<coord_z[i]<<" ";
+	}
+
 	out_val.close();
 }
