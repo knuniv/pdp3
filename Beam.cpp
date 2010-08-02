@@ -37,6 +37,7 @@ void Beam::beam_inject(double n_b,double b_vel, Time* time)
 		double	rand_r = random_reverse(i,3);		
 		double	rand_z = random_reverse(i,5);
 			x1[i+start_number] = (radius)*sqrt(rand_r) + dr/2.0;
+		
 			x3[i+start_number] = dl*(rand_z)+dz/2.0;
 			v3[i+start_number] = b_vel;
 			is_alive[i+start_number] = true;

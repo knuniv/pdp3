@@ -19,7 +19,7 @@ int main()
 {
 
 	PML pml1(0.0,0.15, 0.0, 0.000001, 0.07);
-	Geometry geom1(0.2,6.3534/2.0, 129, 1025, &pml1);
+	Geometry geom1(0.2,0.4, 129, 257, &pml1);
 	double left_plasma_boundary = geom1.second_size*0.35;
 
 	Time time1(0,0,0,100000e-12,1e-12);
@@ -59,7 +59,7 @@ int main()
 	particles_list p_list(0);
 	///////////////////////////////////////////
 	// beam part
-	Beam electron_beam("electron_beam", -1, 1, 1e5, &geom1,&p_list,1e-8,0.02);
+	Beam electron_beam("electron_beam", -1, 1, 1e6, &geom1,&p_list,1e-9,0.05);
 	electron_beam.calc_init_param(1e13,5e7);
 	///////////////////////////////////////////
 	Particles electrons("electrons", -1, 1, 0e6, &geom1,&p_list);
