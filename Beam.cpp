@@ -12,7 +12,7 @@ Beam::~Beam(void)
 void Beam::calc_init_param(double n_b, double b_vel)
 {
 	double b_lenght = duration*b_vel;
-	double n_in_big = 3.1415*radius*radius*b_lenght/number;
+	double n_in_big = 3.1415*radius*radius*b_lenght*n_b/number;
 	charge *= n_in_big;
 	mass *= n_in_big;
 	for(int i=0;i<number;i++)
@@ -25,13 +25,16 @@ void Beam::calc_init_param(double n_b, double b_vel)
 }
 void Beam::beam_inject(double n_b,double b_vel, Time* time)
 {
-	double dl = b_vel*time->delta_t;
-	int step_num =  duration/time->delta_t;
+	/*double dl = b_vel*time->delta_t;
+	int step_num =  duration/;*/
+	double dl = b_vel*duration;
+	int step_num = 1;
 	int particles_in_step =  number/step_num;
 	int start_number = time->current_time/time->delta_t*particles_in_step;
 	double dr = geom1->dr*1.00000001;
 	double dz = geom1->dz*1.00000001;
-    if (time->current_time<duration)
+  //  if (time->current_time<duration)
+if (time->current_time<time->delta_t)
 		for(int i = 0; i <  particles_in_step; i++)
 		{
 		double	rand_r = random_reverse(i,3);		

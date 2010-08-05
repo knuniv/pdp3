@@ -59,8 +59,8 @@ int main()
 	particles_list p_list(0);
 	///////////////////////////////////////////
 	// beam part
-	Beam electron_beam("electron_beam", -1, 1, 1e6, &geom1,&p_list,1e-9,0.05);
-	electron_beam.calc_init_param(1e13,5e7);
+	Beam electron_beam("electron_beam", -1, 1, 2e5, &geom1,&p_list,1e-9,0.05);
+	electron_beam.calc_init_param(1e14,5e7);
 	///////////////////////////////////////////
 	Particles electrons("electrons", -1, 1, 0e6, &geom1,&p_list);
 	Particles ions("ions", 1, 1836, 0e6, &geom1,&p_list);
@@ -88,6 +88,7 @@ int main()
 
 	//p_list.azimuthal_j_weighting(&time1, &current1);
 	//p_list.j_weighting(&time1,&current1,);
+	electron_beam.beam_inject(1e14,5e7,&time1);			
 	p_list.charge_weighting(&rho_new);
 	//electrons.charge_weighting(&rho_new);
 	//out_class.out_data("rho",rho_new.get_ro(),1,128,2048);
@@ -95,14 +96,12 @@ int main()
 	//weight currents and charges before relaxation period
 		//solve Poisson equation
 
-	/*for(int j=0;(j<geom1.n_grid_1-1);j++)
-      for(int k=0;k<(geom1.n_grid_2-1);k++)
-		curr<<rho_new.get_ro()[j][k]<<" ";*/
-						
+		
 	Poisson_neumann poisson1(&geom1);
 
 	poisson1.poisson_solve(&e_field1, &rho_new);
 	bool res1 = poisson1.test_poisson_equation(&e_field1, &rho_new);
+	out_class.out_data("e3",e_field1.e3,0,100,geom1.n_grid_1-1,geom1.n_grid_2-1);
 	
 	//relaxation period
 	while (time1.current_time < time1.relaxation_time)
@@ -153,7 +152,7 @@ int main()
 		
 			p_list.charge_weighting(&rho_new);  //continuity equation
 		res =  continuity_equation(&time1, &geom1, &current1, &rho_old, &rho_new); 
-		electron_beam.beam_inject(1e14,5e7,&time1);
+		
 
 			
 		if  ((((int)(time1.current_time/time1.delta_t))%50==0))
@@ -165,6 +164,7 @@ int main()
 			out_class.out_data("e3",e_field1.e3,step_number,100,geom1.n_grid_1-1,geom1.n_grid_2-1);
 			out_class.out_coord("coords",electron_beam.x1,electron_beam.x3,step_number,100,electron_beam.number);
 			out_class.out_data("rho",rho_new.get_ro(),step_number,100,geom1.n_grid_1-1,geom1.n_grid_2-1);
+			out_class.out_data("j3",current1.get_j3(),step_number,100,geom1.n_grid_1-1,geom1.n_grid_2-1);
 				step_number=step_number+1;
 		}
 	
