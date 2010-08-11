@@ -7,6 +7,7 @@
 #include "Fourier.h"
 #include "Poisson.h"
 #include "Poisson_neumann.h"
+#include "Poisson_dirichlet.h"
 #include "particles_list.h"
 #include <fstream>
 #include <math.h>
@@ -19,7 +20,7 @@ int main()
 {
 
 	PML pml1(0.0,0.15, 0.0, 0.000001, 0.07);
-	Geometry geom1(0.2,0.4, 129, 257, &pml1);
+	Geometry geom1(0.2,0.4, 127, 255, &pml1);
 	double left_plasma_boundary = geom1.second_size*0.35;
 
 	Time time1(0,0,0,100000e-12,1e-12);
@@ -97,10 +98,12 @@ int main()
 		//solve Poisson equation
 
 		
-	Poisson_neumann poisson1(&geom1);
+	//Poisson_neumann poisson1(&geom1);
 
-	poisson1.poisson_solve(&e_field1, &rho_new);
-	bool res1 = poisson1.test_poisson_equation(&e_field1, &rho_new);
+	//poisson1.poisson_solve(&e_field1, &rho_new);
+	Poisson_dirichlet dirih(&geom1);
+	dirih.poisson_solve(&e_field1, &rho_new);
+	bool res1 = dirih.test_poisson_equation(&e_field1, &rho_new);
 	out_class.out_data("e3",e_field1.e3,0,100,geom1.n_grid_1-1,geom1.n_grid_2-1);
 	
 	//relaxation period
