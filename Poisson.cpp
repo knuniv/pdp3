@@ -13,7 +13,7 @@ bool Poisson::test_poisson_equation(E_field* input_e ,charge_density *rho)
 	int i=0, k=0;
 	double dr = cyl_geom->dr;
 	double dz = cyl_geom->dz;
-	double accur =1e-6;
+	double accur =1e-3;
 	double a=0;
 	bool res =true;
 	double **rho1 = rho->get_ro();

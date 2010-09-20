@@ -63,8 +63,8 @@ int main()
 	Beam electron_beam("electron_beam", -1, 1, 2e5, &geom1,&p_list,1e-9,0.05);
 	electron_beam.calc_init_param(1e14,5e7);
 	///////////////////////////////////////////
-	Particles electrons("electrons", -1, 1, 0e6, &geom1,&p_list);
-	Particles ions("ions", 1, 1836, 0e6, &geom1,&p_list);
+	Particles electrons("electrons", -0, 1, 1e1, &geom1,&p_list);
+	Particles ions("ions", 0, 1836, 1e1, &geom1,&p_list);
 	p_list.create_coord_arrays();
 
 	electrons.load_spatial_distribution(2.5e14, 1.5e15, left_plasma_boundary);
@@ -89,7 +89,7 @@ int main()
 
 	//p_list.azimuthal_j_weighting(&time1, &current1);
 	//p_list.j_weighting(&time1,&current1,);
-	electron_beam.beam_inject(1e14,5e7,&time1);			
+		
 	p_list.charge_weighting(&rho_new);
 	//electrons.charge_weighting(&rho_new);
 	//out_class.out_data("rho",rho_new.get_ro(),1,128,2048);
@@ -120,11 +120,12 @@ int main()
 	}
 	time1.current_time = 0.0 ;
 
-	//variable for out_class function
+	//variable for out_class function 
 	int step_number= 0;
      
     while (time1.current_time < time1.end_time)
 	{
+electron_beam.beam_inject(1e14,5e7,&time1);		
 		//radiation  source
 		//maxwell_rad.radiation_source(&geom1,0.4,2e9,0,time1.current_time);
 		

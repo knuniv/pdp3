@@ -35,6 +35,8 @@ void Poisson_dirichlet::poisson_solve(E_field* input_e, charge_density* ro1)
 	double** e1 = input_e->e1;
 	double** e3 = input_e->e3;
 	double** fi = input_e->fi;
+	double dr = cyl_geom->dr;
+	double dz = cyl_geom->dz;
 
 ///////////////////////////////////////////////
 		//copy charge_density array in to temp array//
@@ -62,8 +64,8 @@ for( i=0;i<(cyl_geom->n_grid_1);i++)
 	for( k=0;k<(cyl_geom->n_grid_2);k++)
 	{
 			//b=2.0+ pow((geom1->dr*pi*k/(geom1->dz*geom1->n_grid_2)),2);
-	    	b = 2.0*(1 - (cos(pi*(k+1)/(2*(cyl_geom->n_grid_2-1))) - 1)*cyl_geom->dr*cyl_geom->dr/(cyl_geom->dz*cyl_geom->dz));
-			d=cyl_geom->dr*cyl_geom->dr*t_charge_density[0][k]/epsilon0;
+	    	b = 2.0*(1.0 - dr*dr/(dz*dz)*(cos(pi*(k+1)/(cyl_geom->n_grid_2+1)) - 1));
+			d=dr*dr*t_charge_density[0][k]/epsilon0;
 			alpha[1]=4.0/(2.0+b);
 			beta[1]=d/(2.0+b);
 
@@ -74,7 +76,7 @@ for( i=0;i<(cyl_geom->n_grid_1);i++)
 				
 				a = 1.0-1.0/(2.0*(i));
 				c = 1.0+1.0/(2.0*(i));
-				d = cyl_geom->dr*cyl_geom->dr*t_charge_density[i][k]/epsilon0;
+				d = dr*dr*t_charge_density[i][k]/epsilon0;
 
 				alpha[i+1] = c/(b-alpha[i]*a);
 				beta[i+1]  = (d+beta[i]*a)/(b-alpha[i]*a);

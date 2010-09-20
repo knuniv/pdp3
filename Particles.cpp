@@ -214,8 +214,8 @@ void Particles::half_step_coord(Time* t)
 
 			if (x3[i] < half_dz)
 			{
-				x3[i] = dz - x3[i];
-				v3[i] = -v3[i];
+				//x3[i] = dz - x3[i];
+				//v3[i] = -v3[i];
 			}
 		}
 }
