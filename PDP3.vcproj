@@ -199,6 +199,26 @@
 			UniqueIdentifier="{4FC737F1-C7A5-4376-A066-2A32D752A2FF}"
 			>
 			<File
+				RelativePath=".\Beam.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\Boundary_conditions.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\boundary_dirichlet.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\Boundary_Maxwell_conditions.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\boundary_neumann.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\charge_density.cpp"
 				>
 			</File>
@@ -227,6 +247,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\input_output_class.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\Main.cpp"
 				>
 			</File>
@@ -235,7 +259,23 @@
 				>
 			</File>
 			<File
+				RelativePath=".\particles_list.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\PML.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\Poisson.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\Poisson_dirichlet.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\Poisson_neumann.cpp"
 				>
 			</File>
 			<File
@@ -252,6 +292,26 @@
 			Filter="h;hpp;hxx;hm;inl;inc;xsd"
 			UniqueIdentifier="{93995380-89BD-4b04-88EB-625FBE52EBFB}"
 			>
+			<File
+				RelativePath=".\Beam.h"
+				>
+			</File>
+			<File
+				RelativePath=".\Boundary_conditions.h"
+				>
+			</File>
+			<File
+				RelativePath=".\boundary_dirichlet.h"
+				>
+			</File>
+			<File
+				RelativePath=".\Boundary_Maxwell_conditions.h"
+				>
+			</File>
+			<File
+				RelativePath=".\boundary_neumann.h"
+				>
+			</File>
 			<File
 				RelativePath=".\charge_density.h"
 				>
@@ -281,11 +341,27 @@
 				>
 			</File>
 			<File
+				RelativePath=".\input_output_class.h"
+				>
+			</File>
+			<File
 				RelativePath=".\Particles.h"
 				>
 			</File>
 			<File
+				RelativePath=".\particles_list.h"
+				>
+			</File>
+			<File
 				RelativePath=".\PML.h"
+				>
+			</File>
+			<File
+				RelativePath=".\poisson_dirichlet.h"
+				>
+			</File>
+			<File
+				RelativePath=".\poisson_neumann.h"
 				>
 			</File>
 			<File
