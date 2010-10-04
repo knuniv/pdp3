@@ -463,7 +463,9 @@ Triple E_field::get_field(double x1, double x3)
 
    //weighting Er[i+1][k+1]//
    er = er + e1[i_r+1][k_z+1]*(pi*dz2*(r3*r3-r2*r2))/vol_2;
-   
+
+   if (k_z < 0)
+	   er = 0.0;
 ///////////////////////////////////////////////////////
 
 
@@ -502,7 +504,8 @@ Triple E_field::get_field(double x1, double x3)
          //weighting Ez[i+1][k+1]//
 		   ez = ez + e3[i_r+1][k_z+1]*pi*dz2*(r3*r3-r2*r2)/vol_2;    
    
-  
+     if (k_z < 0)
+	   ez = 0.0;
 ///////////////////////////////////////////////////////
 
 	 // weighting of E_fi//
@@ -537,6 +540,8 @@ Triple E_field::get_field(double x1, double x3)
          //weighting Efi[i+1][k+1]//
 		   efi =efi + e2[i_r+1][k_z+1]*pi*dz2*(r3*r3-r2*r2)/vol_2;
   
+	if (k_z < 0)
+	  efi = 0.0;
  
 		   
 	Triple components(er, efi, ez);

@@ -63,8 +63,8 @@ int main()
 	Beam electron_beam("electron_beam", -1, 1, 2e5, &geom1,&p_list,1e-9,0.05);
 	electron_beam.calc_init_param(1e14,5e7);
 	///////////////////////////////////////////
-	Particles electrons("electrons", -0, 1, 1e1, &geom1,&p_list);
-	Particles ions("ions", 0, 1836, 1e1, &geom1,&p_list);
+	Particles electrons("electrons", -1, 1, 0, &geom1,&p_list);
+	Particles ions("ions", 1, 1836, 0, &geom1,&p_list);
 	p_list.create_coord_arrays();
 
 	electrons.load_spatial_distribution(2.5e14, 1.5e15, left_plasma_boundary);
