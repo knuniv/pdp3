@@ -357,6 +357,14 @@
 				>
 			</File>
 			<File
+				RelativePath=".\poisson_dirichlet.h"
+				>
+			</File>
+			<File
+				RelativePath=".\poisson_neumann.h"
+				>
+			</File>
+			<File
 				RelativePath=".\Poisson.h"
 				>
 			</File>
