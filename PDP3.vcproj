@@ -365,6 +365,18 @@
 				>
 			</File>
 			<File
+				RelativePath=".\Poisson.h"
+				>
+			</File>
+			<File
+				RelativePath=".\poisson_dirichlet.h"
+				>
+			</File>
+			<File
+				RelativePath=".\Poisson_neumann.h"
+				>
+			</File>
+			<File
 				RelativePath=".\resource1.h"
 				>
 			</File>
@@ -374,16 +386,6 @@
 			</File>
 			<File
 				RelativePath=".\Triple.h"
-				>
-			</File>
-		</Filter>
-		<Filter
-			Name="Resource Files"
-			Filter="rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav"
-			UniqueIdentifier="{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}"
-			>
-			<File
-				RelativePath=".\pdp31.rc"
 				>
 			</File>
 		</Filter>

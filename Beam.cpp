@@ -91,3 +91,29 @@ if (time->current_time==0)
 		}
 	
 }
+
+void Beam::bunch_inject(double n_b,double b_vel, Time* time)
+{
+	double dl = b_vel*time->delta_t;
+	int step_num =  duration/time->delta_t;
+	int particles_in_step =  number/step_num;
+	int start_number = time->current_time/time->delta_t*particles_in_step;
+	double dr = geom1->dr*1.00000001;
+	double dz = geom1->dz*1.00000001;
+ 		for(int i = 0; i <  particles_in_step; i++)
+		{
+		double	rand_r = random_reverse(i,3);		
+		double	rand_z = random_reverse(i,5);
+			x1[i+start_number] = (radius)*sqrt(rand_r) + dr/2.0;
+		
+			x3[i+start_number] = dl*(rand_z)+0*dz;
+			v3[i+start_number] = b_vel;
+			is_alive[i+start_number] = true;
+		}
+	for(int i = 0; i <  number; i++)
+		if(x3[i]>(geom1->second_size - dz))
+		{
+			is_alive[i]=false;
+		}
+
+}
