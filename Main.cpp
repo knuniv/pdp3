@@ -60,7 +60,7 @@ int main()
 	particles_list p_list(0);
 	///////////////////////////////////////////
 	// beam part
-	Beam electron_beam("electron_beam", -1, 1, 2e5, &geom1,&p_list,1e-9,0.05);
+	Beam electron_beam("electron_beam", -1, 1, 1e6, &geom1,&p_list,1e-9,0.05);
 	electron_beam.calc_init_param(1e14,5e7);
 	///////////////////////////////////////////
 	Particles electrons("electrons", -1, 1, 0, &geom1,&p_list);
@@ -125,7 +125,8 @@ int main()
      
     while (time1.current_time < time1.end_time)
 	{
-electron_beam.beam_inject(1e14,5e7,&time1);		
+//electron_beam.beam_inject(1e14,5e7,&time1);
+		electron_beam.bunch_inject(1e14,5e7,&time1,100);
 		//radiation  source
 		//maxwell_rad.radiation_source(&geom1,0.4,2e9,0,time1.current_time);
 		
