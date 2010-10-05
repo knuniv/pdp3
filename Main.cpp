@@ -19,9 +19,9 @@ using namespace std;
 int main() 
 {
 
-	PML pml1(0.0,0.15, 0.0, 0.000001, 0.07);
-	Geometry geom1(0.2,0.4, 127, 255, &pml1);
-	double left_plasma_boundary = geom1.second_size*0.35;
+	PML pml1(0.0,0.0, 0.0, 0.000001, 0.07);
+	Geometry geom1(0.1,0.6, 255, 1023, &pml1);
+	double left_plasma_boundary = geom1.second_size*0.0;
 
 	Time time1(0,0,0,100000e-12,1e-12);
 	E_field e_field1(&geom1);
@@ -60,15 +60,15 @@ int main()
 	particles_list p_list(0);
 	///////////////////////////////////////////
 	// beam part
-	Beam electron_beam("electron_beam", -1, 1, 1e6, &geom1,&p_list,1e-9,0.05);
-	electron_beam.calc_init_param(1e14,5e7);
+	Beam electron_beam("electron_beam", -1, 1, 6e5, &geom1,&p_list,1e-9,0.01);
+	electron_beam.calc_init_param(5e12,3e7);
 	///////////////////////////////////////////
-	Particles electrons("electrons", -1, 1, 0, &geom1,&p_list);
-	Particles ions("ions", 1, 1836, 0, &geom1,&p_list);
+	Particles electrons("electrons", -1, 1, 1e6, &geom1,&p_list);
+	Particles ions("ions", 1, 1836, 1e6, &geom1,&p_list);
 	p_list.create_coord_arrays();
 
-	electrons.load_spatial_distribution(2.5e14, 1.5e15, left_plasma_boundary);
-	ions.load_spatial_distribution(2.5e14, 1.5e15, left_plasma_boundary);
+	electrons.load_spatial_distribution(1.6e14, 4.8e14, left_plasma_boundary);
+	ions.load_spatial_distribution(1.6e14, 4.8e14, left_plasma_boundary);
 
 	electrons.velocity_distribution_v2(3e4);
 	ions.velocity_distribution_v2(2e3);
