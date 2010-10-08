@@ -15,6 +15,6 @@ public:
 public:
 	void calc_init_param(double n_b,double b_vel);
 	void beam_inject(double n_b,double b_vel, Time* time);
-	void bunch_inject(double n_b,double b_vel, Time* time, int particles_in_step);
+	void bunch_inject(double n_b,double b_vel, Time* time, int particles_in_step,double fi,double koef);
 	void beam_inject_calc_E(Geometry* geom, E_field * E_beam,E_field* E,double n_b,double b_vel, Time* time);
 };

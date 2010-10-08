@@ -92,27 +92,36 @@ if (time->current_time==0)
 	
 }
 
-void Beam::bunch_inject(double n_b,double b_vel, Time* time,int particles_in_step)
+void Beam::bunch_inject(double n_b,double b_vel, Time* time,int particles_in_step, double fi, double koef)
 {
 	double dl = b_vel*time->delta_t;
 	int step_num =  duration/time->delta_t;
 	int start_number = time->current_time/time->delta_t*particles_in_step;
 	double dr = geom1->dr*1.00000001;
 	double dz = geom1->dz*1.00000001;
- 		for(int i = 0; i <  particles_in_step; i++)
+	double pi = 3.1415926;
+	double mod_r = koef*radius*sin(2*pi*fi*time->current_time);
+
+	int n=0;
+	int i=0;
+ 		while(n<particles_in_step)
 		{
-		double	rand_r = random_reverse(i,3);		
-		double	rand_z = random_reverse(i,5);
-			x1[i+start_number] = (radius)*sqrt(rand_r) + dr/2.0;
-		
-			x3[i+start_number] = dl*(rand_z)-dl;
-			v3[i+start_number] = b_vel;
-			is_alive[i+start_number] = true;
+			if(is_alive)
+			{
+				double	rand_r = random_reverse(i,3);		
+				double	rand_z = random_reverse(i,5);
+				x1[i] = (mod_r)*sqrt(rand_r) + dr/2.0;
+				x3[i] = dl*(rand_z)-dl;
+				v3[i] = b_vel;
+				is_alive[i+start_number] = true;
+				n=n+1;
+			}
+		i=i+1;
 		}
-	for(int i = 0; i <  number; i++)
-		if(x3[i]>(geom1->second_size - dz))
+		for(int i = 0; i <  number; i++)
+		if(x3[i]>(geom1->second_size - dz/2.0))
 		{
 			is_alive[i]=false;
 		}
 
-}
+}	
