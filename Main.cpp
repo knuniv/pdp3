@@ -126,7 +126,7 @@ int main()
     while (time1.current_time < time1.end_time)
 	{
 //electron_beam.beam_inject(1e14,5e7,&time1);
-		electron_beam.bunch_inject(1e14,5e7,&time1,100,1e8,0.3);
+		electron_beam.bunch_inject(1e14,5e7,&time1,100,1.6e8,0.3);
 		//radiation  source
 		//maxwell_rad.radiation_source(&geom1,0.4,2e9,0,time1.current_time);
 		

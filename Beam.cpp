@@ -106,14 +106,14 @@ void Beam::bunch_inject(double n_b,double b_vel, Time* time,int particles_in_ste
 	int i=0;
  		while(n<particles_in_step)
 		{
-			if(is_alive)
+			if(!is_alive[i])
 			{
 				double	rand_r = random_reverse(i,3);		
 				double	rand_z = random_reverse(i,5);
 				x1[i] = (mod_r)*sqrt(rand_r) + dr/2.0;
 				x3[i] = dl*(rand_z)-dl;
 				v3[i] = b_vel;
-				is_alive[i+start_number] = true;
+				is_alive[i] = true;
 				n=n+1;
 			}
 		i=i+1;
