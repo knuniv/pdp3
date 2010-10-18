@@ -107,7 +107,7 @@ void Beam::bunch_inject(Time* time,int particles_in_step, double fi, double koef
 	int i=0;
  		while(n<particles_in_step)
 		{
-			if(is_alive[i])
+			if(!is_alive[i])
 			{
 				double	rand_r = random_reverse(i,3);		
 				double	rand_z = random_reverse(i,5);
