@@ -12,8 +12,10 @@ Beam::~Beam(void)
 }
 void Beam::calc_init_param(double n_b, double b_vel)
 {
-	double b_lenght = duration*b_vel;
-	double n_in_big = 3.1415*radius*radius*b_lenght*n_b/number;
+	n_beam = n_b;
+	vel_beam = b_vel;
+	double b_lenght = duration*vel_beam;
+	double n_in_big = 3.1415*radius*radius*b_lenght*n_beam/number;
 	charge *= n_in_big;
 	mass *= n_in_big;
 	for(int i=0;i<number;i++)
@@ -24,9 +26,10 @@ void Beam::calc_init_param(double n_b, double b_vel)
 		v3[i]=0;
 	}
 }
-void Beam::beam_inject(double n_b,double b_vel, Time* time)
+
+void Beam::beam_inject( Time* time)
 {
-	double dl = b_vel*time->delta_t;
+	double dl = vel_beam*time->delta_t;
 	int step_num =  duration/time->delta_t;
 	int particles_in_step =  number/step_num;
 	int start_number = time->current_time/time->delta_t*particles_in_step;
@@ -40,13 +43,13 @@ void Beam::beam_inject(double n_b,double b_vel, Time* time)
 			x1[i+start_number] = (radius)*sqrt(rand_r) + dr/2.0;
 		
 			x3[i+start_number] = dl*(rand_z)- dl;
-			v3[i+start_number] = b_vel;
+			v3[i+start_number] = vel_beam;
 			is_alive[i+start_number] = true;
 		}
 }
-void Beam::beam_inject_calc_E(Geometry* geom,E_field*E_beam, E_field*E,double n_b,double b_vel, Time* time)
+void Beam::beam_inject_calc_E(Geometry* geom,E_field*E_beam, E_field*E, Time* time)
 {
-	double dl = b_vel*time->delta_t;
+	double dl = vel_beam*time->delta_t;
 	int step_num =  duration/time->delta_t;
 	int particles_in_step =  number/step_num;
 	int start_number = time->current_time/time->delta_t*particles_in_step;
@@ -60,7 +63,7 @@ void Beam::beam_inject_calc_E(Geometry* geom,E_field*E_beam, E_field*E,double n_
 			x1[i+start_number] = (radius)*sqrt(rand_r) + dr/2.0;
 		
 			x3[i+start_number] = dl*(rand_z)-dl;
-			v3[i+start_number] = b_vel;
+			v3[i+start_number] =vel_beam;
 			is_alive[i+start_number] = true;
 		}
 if (time->current_time==0)
@@ -92,28 +95,26 @@ if (time->current_time==0)
 	
 }
 
-void Beam::bunch_inject(double n_b,double b_vel, Time* time,int particles_in_step, double fi, double koef)
+void Beam::bunch_inject(Time* time,int particles_in_step, double fi, double koef)
 {
-	double dl = b_vel*time->delta_t;
-	int step_num =  duration/time->delta_t;
-	int start_number = time->current_time/time->delta_t*particles_in_step;
+	double dl = vel_beam*time->delta_t;
 	double dr = geom1->dr*1.00000001;
 	double dz = geom1->dz*1.00000001;
 	double pi = 3.1415926;
-	double mod_r = koef*radius*sin(2*pi*fi*time->current_time);
+	double mod_r = radius*(1+koef/2.0*sin(2*pi*fi*time->current_time));
 
 	int n=0;
 	int i=0;
  		while(n<particles_in_step)
 		{
-			if(is_alive)
+			if(is_alive[i])
 			{
 				double	rand_r = random_reverse(i,3);		
 				double	rand_z = random_reverse(i,5);
 				x1[i] = (mod_r)*sqrt(rand_r) + dr/2.0;
 				x3[i] = dl*(rand_z)-dl;
-				v3[i] = b_vel;
-				is_alive[i+start_number] = true;
+				v3[i] = vel_beam;
+				is_alive[i] = true;
 				n=n+1;
 			}
 		i=i+1;
