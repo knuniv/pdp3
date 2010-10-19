@@ -367,7 +367,8 @@ Triple H_field::get_field(double x1, double x3)
 
    //weighting Hz[i+1][k+1]//
   hz = hz + h3_half_time[i_r+1][k_z+1]*(pi*dz2*(r3*r3-r2*r2))/vol_2;
-   
+   if (k_z < 0)
+	  hz= 0.0;
 ///////////////////////////////////////////////////////
 
 
@@ -408,7 +409,8 @@ Triple H_field::get_field(double x1, double x3)
          //weighting Hr[i+1][k+1]//
 		   hr = hr + h1_half_time[i_r+1][k_z+1]*pi*dz2*(r3*r3-r2*r2)/vol_2;    
     
-  
+  if (k_z < 0)
+	  hr = 0.0;
 ///////////////////////////////////////////////////////
 
 	 // weighting of H_fi//
@@ -436,7 +438,8 @@ Triple H_field::get_field(double x1, double x3)
    
          //weighting Hfi[i+1][k+1]//
 		   hfi = hfi + h2_half_time[i_r+1][k_z+1]*pi*dz2*(r3*r3-r2*r2)/vol_2;
-  
+  if (k_z < 0)
+	  hfi = 0.0;
 		   
 	Triple components(hr, hfi, hz);
 

@@ -15,9 +15,9 @@ void Beam::calc_init_param(double n_b, double b_vel)
 	n_beam = n_b;
 	vel_beam = b_vel;
 	double b_lenght = duration*vel_beam;
-	double n_in_big = 3.1415*radius*radius*b_lenght*n_beam/number;
-	charge *= n_in_big;
-	mass *= n_in_big;
+//	double n_in_big = 3.1415*radius*radius*geom1->second_size*n_beam/number;
+//	charge *= n_in_big;
+//	mass *= n_in_big;
 	for(int i=0;i<number;i++)
 	{
 		is_alive[i]=false;
@@ -101,10 +101,13 @@ void Beam::bunch_inject(Time* time,int particles_in_step, double fi, double koef
 	double dr = geom1->dr*1.00000001;
 	double dz = geom1->dz*1.00000001;
 	double pi = 3.1415926;
-	double mod_r = radius*(1+koef/2.0*sin(2*pi*fi*time->current_time));
-
+	double mod_r = radius*(1 - koef/2.0 + koef/2.0*sin(2*pi*fi*time->current_time));
+	double n_in_big = 3.1415*radius*radius*(1-koef/2.0)*(1-koef/2.0)*geom1->second_size*n_beam/number;
+	charge *= n_in_big;
+ 	mass *= n_in_big;
 	int n=0;
 	int i=0;
+	particles_in_step = particles_in_step*mod_r/radius;
  		while(n<particles_in_step)
 		{
 			if(!is_alive[i])
