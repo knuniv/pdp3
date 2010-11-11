@@ -14,6 +14,7 @@
 #include "Boundary_Maxwell_conditions.h"
 #include "input_output_class.h"
 #include "Beam.h"
+#include "Bunch.h"
 #define  pi = 3.14159265;
 using namespace std;
 int main() 
@@ -60,8 +61,8 @@ int main()
 	particles_list p_list(0);
 	///////////////////////////////////////////
 	// beam part
-	Beam electron_beam("electron_beam", -1, 1, 6e5, &geom1,&p_list,1e-9,0.01);
-	electron_beam.calc_init_bunch_param(&time1,100,5e12,3e7);
+	Bunch electron_bunch("electron_beam", -1, 1, 6e5, &geom1,&p_list,0.01);
+	electron_bunch.calc_init_param(&time1,100,5e12,3e7);
 	///////////////////////////////////////////
 	Particles electrons("electrons", -1, 1, 0e6, &geom1,&p_list);
 	Particles ions("ions", 1, 1836, 0e6, &geom1,&p_list);
@@ -126,7 +127,7 @@ int main()
     while (time1.current_time < time1.end_time)
 	{
 //electron_beam.beam_inject(1e14,5e7,&time1);
-		electron_beam.bunch_inject(&time1,100,1.6e8,0.5);
+		electron_bunch.bunch_inject(&time1,100,1.6e8,0.5);
 		//radiation  source
 		//maxwell_rad.radiation_source(&geom1,0.4,2e9,0,time1.current_time);
 		
@@ -167,7 +168,7 @@ int main()
 			//out_class.out_data("e1",e_field1.e1,100,128,2048);
 		//	out_class.out_data("rho",rho_new.get_ro(),100,geom1.n_grid_1,geom1.n_grid_2);
 			out_class.out_data("e3",e_field1.e3,step_number,100,geom1.n_grid_1-1,geom1.n_grid_2-1);
-			out_class.out_coord("coords",electron_beam.x1,electron_beam.x3,step_number,100,electron_beam.number);
+			out_class.out_coord("coords",electron_bunch.x1, electron_bunch.x3, step_number, 100, electron_bunch.number);
 			out_class.out_data("rho",rho_new.get_ro(),step_number,100,geom1.n_grid_1-1,geom1.n_grid_2-1);
 			out_class.out_data("j3",current1.get_j3(),step_number,100,geom1.n_grid_1-1,geom1.n_grid_2-1);
 				step_number=step_number+1;
