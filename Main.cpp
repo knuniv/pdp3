@@ -60,11 +60,11 @@ int main()
 	particles_list p_list(0);
 	///////////////////////////////////////////
 	// beam part
-	Beam electron_beam("electron_beam", -1, 1, 6e5, &geom1,&p_list,1e-9,0.01);
-	electron_beam.calc_init_bunch_param(&time1,100,5e12,3e7);
+	Beam electron_beam("electron_beam", -1, 1, 10e5, &geom1,&p_list,1e-9,0.01);
+	electron_beam.calc_init_bunch_param(&time1,50,5e12,3e7);
 	///////////////////////////////////////////
-	Particles electrons("electrons", -1, 1, 0e6, &geom1,&p_list);
-	Particles ions("ions", 1, 1836, 0e6, &geom1,&p_list);
+	Particles electrons("electrons", -1, 1, 1e6, &geom1,&p_list);
+	Particles ions("ions", 1, 1836, 1e6, &geom1,&p_list);
 	p_list.create_coord_arrays();
 
 	electrons.load_spatial_distribution(1.6e14, 4.8e14, left_plasma_boundary);
@@ -126,7 +126,7 @@ int main()
     while (time1.current_time < time1.end_time)
 	{
 //electron_beam.beam_inject(1e14,5e7,&time1);
-		electron_beam.bunch_inject(&time1,100,1.6e8,0.5);
+		electron_beam.bunch_inject(&time1,50,1.6e8,0.5);
 		//radiation  source
 		//maxwell_rad.radiation_source(&geom1,0.4,2e9,0,time1.current_time);
 		
