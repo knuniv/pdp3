@@ -14,6 +14,7 @@
 #include "Boundary_Maxwell_conditions.h"
 #include "input_output_class.h"
 #include "Beam.h"
+#include "Bunch.h"
 #define  pi = 3.14159265;
 using namespace std;
 int main() 
@@ -167,7 +168,7 @@ int main()
 			//out_class.out_data("e1",e_field1.e1,100,128,2048);
 		//	out_class.out_data("rho",rho_new.get_ro(),100,geom1.n_grid_1,geom1.n_grid_2);
 			out_class.out_data("e3",e_field1.e3,step_number,100,geom1.n_grid_1-1,geom1.n_grid_2-1);
-			out_class.out_coord("coords",electron_beam.x1,electron_beam.x3,step_number,100,electron_beam.number);
+			out_class.out_coord("coords",electron_bunch.x1, electron_bunch.x3, step_number, 100, electron_bunch.number);
 			out_class.out_data("rho",rho_new.get_ro(),step_number,100,geom1.n_grid_1-1,geom1.n_grid_2-1);
 			out_class.out_data("j3",current1.get_j3(),step_number,100,geom1.n_grid_1-1,geom1.n_grid_2-1);
 				step_number=step_number+1;

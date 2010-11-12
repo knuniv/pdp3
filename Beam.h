@@ -16,8 +16,6 @@ public:
 	double vel_beam; //beam velocity
 public:
 	void calc_init_param(double n_b,double b_vel);
-	void calc_init_bunch_param(Time* time,int particles_in_step,double n_b,double b_vel);
 	void beam_inject(Time* time);
-	void bunch_inject(Time* time, int particles_in_step,double fi,double koef);
 	void beam_inject_calc_E(Geometry* geom, E_field * E_beam,E_field* E, Time* time);
 };

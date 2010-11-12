@@ -119,6 +119,7 @@
     <ClCompile Include="boundary_dirichlet.cpp" />
     <ClCompile Include="Boundary_Maxwell_conditions.cpp" />
     <ClCompile Include="boundary_neumann.cpp" />
+    <ClCompile Include="Bunch.cpp" />
     <ClCompile Include="charge_density.cpp" />
     <ClCompile Include="current.cpp" />
     <ClCompile Include="E_field.cpp" />
@@ -134,6 +135,7 @@
     <ClCompile Include="Poisson.cpp" />
     <ClCompile Include="Poisson_dirichlet.cpp" />
     <ClCompile Include="Poisson_neumann.cpp" />
+    <ClCompile Include="Test_class.cpp" />
     <ClCompile Include="Time.cpp" />
     <ClCompile Include="Triple.cpp" />
   </ItemGroup>
@@ -143,6 +145,7 @@
     <ClInclude Include="boundary_dirichlet.h" />
     <ClInclude Include="Boundary_Maxwell_conditions.h" />
     <ClInclude Include="boundary_neumann.h" />
+    <ClInclude Include="Bunch.h" />
     <ClInclude Include="charge_density.h" />
     <ClInclude Include="current.h" />
     <ClInclude Include="E_field.h" />
@@ -154,10 +157,11 @@
     <ClInclude Include="Particles.h" />
     <ClInclude Include="particles_list.h" />
     <ClInclude Include="PML.h" />
-    <ClInclude Include="poisson_dirichlet.h" />
-    <ClInclude Include="poisson_neumann.h" />
     <ClInclude Include="Poisson.h" />
+    <ClInclude Include="poisson_dirichlet.h" />
+    <ClInclude Include="Poisson_neumann.h" />
     <ClInclude Include="resource1.h" />
+    <ClInclude Include="Test_class.h" />
     <ClInclude Include="Time.h" />
     <ClInclude Include="Triple.h" />
   </ItemGroup>
