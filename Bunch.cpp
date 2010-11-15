@@ -31,7 +31,7 @@ void Bunch::bunch_inject(Time* time,int particles_in_step, double fi, double koe
 	int n=0;
 	int i=0;
 	particles_in_step = particles_in_step*mod_n;
- 		while((n<particles_in_step)&&(n<number))
+ 		while((n<particles_in_step)&&(i<number))
 		{
 			if(!is_alive[i])
 			{
