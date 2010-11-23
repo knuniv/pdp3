@@ -1,6 +1,5 @@
 #pragma once
 #include "particles.h"
-
 class Bunch :
 	public Particles
 {
@@ -13,6 +12,8 @@ public:
 	double n_bunch;// bunch density;
 	double vel_bunch; //bunch velocity
 public:
+	
 	void calc_init_param(Time* time,int particles_in_step,double n_b,double b_vel);
 	void bunch_inject(Time* time, int particles_in_step,double fi,double koef);
+	 void half_step_coord(Time* t);
 	};
