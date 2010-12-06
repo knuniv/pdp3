@@ -192,7 +192,7 @@ void Particles::half_step_coord(Time* t)
 		if (is_alive[i])
 		{	
 			x1[i] = x1[i] + v1[i]*half_dt; 
-            x3[i] = x3[i] + v3[i]*half_dt;
+			x3[i] = x3[i] + v3[i]*half_dt;
 
 			if (x1[i] > x1_wall)
 			{
