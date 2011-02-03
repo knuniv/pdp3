@@ -44,7 +44,7 @@ void Bunch::bunch_inject( Time* time)
 		double	rand_z = random_reverse(i,5);
 			x1[i+start_number] = (radius)*sqrt(rand_r) + dr/2.0;
 		
-			x3[i+start_number] = dl*(rand_z)- dl;
+			x3[i+start_number] = dl*(rand_z);
 			v3[i+start_number] = vel_bunch;
 			is_alive[i+start_number] = true;
 		}
