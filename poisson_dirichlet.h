@@ -8,6 +8,6 @@ public:
 	Poisson_dirichlet(Geometry* cyl_geom);
 	~Poisson_dirichlet(void);
 public:
-	double** t_charge_density;
+	flcuda** t_charge_density;
 	void poisson_solve(E_field* input_e, charge_density* input_rho);
 };

@@ -2,7 +2,7 @@
 #include "field.h"
 #include "E_field.h"
 #include "H_field.h"
-#include "Time.h"
+#include "pdp3_time.h"
 #include "Particles.h"
 #include "Fourier.h"
 #include "Poisson.h"
@@ -15,14 +15,20 @@
 #include "input_output_class.h"
 #include "Beam.h"
 #include "Bunch.h"
+#include "time.h"
+#include "particles_struct.h"
+#include "system_host.cuh"
 #define  pi = 3.14159265;
 using namespace std;
+Particles_struct specie;
 int main() 
 {
+	clock_t start, finish;
+	flcuda time_elapsed;
 
 	PML pml1(0.0,0.0, 0.0, 0.000001, 0.07);
-	Geometry geom1(0.1,0.6, 255, 1023, &pml1);
-	double left_plasma_boundary = geom1.second_size*0.0;
+	Geometry geom1(0.2,1.5, 255, 1023, &pml1);
+	flcuda left_plasma_boundary = geom1.second_size*0.0;
 
 	Time time1(0,0,0,100000e-12,1e-12);
 	E_field e_field1(&geom1);
@@ -37,6 +43,7 @@ int main()
 	current current1(&geom1);
 	charge_density rho_new(&geom1);
 	charge_density rho_old(&geom1);
+	charge_density rho_beam(&geom1);
 
 	e_field1.boundary_conditions();
 	e_field1.set_homogeneous_efield(0.0, 0.0, 0);
@@ -70,8 +77,8 @@ int main()
 	Particles ions("ions", 1, 1836, 0*1e6, &geom1,&p_list);
 	p_list.create_coord_arrays();
 
-	electrons.load_spatial_distribution(1.6e14, 4.8e14, left_plasma_boundary);
-	ions.load_spatial_distribution(1.6e14, 4.8e14, left_plasma_boundary);
+	electrons.load_spatial_distribution(1e14, 1.01e14, left_plasma_boundary);
+	ions.load_spatial_distribution(1e14, 1.01e14, left_plasma_boundary);
 
 	electrons.velocity_distribution_v2(3e4);
 	ions.velocity_distribution_v2(2e3);
@@ -85,7 +92,10 @@ int main()
 	out_vel.close();
 	out_coords.close();
 
-
+    #ifdef BUILD_CUDA
+	  InitCUDA();
+	  SetupCUDA();
+    #endif
 	   
     /////////////////////////////////
 	//0. Half step back
@@ -140,7 +150,7 @@ int main()
 		//2. Calculate v
 			current1.reset_j();
 			rho_old.reset_rho();
-		
+			rho_beam.reset_rho();		
 			p_list.step_v(&e_field1, &h_field1, &time1);
 
 		//3. Calculate x, calculate J
@@ -167,14 +177,15 @@ int main()
 		if  ((((int)(time1.current_time/time1.delta_t))%50==0))
 		{
 			cout<<time1.current_time<<" ";
-		
+			electron_bunch.charge_weighting(&rho_beam);
 			//out_class.out_data("e1",e_field1.e1,100,128,2048);
-		//	out_class.out_data("rho",rho_new.get_ro(),100,geom1.n_grid_1,geom1.n_grid_2);
+			out_class.out_data("rho_beam", rho_beam.get_ro(),step_number,100,geom1.n_grid_1-1,geom1.n_grid_2-1);
 			out_class.out_data("e3",e_field1.e3,step_number,100,geom1.n_grid_1-1,geom1.n_grid_2-1);
 			//out_class.out_coord("coords",electron_beam.x1, electron_beam.x3, step_number, 100, electron_beam.number);
+			//out_class.out_coord("coords",electrons.x1, electrons.x3, step_number, 100, electrons.number);
 			//out_class.out_data("rho",rho_new.get_ro(),step_number,100,geom1.n_grid_1-1,geom1.n_grid_2-1);
 			out_class.out_data("h2",h_field1.h2,step_number,100,geom1.n_grid_1-1,geom1.n_grid_2-1);
-				step_number=step_number+1;
+			//	step_number=step_number+1;
 		}
 	
 		time1.current_time = time1.current_time + time1.delta_t;

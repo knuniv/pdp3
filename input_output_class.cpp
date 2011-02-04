@@ -7,7 +7,7 @@ input_output_class::input_output_class(void)
 input_output_class::~input_output_class(void)
 {
 }
-void input_output_class::out_data(char* comp_name, double** out_value,int step_number, int number, int r_step,int z_step)
+void input_output_class::out_data(char* comp_name, flcuda** out_value,int step_number, int number, int r_step,int z_step)
 {
 	//static variable for defining number of function calling
     //static int count =0;
@@ -33,7 +33,7 @@ void input_output_class::out_data(char* comp_name, double** out_value,int step_n
 	char str_int [50]; 
 	itoa(inc_value,str_int,10);
 	strcat(st_name, str_int);
-	char path[50] = "e:/taras/_results/";
+	char path[50] = "f:/taras/_results/";
 	strcat(path,st_name);
 	ofstream out_val(path,ios::app);
 	// write  values  into file 
@@ -48,7 +48,7 @@ void input_output_class::out_data(char* comp_name, double** out_value,int step_n
 }
 
 /////
-void input_output_class::out_coord(char* comp_name, double* coord_r, double* coord_z,int step_number, int number, int particles_number)
+void input_output_class::out_coord(char* comp_name, flcuda* coord_r, flcuda* coord_z,int step_number, int number, int particles_number)
 {
 	//static variable for defining number of function calling
     //static int count =0;

@@ -9,9 +9,9 @@ public:
 
 	~Beam(void);
 public:
-	double radius; //beam radius
-	double n_beam;// beam density;
-	double vel_beam; //beam velocity
+	flcuda radius; //beam radius
+	flcuda n_beam;// beam density;
+	flcuda vel_beam; //beam velocity
 public:
 	
 	void calc_init_param(Time* time,int particles_in_step,double n_b,double b_vel);

@@ -1,6 +1,6 @@
 #include "Triple.h"
 //#include "stdafx.h"
-Triple::Triple(double f, double s, double t)
+Triple::Triple(flcuda f, flcuda s, flcuda t)
 {
 	first = f;
 	second = s;

@@ -9,7 +9,7 @@ Boundary_Maxwell_conditions::Boundary_Maxwell_conditions(void)
 Boundary_Maxwell_conditions::~Boundary_Maxwell_conditions(void)
 {
 }
-void Boundary_Maxwell_conditions::specify_initial_field(Geometry* cyl_geom, double E_fi_upper, double E_fi_left, double E_fi_right)
+void Boundary_Maxwell_conditions::specify_initial_field(Geometry* cyl_geom, flcuda E_fi_upper, flcuda E_fi_left, flcuda E_fi_right)
 {
 int i=0, k=0;
 int n_grid1=cyl_geom->n_grid_1;
@@ -28,11 +28,11 @@ for (i=0;i<(n_grid1);i++)
 /////////////////////////////////////////////
 
 }
-void Boundary_Maxwell_conditions::radiation_source(Geometry* cyl_geom,double region_size, double frequency, int wave_type, double time)
+void Boundary_Maxwell_conditions::radiation_source(Geometry* cyl_geom,flcuda region_size, flcuda frequency, int wave_type, flcuda time)
 {
 	int i_max =0, i=0;
 	i_max = (int) (region_size/cyl_geom->dr);
-	double pi = 3.1415926;
+	flcuda pi = 3.1415926;
 
 	switch (wave_type)
 	{
@@ -52,15 +52,15 @@ void Boundary_Maxwell_conditions::radiation_source(Geometry* cyl_geom,double reg
 	   break;
 	}
 }
-void  Boundary_Maxwell_conditions::probe_mode_exitation(Geometry* cyl_geom, current* j_input, double n, double frequency,double time)
+void  Boundary_Maxwell_conditions::probe_mode_exitation(Geometry* cyl_geom, current* j_input, flcuda n, flcuda frequency,flcuda time)
 {
 	int k_max =0, k=0;
 	int k_start =0;
-	double probe_lenght = 3.0e8*n/frequency;
+	flcuda probe_lenght = 3.0e8*n/frequency;
 	k_max = (int) (probe_lenght/cyl_geom->dz)+k_start;
-	double pi = 3.1415926;
-	double dz = cyl_geom->dz;
-	double **j_p;
+	flcuda pi = 3.1415926;
+	flcuda dz = cyl_geom->dz;
+	flcuda **j_p;
 	j_p = j_input->get_j3();
 	/*if (cyl_geom->dz*k<probe_lenght)
 	{

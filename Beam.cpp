@@ -27,9 +27,9 @@ void Beam::calc_init_param(Time* time,int particles_in_step,double n_b, double b
 }
 void Beam::beam_inject(Time* time,int particles_in_step, double fi, double koef)
 {
-	double dl = vel_beam*time->delta_t;
-	double dr = geom1->dr*1.00000001;
-	double dz = geom1->dz*1.00000001;
+	flcuda dl = vel_beam*time->delta_t;
+	flcuda dr = geom1->dr*1.00000001;
+	flcuda dz = geom1->dz*1.00000001;
 	double pi = 3.1415926;
 	double mod_n = (1 - koef/2.0 + koef/2.0*sin(2*pi*fi*time->current_time));
 	int n=0;
@@ -39,8 +39,8 @@ void Beam::beam_inject(Time* time,int particles_in_step, double fi, double koef)
 		{
 			if(!is_alive[i])
 			{
-				double	rand_r = random_reverse(i,3);		
-				double	rand_z = random_reverse(i,5);
+		flcuda	rand_r = random_reverse(i,3);		
+		flcuda	rand_z = random_reverse(i,5);
 				x1[i] = (radius)*sqrt(rand_r) + dr/2.0;
 				x3[i] = dl*(rand_z)-dl;
 				v3[i] = vel_beam;

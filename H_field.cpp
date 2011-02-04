@@ -11,83 +11,85 @@ H_field::H_field(Geometry* geom1_l):geom1(geom1_l)
 {
      //Hr//
 /////////////////////////////////////////
-	h1 = new double* [geom1->n_grid_1];
+	h1 = new flcuda* [geom1->n_grid_1];
 	for (int i=0;i<(geom1->n_grid_1);i++)
 		{
-			h1[i] = new double[geom1->n_grid_2-1];
+			h1[i] = new flcuda[geom1->n_grid_2-1];
 		}
+	h1_1d = new flcuda[geom1->n_grid_1 * (geom1->n_grid_2 - 1)];
 ////////////////////////////////////////
 
 	//Hf//
 /////////////////////////////////////////
-	h2 = new double* [geom1->n_grid_1-1];
+	h2 = new flcuda* [geom1->n_grid_1-1];
 	for (int i=0;i<(geom1->n_grid_1-1);i++)
 		{
-			h2[i] = new double[geom1->n_grid_2-1];
+			h2[i] = new flcuda[geom1->n_grid_2-1];
 		}
+	h2_1d = new flcuda[(geom1->n_grid_1 - 1) * (geom1->n_grid_2 - 1)];
 ////////////////////////////////////////
 
 		//Hz//
 /////////////////////////////////////////
-	h3 = new double* [geom1->n_grid_1-1];
+	h3 = new flcuda* [geom1->n_grid_1-1];
 	for (int i=0;i<(geom1->n_grid_1-1);i++)
 		{
-			h3[i] = new double[geom1->n_grid_2];
+			h3[i] = new flcuda[geom1->n_grid_2];
 		}
-
+    h3_1d = new flcuda[(geom1->n_grid_1 - 1) * geom1->n_grid_2];
 ////////////////////////////////////////
 
 	     //Hr_half_time//
 /////////////////////////////////////////
-	h1_half_time = new double* [geom1->n_grid_1];
+	h1_half_time = new flcuda* [geom1->n_grid_1];
 	for (int i=0;i<(geom1->n_grid_1);i++)
 		{
-			h1_half_time[i] = new double[geom1->n_grid_2-1];
+			h1_half_time[i] = new flcuda[geom1->n_grid_2-1];
 		}
 ////////////////////////////////////////
 
 	//Hf half time//
 /////////////////////////////////////////
-	h2_half_time = new double* [geom1->n_grid_1-1];
+	h2_half_time = new flcuda* [geom1->n_grid_1-1];
 	for (int i=0;i<(geom1->n_grid_1-1);i++)
 		{
-			h2_half_time[i] = new double[geom1->n_grid_2-1];
+			h2_half_time[i] = new flcuda[geom1->n_grid_2-1];
 		}
 ////////////////////////////////////////
 
 		//Hz half time//
 /////////////////////////////////////////
-	h3_half_time = new double* [geom1->n_grid_1-1];
+	h3_half_time = new flcuda* [geom1->n_grid_1-1];
 	for (int i=0;i<(geom1->n_grid_1-1);i++)
 		{
-			h3_half_time[i] = new double[geom1->n_grid_2];
+			h3_half_time[i] = new flcuda[geom1->n_grid_2];
 		}
 
 ////////////////////////////////////////
 		//Ar//
 /////////////////////////////////////////
-	Ar = new double* [geom1->n_grid_1];
+	Ar = new flcuda* [geom1->n_grid_1];
 	for (int i=0;i<(geom1->n_grid_1);i++)
 		{
-			Ar[i] = new double[geom1->n_grid_2];
+			Ar[i] = new flcuda[geom1->n_grid_2];
 		}
 
 ////////////////////////////////////////
 		//Afi//
 /////////////////////////////////////////
-	Afi = new double* [geom1->n_grid_1];
+	Afi = new flcuda* [geom1->n_grid_1];
 	for (int i=0;i<(geom1->n_grid_1);i++)
 		{
-			Afi[i] = new double[geom1->n_grid_2];
+			Afi[i] = new flcuda[geom1->n_grid_2];
 		}
 
 ////////////////////////////////////////
 		//Az//
 /////////////////////////////////////////
-	Az = new double* [geom1->n_grid_1];
+	Az = new flcuda* [geom1->n_grid_1];
 	for (int i=0;i<(geom1->n_grid_1);i++)
 		{
-			Az[i] = new double[geom1->n_grid_2];
+			Az[i] = new flcuda[geom1->n_grid_2];
 		}
 
 ////////////////////////////////////
@@ -157,7 +159,7 @@ H_field::~H_field(void)
 
 }
 
-void H_field::set_homogeneous_h(double H1, double H2, double H3)
+void H_field::set_homogeneous_h(flcuda H1, flcuda H2, flcuda H3)
 {
 for (int i=0;i<geom1->n_grid_1;i++)
 	for (int k=0;(k<geom1->n_grid_2-1);k++)
@@ -190,8 +192,8 @@ for (int i=0;i<(geom1->n_grid_1-1);i++)
 
 void H_field::calc_field(E_field* e_field1, Time* time1)
 {
-	double const_magn0 = 1.26E-6;
-	double alpha;
+	flcuda const_magn0 = 1.26E-6;
+	flcuda alpha;
 	int i=0;
 	int k=0;
 	//Hr - last i value //
@@ -233,15 +235,15 @@ void H_field::calc_field(E_field* e_field1, Time* time1)
 ///////////////////////////////////////////////
 void H_field::magnetostatic_equation(Geometry* geom1)
 {
-	const double pi = 3.141592;
+	const flcuda pi = 3.141592;
 	int i=0;
 	int k=0;
-	double a=0;
-	double c=0;
-	double b=0;
-	double d=0;
-	double* alpha = new double [geom1->n_grid_1];
-	double* beta = new double [geom1->n_grid_1];
+	flcuda a=0;
+	flcuda c=0;
+	flcuda b=0;
+	flcuda d=0;
+	flcuda* alpha = new flcuda [geom1->n_grid_1];
+	flcuda* beta = new flcuda [geom1->n_grid_1];
 	Fourier* four1=0;
 
 //////////////////////////////////////////////////
@@ -319,25 +321,23 @@ void H_field::magnetostatic_equation(Geometry* geom1)
 ////////////////////////////////////////////////////////////
 	//function for magnetic field weighting//
 
-Triple H_field::get_field(double x1, double x3)
+Triple H_field::get_field(flcuda x1, flcuda x3)
 {
-
-	{	
 	int i_r=0;  // number of particle i cell 
 	int k_z=0;  // number of particle k cell
 	
-	double pi = 3.14159;
-	double dr = geom1->dr;
-	double dz = geom1->dz;
-	double r1, r2, r3; // temp variables for calculation
-	double dz1, dz2;   // temp var.: width of k and k+1 cell 
-	double hr =0;
-	double hfi =0;
-	double hz =0;
-	double vol_1 =0; //  volume of i cell; Q/V, V - volume of elementary cell 
-	double vol_2 =0; //  volume of i+1 cell;
+	flcuda pi = 3.14159;
+	flcuda dr = geom1->dr;
+	flcuda dz = geom1->dz;
+	flcuda r1, r2, r3; // temp variables for calculation
+	flcuda dz1, dz2;   // temp var.: width of k and k+1 cell 
+	flcuda hr =0;
+	flcuda hfi =0;
+	flcuda hz =0;
+	flcuda vol_1 =0; //  volume of i cell; Q/V, V - volume of elementary cell 
+	flcuda vol_2 =0; //  volume of i+1 cell;
 	
-	double value =0;
+	flcuda value =0;
 ////////////////////////
 	r1 = x1-0.5*dr;
 	r3 = x1+0.5*dr;
@@ -367,8 +367,7 @@ Triple H_field::get_field(double x1, double x3)
 
    //weighting Hz[i+1][k+1]//
   hz = hz + h3_half_time[i_r+1][k_z+1]*(pi*dz2*(r3*r3-r2*r2))/vol_2;
-   if (k_z < 0)
-	  hz= 0.0;
+   
 ///////////////////////////////////////////////////////
 
 
@@ -409,8 +408,7 @@ Triple H_field::get_field(double x1, double x3)
          //weighting Hr[i+1][k+1]//
 		   hr = hr + h1_half_time[i_r+1][k_z+1]*pi*dz2*(r3*r3-r2*r2)/vol_2;    
     
-  if (k_z < 0)
-	  hr = 0.0;
+  
 ///////////////////////////////////////////////////////
 
 	 // weighting of H_fi//
@@ -438,14 +436,39 @@ Triple H_field::get_field(double x1, double x3)
    
          //weighting Hfi[i+1][k+1]//
 		   hfi = hfi + h2_half_time[i_r+1][k_z+1]*pi*dz2*(r3*r3-r2*r2)/vol_2;
-  if (k_z < 0)
-	  hfi = 0.0;
+  
 		   
 	Triple components(hr, hfi, hz);
 
 	return components;
 }
+///////Return one dimensional field components///////////
 
-
-
+flcuda* H_field::get_1d_h1()
+{
+  //copy 2d field array into 1d array rowwise
+  for (int i = 0; i < geom1->n_grid_1; i++)
+      for (int k = 0; k < geom1->n_grid_2 - 1; k++)
+		  h1_1d[i * (geom1->n_grid_2 - 1) + k] = h1_half_time[i][k];
+  return h1_1d;
 }
+
+flcuda* H_field::get_1d_h2()
+{
+  //copy 2d field array into 1d array rowwise
+  for (int i = 0; i < geom1->n_grid_1 - 1; i++)
+      for (int k = 0; k < geom1->n_grid_2 - 1; k++)
+		  h2_1d[i * (geom1->n_grid_2 - 1) + k] = h2_half_time[i][k];
+  return h2_1d;
+}
+
+flcuda* H_field::get_1d_h3()
+{
+  //copy 2d field array into 1d array rowwise
+  for (int i = 0; i < geom1->n_grid_1 - 1; i++)
+      for (int k = 0; k < geom1->n_grid_2; k++)
+		  h3_1d[i * geom1->n_grid_2 + k] = h3_half_time[i][k];
+  return h3_1d;
+}
+/////////////////////////////////////////////////////
+

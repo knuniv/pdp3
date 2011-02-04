@@ -13,5 +13,5 @@ public:
 	 Geometry *cyl_geom;
 	E_field * e_f;
 	charge_density *rho;
-	void specify_boundary_conditions(double E_fi_upper, double E_fi_left, double E_fi_right, double fi_upper_wall);
+	void specify_boundary_conditions(flcuda E_fi_upper, flcuda E_fi_left, flcuda E_fi_right, flcuda fi_upper_wall);
 };

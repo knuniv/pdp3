@@ -1,6 +1,6 @@
 #include "E_field.h"
 #include "H_field.h"
-#include "Time.h"
+#include "pdp3_time.h"
 
 Time::Time(void)
 {
@@ -10,7 +10,7 @@ Time::~Time(void)
 {
 }
 
-Time::Time(double ct, double st, double rt, double et, double dt)
+Time::Time(flcuda ct, flcuda st, flcuda rt, flcuda et, flcuda dt)
 {
 	start_time=st;
 	relaxation_time = rt;
