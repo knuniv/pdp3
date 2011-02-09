@@ -27,7 +27,8 @@ int main()
 	flcuda time_elapsed;
 
 	PML pml1(0.0,0.0, 0.0, 0.000001, 0.07);
-	Geometry geom1(0.2,1.5, 255, 1023, &pml1);
+	Geometry geom1(0.2,1.5, 255, 2047, &pml1);
+    //Geometry geom1(0.2,1.5, 15, 31, &pml1);
 	flcuda left_plasma_boundary = geom1.second_size*0.0;
 
 	Time time1(0,0,0,100000e-12,1e-12);
@@ -70,11 +71,11 @@ int main()
 	// beam part
 	//Beam electron_beam("electron_beam", -1, 1, 10e5, &geom1,&p_list,0.01);
 	//electron_beam.calc_init_param(&time1,50,5e12,3e7);
-	Bunch electron_bunch("electron_bunch", -1,1,10e5,&geom1,&p_list,1e-8,0.01);
+	Bunch electron_bunch("electron_bunch", -1,1,1e6,&geom1,&p_list,1e-8,0.02);
 	electron_bunch.calc_init_param(1e12,3e7);
 	///////////////////////////////////////////
-	Particles electrons("electrons", -1, 1, 0*1e6, &geom1,&p_list);
-	Particles ions("ions", 1, 1836, 0*1e6, &geom1,&p_list);
+	Particles electrons("electrons", -1, 1, 1e6, &geom1,&p_list);
+	Particles ions("ions", 1, 1836, 1e6, &geom1,&p_list);
 	p_list.create_coord_arrays();
 
 	electrons.load_spatial_distribution(1e14, 1.01e14, left_plasma_boundary);
@@ -82,15 +83,15 @@ int main()
 
 	electrons.velocity_distribution_v2(3e4);
 	ions.velocity_distribution_v2(2e3);
-	ofstream out_vel("velocities");
-	ofstream out_coords("coords");
-	for (i = 0; i< electrons.number; i++)
-	{
-		out_vel<<electrons.v1[i]<<" "<<electrons.v2[i]<<" "<<electrons.v3[i]<<" ";
-		out_coords<<electrons.x1[i]<<" "<<electrons.x3[i]<<" ";
-	}
-	out_vel.close();
-	out_coords.close();
+	//ofstream out_vel("velocities");
+	//ofstream out_coords("coords");
+	//for (i = 0; i< electrons.number; i++)
+	//{
+	//	out_vel<<electrons.v1[i]<<" "<<electrons.v2[i]<<" "<<electrons.v3[i]<<" ";
+	//	out_coords<<electrons.x1[i]<<" "<<electrons.x3[i]<<" ";
+	//}
+	//out_vel.close();
+	//out_coords.close();
 
     #ifdef BUILD_CUDA
 	  InitCUDA();
@@ -117,7 +118,7 @@ int main()
 	Poisson_dirichlet dirih(&geom1);
 	dirih.poisson_solve(&e_field1, &rho_new);
 	bool res1 = dirih.test_poisson_equation(&e_field1, &rho_new);
-	out_class.out_data("e3",e_field1.e3,0,100,geom1.n_grid_1-1,geom1.n_grid_2-1);
+	//out_class.out_data("e3",e_field1.e3,0,100,geom1.n_grid_1-1,geom1.n_grid_2-1);
 	
 	//relaxation period
 	while (time1.current_time < time1.relaxation_time)
@@ -174,7 +175,8 @@ int main()
 		
 
 			
-		if  ((((int)(time1.current_time/time1.delta_t))%50==0))
+		if  ((((int)(time1.current_time/time1.delta_t))%100==0))
+		//if  ( abs(time1.current_time - time1.end_time + time1.delta_t) < 1e-13)
 		{
 			cout<<time1.current_time<<" ";
 			electron_bunch.charge_weighting(&rho_beam);
@@ -185,7 +187,7 @@ int main()
 			//out_class.out_coord("coords",electrons.x1, electrons.x3, step_number, 100, electrons.number);
 			//out_class.out_data("rho",rho_new.get_ro(),step_number,100,geom1.n_grid_1-1,geom1.n_grid_2-1);
 			out_class.out_data("h2",h_field1.h2,step_number,100,geom1.n_grid_1-1,geom1.n_grid_2-1);
-			//	step_number=step_number+1;
+				step_number=step_number+1;
 		}
 	
 		time1.current_time = time1.current_time + time1.delta_t;
