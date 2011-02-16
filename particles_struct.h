@@ -1,7 +1,7 @@
 #ifndef __PARTICLESSTRUCTH__
 #define __PARTICLESSTRUCTH__
 
-typedef float flcuda;
+typedef double flcuda;
 #ifndef BUILD_CUDA
 #define BUILD_CUDA
 #endif

@@ -13,18 +13,16 @@ extern "C"
 {
 
 bool InitCUDA(void);
-void SetupCUDA();
+void SetupCUDA(int grid_num1, int grid_num3, int number);
 void CopySpecie2Cuda (Particles_struct specie);
-void TransferXVToCUDA (flcuda* CPU_x1, flcuda* CPU_x3, flcuda* CPU_v1, flcuda* CPU_v2, flcuda* CPU_v3);
-void TransferEHToCUDA (flcuda* CPU_e1, flcuda* CPU_e2, flcuda* CPU_e3, flcuda* CPU_h1, flcuda* CPU_h2, flcuda* CPU_h3);
-void TransferXVFromCUDA (flcuda* CPU_x1, flcuda* CPU_x3, flcuda* CPU_v1, flcuda* CPU_v2, flcuda* CPU_v3);
+void TransferXVToCUDA (flcuda* CPU_x1, flcuda* CPU_x3, flcuda* CPU_v1, flcuda* CPU_v2, flcuda* CPU_v3, bool* CPU_is_alive, int number);
+void TransferEHToCUDA (flcuda* CPU_e1, flcuda* CPU_e2, flcuda* CPU_e3, flcuda* CPU_h1, flcuda* CPU_h2, flcuda* CPU_h3, int grid_num1, int grid_num3);
+void TransferXVFromCUDA (flcuda* CPU_x1, flcuda* CPU_x3, flcuda* CPU_v1, flcuda* CPU_v2, flcuda* CPU_v3, int number);
 void TransferToCUDA (Particle* CPU_ParticlesArray, int numPoints );
 void TransferFromCUDA ( Particle* CPU_ParticlesArray, int numPoints );
 
-void CUDA_Advance(flcuda dt);
-void CUDA_AdvanceCoordinates();
-void CUDA_AdvanceVelocities();
-void CUDA_StepV(flcuda dt);
+
+void CUDA_StepV(int number, flcuda dt);
 //void CUDA_CopyParticlesToGLBuffer(float3* positions);
 
 

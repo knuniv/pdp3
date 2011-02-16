@@ -27,136 +27,25 @@ __device__ flcuda* cur2;
 __device__ flcuda* cur3;
 __device__ flcuda* rho;
 
+//is alive array
+__device__ bool* is_alive;
 
 
 
-__global__ void Advance(Particles_struct cuda_specie, flcuda timestep)
-{
-//	uint i = __mul24(blockIdx.x, blockDim.x) + threadIdx.x;	// particle index		
-//	if (i >= cuda_params.NumParticles)
-//		return;
-//
-//	Particle *particle = &ParticlesArray[i];
-//
-//	flcuda3 acceleration;
-//	acceleration.x = particle->force.x / cuda_params.Mass;
-//	acceleration.y = particle->force.y / cuda_params.Mass;
-//	acceleration.z = particle->force.z / cuda_params.Mass;
-//
-//	acceleration.x += cuda_params.Gravity.x;
-//	acceleration.y += cuda_params.Gravity.y;
-//	acceleration.z += cuda_params.Gravity.z;
-//
-//
-//	particle->vel.x += acceleration.x * cuda_params.TimeStep;
-//	particle->vel.y += acceleration.y * cuda_params.TimeStep;
-//	particle->vel.z += acceleration.z * cuda_params.TimeStep;
-//
-//	particle->pos.x += particle->vel.x * cuda_params.TimeStep;
-//	particle->pos.y += particle->vel.y * cuda_params.TimeStep;
-//	particle->pos.z += particle->vel.z * cuda_params.TimeStep;
-//    if (!cuda_params.BoundaryEnabled)
-//	{
-//	if (particle->pos.x < 0)
-//	{
-//        particle->vel.x = -particle->vel.x*cuda_params.Damping;
-//		particle->pos.x = -particle->pos.x;
-//	}
-//	if (particle->pos.y < 0)
-//	{
-//        particle->vel.y = -particle->vel.y*cuda_params.Damping;
-//		particle->pos.y = -particle->pos.y;
-//	}
-//	if (particle->pos.z < 0)
-//	{
-//        particle->vel.z = -particle->vel.z*cuda_params.Damping;
-//		particle->pos.z = -particle->pos.z;
-//	}
-//	if (particle->pos.x > cuda_params.MaxCoord.x)
-//	{
-//        particle->vel.x = -particle->vel.x*cuda_params.Damping;
-//		particle->pos.x =  2*cuda_params.MaxCoord.x -particle->pos.x;
-//	}
-//	if (particle->pos.y > cuda_params.MaxCoord.y)
-//	{
-//        particle->vel.y = -particle->vel.y*cuda_params.Damping;
-//		particle->pos.y = 2*cuda_params.MaxCoord.y -particle->pos.y;
-//	}
-//	if (particle->pos.z > cuda_params.MaxCoord.z)
-//	{
-//        particle->vel.z = -particle->vel.z*cuda_params.Damping;
-//		particle->pos.z = 2*cuda_params.MaxCoord.z -particle->pos.z;
-//	}
-//	}
-}
-
-__global__ void AdvanceCoordinates(Particles_struct cuda_specie, flcuda timestep)
-{
-	uint i = __mul24(blockIdx.x, blockDim.x) + threadIdx.x;	// particle index		
-	/*if (i >= cuda_params.NumParticles)
-		return;
-
-	if (ParticlesArray[i].is_active)
-	{
-	Particle *particle = &ParticlesArray[i];
-
-	particle->pos.x += particle->vel.x * cuda_params.TimeStep;
-	particle->pos.y += particle->vel.y * cuda_params.TimeStep;
-	particle->pos.z += particle->vel.z * cuda_params.TimeStep;
-    if (!cuda_params.BoundaryEnabled)
-	{
-	if (particle->pos.x < 0)
-	{
-        particle->vel.x = -particle->vel.x*cuda_params.Damping;
-		particle->pos.x = -particle->pos.x;
-	}
-	if (particle->pos.y < 0)
-	{
-        particle->vel.y = -particle->vel.y*cuda_params.Damping;
-		particle->pos.y = -particle->pos.y;
-	}
-	if (particle->pos.z < 0)
-	{
-        particle->vel.z = -particle->vel.z*cuda_params.Damping;
-		particle->pos.z = -particle->pos.z;
-	}
-	if (particle->pos.x > cuda_params.MaxCoord.x)
-	{
-        particle->vel.x = -particle->vel.x*cuda_params.Damping;
-		particle->pos.x =  2*cuda_params.MaxCoord.x -particle->pos.x;
-	}
-	if (particle->pos.y > cuda_params.MaxCoord.y)
-	{
-        particle->vel.y = -particle->vel.y*cuda_params.Damping;
-		particle->pos.y = 2*cuda_params.MaxCoord.y -particle->pos.y;
-	}
-	if (particle->pos.z > cuda_params.MaxCoord.z)
-	{
-        particle->vel.z = -particle->vel.z*cuda_params.Damping;
-		particle->pos.z = 2*cuda_params.MaxCoord.z -particle->pos.z;
-	}
-	}
-	}*/
-}
-
-__global__ void AdvanceVelocities(Particles_struct cuda_specie, flcuda timestep)
-{
-	uint i = __mul24(blockIdx.x, blockDim.x) + threadIdx.x;	// particle index		
-
-}
-
-__global__ void StepV(flcuda* x1, flcuda* x3, flcuda* v1, flcuda* v2, flcuda* v3, flcuda* e1, flcuda* e2, flcuda* e3, flcuda* h1, flcuda* h2, flcuda* h3,  flcuda timestep)
+__global__ void StepV(flcuda* x1, flcuda* x3, flcuda* v1, flcuda* v2, flcuda* v3, 
+					  flcuda* e1, flcuda* e2, flcuda* e3, flcuda* h1, flcuda* h2, 
+					  flcuda* h3, bool* is_alive, int number, flcuda timestep)
 {
 	uint i = __mul24(blockIdx.x, blockDim.x) + threadIdx.x;
-	flcuda gamma, temp;
+	flcuda gamma, gamma_inv, temp;
 	flcuda e1_val = 0.0, e2_val, e3_val, b1_val, b2_val, b3_val, vv1, vv2, vv3;
-	const flcuda mu0 = 1e-6;
-	flcuda const1 = cuda_specie.charge*timestep/2.0/cuda_specie.mass;
+	const flcuda mu0 = (flcuda)1.0e-6;
+	flcuda const1 = cuda_specie.charge*timestep/(flcuda)2.0/cuda_specie.mass;
 	flcuda const2;
 	temp = x1[i];
 	//if (t->current_time == t->start_time) const1 = const1/2.0;
-		//if (is_alive[i])
-		//{
+		if (is_alive[i] && (i < number))
+		{
 	   	      e1_val = get_field_e(x1[i], x3[i], e1, 1, cuda_specie) * const1;
 	          e2_val = get_field_e(x1[i], x3[i], e2, 2, cuda_specie) * const1;
 	          e3_val = get_field_e(x1[i], x3[i], e3, 3, cuda_specie) * const1;
@@ -186,12 +75,12 @@ __global__ void StepV(flcuda* x1, flcuda* x3, flcuda* v1, flcuda* v2, flcuda* v3
 			//3. Rotation in the magnetic field
 			//u" = u' + 2/(1+B'^2)[(u' + [u'xB'(n)])xB'(n)]
 			//B'(n) = B(n)*q*dt/2/mass/gamma(n)
-			gamma = get_gamma_inv(i, v1, v2, v3);
+			gamma_inv = get_gamma_inv(i, v1, v2, v3);
   
-			b1_val = b1_val/gamma;
-	        b2_val = b2_val/gamma;
-	        b3_val = b3_val/gamma;
-			const2 = 2.0/(1.0 + b1_val*b1_val + b2_val*b2_val + b3_val*b3_val);
+			b1_val = b1_val/gamma_inv;
+	        b2_val = b2_val/gamma_inv;
+	        b3_val = b3_val/gamma_inv;
+			const2 = (flcuda)2.0/((flcuda)1.0 + b1_val*b1_val + b2_val*b2_val + b3_val*b3_val);
 			vv1 = v1[i];
 			vv2 = v2[i];
 			vv3 = v3[i];
@@ -210,20 +99,10 @@ __global__ void StepV(flcuda* x1, flcuda* x3, flcuda* v1, flcuda* v2, flcuda* v3
 		    v1[i] = v1[i]/gamma;
 			v2[i] = v2[i]/gamma;
 			v3[i] = v3[i]/gamma;
-			 //         if (i == 0)
-			//	  v1[0] = gamma;
-			//else if (i == 1)
-			//      v3[0] = gamma;
+		}
 
-		//}
 }
 
-//__device__ flcuda CalculateDistance(int i, int j, Particle *PArray1, Particle *PArray2)
-//{
-//	flcuda dx, dy, dz;
-//
-//	return 1.0;
-//}
 
 __device__ flcuda get_field_e(flcuda x1, flcuda x3, flcuda* e_input, int component, Particles_struct cuda_specie)
 {	
@@ -497,11 +376,11 @@ __device__ int get_linear_coord(int index_r, int index_z, int ngrid_z, int compo
 
 __device__ flcuda get_gamma(int i, flcuda* v1, flcuda* v2, flcuda* v3)
 {
-	return pow(1.0 - (v1[i]*v1[i] + v2[i]*v2[i] + v3[i]*v3[i])/300000000.0/300000000.0,-0.5);
+	return pow((flcuda)1.0 - (v1[i]*v1[i] + v2[i]*v2[i] + v3[i]*v3[i])/(flcuda)300000000.0/(flcuda)300000000.0,(flcuda)-0.5);
 }
 
 __device__ flcuda get_gamma_inv(int i, flcuda* v1, flcuda* v2, flcuda* v3)
 {
-	return pow((v1[i]*v1[i] + v2[i]*v2[i] + v3[i]*v3[i])/300000000.0/300000000.0 + 1, 0.5);
+	return pow((v1[i]*v1[i] + v2[i]*v2[i] + v3[i]*v3[i])/(flcuda)300000000.0/(flcuda)300000000.0 + (flcuda)1.0, (flcuda)0.5);	
 }
 

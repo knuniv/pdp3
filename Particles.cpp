@@ -108,7 +108,7 @@ flcuda Particles::get_gamma(int i)
 
 flcuda Particles::get_gamma_inv(int i)
 {
-	return pow((v1[i]*v1[i] + v2[i]*v2[i] + v3[i]*v3[i])/c2 + 1, (flcuda)0.5);
+	return pow((v1[i]*v1[i] + v2[i]*v2[i] + v3[i]*v3[i])/c2 + 1.0, (flcuda)0.5);	
 }
 
 void Particles::step_v(E_field *e_fld, H_field *h_fld, Time* t)
@@ -170,6 +170,8 @@ void Particles::step_v(E_field *e_fld, H_field *h_fld, Time* t)
 		    v1[i] = v1[i]/gamma;
 			v2[i] = v2[i]/gamma;
 			v3[i] = v3[i]/gamma;
+
+
 
 		}
 
