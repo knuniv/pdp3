@@ -37,12 +37,11 @@ __global__ void StepV(flcuda* x1, flcuda* x3, flcuda* v1, flcuda* v2, flcuda* v3
 					  flcuda* h3, bool* is_alive, int number, flcuda timestep)
 {
 	uint i = __mul24(blockIdx.x, blockDim.x) + threadIdx.x;
-	flcuda gamma, gamma_inv, temp;
+	flcuda gamma, gamma_inv;
 	flcuda e1_val = 0.0, e2_val, e3_val, b1_val, b2_val, b3_val, vv1, vv2, vv3;
 	const flcuda mu0 = (flcuda)1.0e-6;
 	flcuda const1 = cuda_specie.charge*timestep/(flcuda)2.0/cuda_specie.mass;
 	flcuda const2;
-	temp = x1[i];
 	//if (t->current_time == t->start_time) const1 = const1/2.0;
 		if (is_alive[i] && (i < number))
 		{
@@ -121,7 +120,6 @@ __device__ flcuda get_field_e(flcuda x1, flcuda x3, flcuda* e_input, int compone
 	flcuda vol_1 =0; //  volume of i cell; Q/V, V - volume of elementary cell 
 	flcuda vol_2 =0; //  volume of i+1 cell;
 	
-	flcuda value =0;
 ////////////////////////
 	r1 = x1-0.5*dr;
 	r3 = x1+0.5*dr;
@@ -248,7 +246,7 @@ __device__ flcuda get_field_e(flcuda x1, flcuda x3, flcuda* e_input, int compone
 __device__ flcuda get_field_h(flcuda x1, flcuda x3, flcuda* h_input, int component, Particles_struct cuda_specie)
 {
   int i_r = 0, k_z = 0;  
-  flcuda r1, r2, r3, dz1, dz2, hr = 0.0, hfi = 0.0, hz = 0.0, value = 0.0,
+  flcuda r1, r2, r3, dz1, dz2, hr = 0.0, hfi = 0.0, hz = 0.0, 
 	     vol_1 = 0.0, vol_2 = 0.0; //  volumes of i and i+1 cell; Q/V, V - volume of elementary cell 
 	
   flcuda pi = 3.14159;
@@ -345,6 +343,7 @@ __device__ flcuda get_field_h(flcuda x1, flcuda x3, flcuda* h_input, int compone
       return hfi;
     }
   }
+  return 0.0;
 }
 
 __device__ int get_linear_coord(int index_r, int index_z, int ngrid_z, int component)
@@ -358,17 +357,11 @@ __device__ int get_linear_coord(int index_r, int index_z, int ngrid_z, int compo
 		case 1:
 		case 2:
 		case 6:
-			{
 			return (index_r * ngrid_z + index_z);
-			break;
-			}
 		case 3:
 		case 4:
 		case 5:
-			{
 			return (index_r * (ngrid_z - 1) + index_z);
-			break;
-			}
 	}
 					 
   return 0;
