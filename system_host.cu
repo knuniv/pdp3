@@ -113,10 +113,23 @@ void TransferEHToCUDA (flcuda* CPU_e1, flcuda* CPU_e2, flcuda* CPU_e3, flcuda* C
 	cudaThreadSynchronize ();
 }
 
+void TransferEHFromCUDA (flcuda* CPU_e1, flcuda* CPU_e2, flcuda* CPU_e3, flcuda* CPU_h1, flcuda* CPU_h2, flcuda* CPU_h3, int grid_num1, int grid_num3)
+{
+     cudaMemcpy (CPU_e1, e1, (grid_num1 - 1) *  grid_num3 *      sizeof(flcuda), cudaMemcpyDeviceToHost ) ;
+	 cudaMemcpy (CPU_e2, e2,  grid_num1      *  grid_num3 *      sizeof(flcuda), cudaMemcpyDeviceToHost ) ;
+	 cudaMemcpy (CPU_e3, e3,  grid_num1      * (grid_num3 - 1) * sizeof(flcuda), cudaMemcpyDeviceToHost ) ;
+
+	 cudaMemcpy (CPU_h1, h1,  grid_num1      * (grid_num3 - 1) * sizeof(flcuda), cudaMemcpyDeviceToHost ) ;
+	 cudaMemcpy (CPU_h2, h2, (grid_num1 - 1) * (grid_num3 - 1) * sizeof(flcuda), cudaMemcpyDeviceToHost ) ;
+	 cudaMemcpy (CPU_h3, h3, (grid_num1 - 1) *  grid_num3 *      sizeof(flcuda), cudaMemcpyDeviceToHost ) ;
+	
+	cudaThreadSynchronize ();
+}
+
 void TransferXVFromCUDA (flcuda* CPU_x1, flcuda* CPU_x3, flcuda* CPU_v1, flcuda* CPU_v2, flcuda* CPU_v3, int number)
 {
-     cudaMemcpy (CPU_x1, x1, number * sizeof(flcuda), cudaMemcpyDeviceToHost ) ;
-	 cudaMemcpy (CPU_x3, x3, number * sizeof(flcuda), cudaMemcpyDeviceToHost ) ;
+  //   cudaMemcpy (CPU_x1, x1, number * sizeof(flcuda), cudaMemcpyDeviceToHost ) ;
+	 //cudaMemcpy (CPU_x3, x3, number * sizeof(flcuda), cudaMemcpyDeviceToHost ) ;
 
 	 cudaMemcpy (CPU_v1, v1, number * sizeof(flcuda), cudaMemcpyDeviceToHost ) ;
 	 cudaMemcpy (CPU_v2, v2, number * sizeof(flcuda), cudaMemcpyDeviceToHost ) ;

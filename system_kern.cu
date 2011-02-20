@@ -109,7 +109,7 @@ __device__ flcuda get_field_e(flcuda x1, flcuda x3, flcuda* e_input, int compone
 	int k_z=0;  // number of particle k cell
 	int counter;
 	
-	flcuda pi = 3.14159;
+	flcuda pi = 3.1415926535897932;
 	flcuda dr = cuda_specie.dr;
 	flcuda dz = cuda_specie.dz;
 	flcuda r1, r2, r3; // temp variables for calculation
@@ -174,7 +174,7 @@ __device__ flcuda get_field_e(flcuda x1, flcuda x3, flcuda* e_input, int compone
 
    if(x1>dr)
 	{
-		vol_1 = pi*dz*dr*dr*2*i_r;
+		vol_1 = pi*dz*dr*dr*2.0*(flcuda)i_r;
     }
    else
    {
@@ -213,7 +213,7 @@ __device__ flcuda get_field_e(flcuda x1, flcuda x3, flcuda* e_input, int compone
 	
   if(x1>dr)
 	{
-		vol_1 = pi*dz*dr*dr*2*i_r;
+		vol_1 = pi*dz*dr*dr*2.0*(flcuda)i_r;
     }
   else
   {
@@ -249,7 +249,7 @@ __device__ flcuda get_field_h(flcuda x1, flcuda x3, flcuda* h_input, int compone
   flcuda r1, r2, r3, dz1, dz2, hr = 0.0, hfi = 0.0, hz = 0.0, 
 	     vol_1 = 0.0, vol_2 = 0.0; //  volumes of i and i+1 cell; Q/V, V - volume of elementary cell 
 	
-  flcuda pi = 3.14159;
+  flcuda pi = 3.1415926535897932;
   flcuda dr = cuda_specie.dr;
   flcuda dz = cuda_specie.dz;
 

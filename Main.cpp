@@ -18,7 +18,7 @@
 #include "time.h"
 #include "particles_struct.h"
 #include "system_host.cuh"
-#define  pi = 3.14159265;
+#define  pi = 3.1415926535897932;
 using namespace std;
 Particles_struct specie;
 int main() 
@@ -27,11 +27,11 @@ int main()
 	flcuda time_elapsed;
 
 	PML pml1(0.0,0.0, 0.0, 0.000001, 0.07);
-	Geometry geom1(0.2,1.5, 255, 2047, &pml1);
-    //Geometry geom1(0.2,1.5, 15, 31, &pml1);
+	Geometry geom1(0.4,1.5, 255, 1023, &pml1);
+    //Geometry geom1(0.2,1.5, 63, 255, &pml1);
 	flcuda left_plasma_boundary = geom1.second_size*0.0;
 
-	Time time1(0,0,0,100000e-12,1e-12);
+	Time time1(0,0,0,20000e-12,1e-12);
 	E_field e_field1(&geom1);
 	H_field h_field1(&geom1);
 	Fourier four1(0);
@@ -72,7 +72,7 @@ int main()
 	//Beam electron_beam("electron_beam", -1, 1, 10e5, &geom1,&p_list,0.01);
 	//electron_beam.calc_init_param(&time1,50,5e12,3e7);
 	Bunch electron_bunch("electron_bunch", -1,1,1e6,&geom1,&p_list,1e-8,0.02);
-	electron_bunch.calc_init_param(1e12,3e7);
+	electron_bunch.calc_init_param(8e12,3e7);
 	///////////////////////////////////////////
 	Particles electrons("electrons", -1, 1, 1e6, &geom1,&p_list);
 	Particles ions("ions", 1, 1836, 1e6, &geom1,&p_list);
@@ -93,9 +93,15 @@ int main()
 	//out_vel.close();
 	//out_coords.close();
 
+	int cuda_particles_number = 0;
+	for (i = 0; i < p_list.part_list.size(); i++)
+	if (cuda_particles_number < p_list.part_list[i]->number)
+		cuda_particles_number = p_list.part_list[i]->number;
+
+
     #ifdef BUILD_CUDA
 	  InitCUDA();
-	  SetupCUDA();
+	  SetupCUDA(geom1.n_grid_1, geom1.n_grid_2, cuda_particles_number);
     #endif
 	   
     /////////////////////////////////
@@ -141,7 +147,7 @@ int main()
 	{
 //electron_beam.beam_inject(1e14,5e7,&time1);
 		//electron_beam.beam_inject(&time1,50,1.6e8,0.5);
-		electron_bunch.bunch_inject(&time1);
+	    electron_bunch.bunch_inject(&time1);
 		//radiation  source
 		//maxwell_rad.radiation_source(&geom1,0.4,2e9,0,time1.current_time);
 		
@@ -183,8 +189,11 @@ int main()
 			//out_class.out_data("e1",e_field1.e1,100,128,2048);
 			out_class.out_data("rho_beam", rho_beam.get_ro(),step_number,100,geom1.n_grid_1-1,geom1.n_grid_2-1);
 			out_class.out_data("e3",e_field1.e3,step_number,100,geom1.n_grid_1-1,geom1.n_grid_2-1);
-			//out_class.out_coord("coords",electron_beam.x1, electron_beam.x3, step_number, 100, electron_beam.number);
+			out_class.out_data("e1",e_field1.e1,step_number,100,geom1.n_grid_1-1,geom1.n_grid_2-1);
+			//out_class.out_coord("coords",electron_bunch.x1, electron_bunch.x3, step_number, 100, electron_bunch.number);
+			//out_class.out_coord("vels",electron_bunch.v1, electron_bunch.v3, step_number, 100, electron_bunch.number);
 			//out_class.out_coord("coords",electrons.x1, electrons.x3, step_number, 100, electrons.number);
+			//out_class.out_coord("vels",electrons.v1, electrons.v3, step_number, 100, electrons.number);
 			//out_class.out_data("rho",rho_new.get_ro(),step_number,100,geom1.n_grid_1-1,geom1.n_grid_2-1);
 			out_class.out_data("h2",h_field1.h2,step_number,100,geom1.n_grid_1-1,geom1.n_grid_2-1);
 				step_number=step_number+1;

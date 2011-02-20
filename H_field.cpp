@@ -326,7 +326,7 @@ Triple H_field::get_field(flcuda x1, flcuda x3)
 	int i_r=0;  // number of particle i cell 
 	int k_z=0;  // number of particle k cell
 	
-	flcuda pi = 3.14159;
+	flcuda pi = 3.1415926535897932;
 	flcuda dr = geom1->dr;
 	flcuda dz = geom1->dz;
 	flcuda r1, r2, r3; // temp variables for calculation
