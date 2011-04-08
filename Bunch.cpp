@@ -46,6 +46,7 @@ void Bunch::bunch_inject( Time* time)
 		
 			x3[i+start_number] = dl*(rand_z)+dz/2.0;
 			v3[i+start_number] = vel_bunch;
+			v1[i+start_number] = 1e5;
 			is_alive[i+start_number] = true;
 		}
 }

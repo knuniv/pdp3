@@ -33,6 +33,7 @@ void particles_list::step_v(E_field *e_fld, H_field *h_fld, Time* t)
     #ifdef BUILD_CUDA
 	  TransferEHToCUDA (e_fld->get_1d_e1(), e_fld->get_1d_e2(), e_fld->get_1d_e3(), h_fld->get_1d_h1(), 
 		                h_fld->get_1d_h2(), h_fld->get_1d_h3(), e_fld->geom1->n_grid_1, e_fld->geom1->n_grid_2);
+
     #endif
 	for(i=0;i<part_list.size();i++)
 	{
