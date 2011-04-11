@@ -3,6 +3,7 @@
 #include "H_field.h"
 #include "Time.h"
 #include "Triple.h"
+#include <math.h>
 #define  pi 3.14159265358979
 
 using namespace std;
@@ -495,9 +496,9 @@ return r;
 
 }
 
-void Particles::load_spatial_distribution(double n1, double n2, double left_plasma_boundary)
+void Particles::load_spatial_distribution(double n1, double n2, double left_plasma_boundary,int type)
 {
-	int n;
+	int n =0;
 	//calculate number of electrons in a big particle
 	double n_in_big = (pi*geom1->first_size*geom1->first_size*geom1->second_size/number*(n2+n1)/2.0);
 	double rand_r;
@@ -507,16 +508,97 @@ void Particles::load_spatial_distribution(double n1, double n2, double left_plas
 	charge *= n_in_big;
 	mass *= n_in_big;
 	double dn = n2 - n1;
-	for(n = 0; n < number; n++)
-	{
+	switch (type) {
+	case 0: 
+		{
+		for(n = 0; n < number; n++)
+		{
 		rand_r = random_reverse(n,13);		
 		rand_z = random_reverse(number - 1 - n,11);
 		x1[n] = (geom1->first_size - dr)*sqrt(rand_r) + dr/2.0;
 		//x3[n] = (geom1->second_size - dz)*sqrt(rand_z) + dz/2.0;
 		x3[n] = (geom1->second_size - left_plasma_boundary - dz)/dn*(sqrt(n1*n1 + rand_z*(2*n1*dn + dn*dn)) - n1) +
 			    left_plasma_boundary + dz/2.0;
-	}
+		}
+		}
+	break;
+	case 1: //Normal distribution
+		{
+	
+			double sigma = 0.01;
+			double R_sq= (geom1->first_size - 1.0*dr/1.0)*(geom1->first_size - 1.0*dr/1.0 );
+			double tt=0;
+		 for (int i = 0; i<number;i++)
+		 {
+			 rand_r = random_reverse(i,13);
+			 //x1[i]=sigma*sqrt(-2.0*log(1.0 - rand_r*(1.0-exp(-R_sq/(2.0*sigma*sigma)))))+dr/2.0;
+			 x1[i] = (geom1->first_size - dr)*sqrt(rand_r) + dr/2.0;
+			 double tt = exp(-R_sq/(2.0*sigma*sigma));
+			 rand_z = random_reverse(number - 1 - i,11);
+			 x3[i] = (geom1->second_size - dz)*rand_z + dz/2.0;
+			//x3[i] = (geom1->second_size - left_plasma_boundary - dz)/dn*(sqrt(n1*n1 + rand_z*(2*n1*dn + dn*dn)) - n1) + left_plasma_boundary + dz/2.0;
+		 }
 
+//			int i = 0;
+//			int j=0;
+//			double R =0; // number from [0;1]
+//			double dr_int = (geom1->first_size-dr/1.0)/1e7; // velocity step in calculation integral
+//			int lenght_arr = 1e7;
+//			double s =0; 
+//			double ds =0;
+//			double* integ_array = new double [lenght_arr];
+//
+//			double const1 = 2*sigma*sigma;
+//
+//		// part of numerical integral calculation//
+//			 while (i<lenght_arr)
+//			{
+//		 /*temp1 = dv*i*dv*i;
+//		 ds = temp1 * exp(-temp1 / const1 ) * dv;*/
+//			ds = exp(-dr_int*i*dr_int*i/const1)*dr_int;
+//			 s=s+ds;
+//			 integ_array[i] = s;
+//			 i=i+1;
+//			 }
+// ///////////////////////////////////////
+//
+// for(int i_n=0;i_n<number;i_n++)
+//{
+// double Rr = random_reverse(i_n,13);	
+// double t_z = s;
+// //R = rand()/(double)32768;
+// double f_vr = Rr*t_z;
+// 
+// //binary search//
+// ///////////////////////////////////
+// i=0;
+// j=lenght_arr;
+// int k=0;
+//while(i<=j) 
+//{
+//	k = i + (j-i)/2;
+//	if(f_vr>integ_array[k])
+//		i=k+1;
+//	else if (f_vr<integ_array[k])
+//		j=k-1;
+//	else 
+//		break;
+//}
+//x1[i_n]=dr_int*k+dr/2.0;
+// }
+//////////////////////////////////////////
+//
+//
+//			//x3[n] = (geom1->second_size - dz)*sqrt(rand_z) + dz/2.0;
+// 			for(n = 0; n < number; n++)
+//			{
+//				rand_z = random_reverse(number - 1 - n,11);
+//				x3[n] = (geom1->second_size - left_plasma_boundary - dz)/dn*(sqrt(n1*n1 + rand_z*(2*n1*dn + dn*dn)) - n1) + left_plasma_boundary + dz/2.0;
+//			}
+			
+		}
+     break;
+	}
 }
 
 void Particles::load_velocity_distribution(double v_thermal)
@@ -1049,7 +1131,7 @@ void Particles:: strict_motion_weighting(Time *time1, current *this_j, double x1
 
 			double r1=0, r2=0,r3=0;
 			double delta_z = 0.0;
-			double value_part = 2*pi*x1_new*dr*dz;
+			double value_part = 2.0*pi*x1_new*dr*dz;
 			double wj_lower =0;
 			r1 = x1_new-0.5*dr;
 			r2 = (i_n+0.5)*dr;
@@ -1060,7 +1142,7 @@ void Particles:: strict_motion_weighting(Time *time1, current *this_j, double x1
 			}
 			else
 			{
-			 wj_lower = charge/(time1->delta_t*2*pi*i_n*dr*dr) * pi*(r2*r2-r1*r1)/value_part;
+			 wj_lower = charge/(time1->delta_t*2.0*pi*i_n*dr*dr) * pi*(r2*r2-r1*r1)/value_part;
 			}
 			double wj_upper =  charge/(time1->delta_t*2*pi*(i_n+1)*dr*dr) *pi*(r3*r3-r2*r2)/value_part;
 			double wj=0;
@@ -1198,7 +1280,7 @@ bool continuity_equation(Time *input_time, Geometry *input_geometry, current *in
 	double delta_rho = 1.0/(input_geometry->dz*4.0*3.1415*input_geometry->dr*input_geometry->dr) ;
 	int i, k;
 	bool ok = true;
-	double res, tolerance = 1e-1 ;
+	double res, tolerance = 1e-3 ;
 	for (i=1;i<input_geometry->n_grid_1-1;i++)
 
 		for (k=1;k<input_geometry->n_grid_2-1;k++)
