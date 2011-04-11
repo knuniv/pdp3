@@ -167,7 +167,7 @@ int main()
 		
 
 		
-		if  ((((int)(time1.current_time/time1.delta_t))%1==0))
+		if  ((((int)(time1.current_time/time1.delta_t))%10==0))
 		{
 			cout<<time1.current_time<<" ";
 		
