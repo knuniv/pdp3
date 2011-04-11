@@ -10,27 +10,27 @@ current::current(Geometry* geom1_t): geom1(geom1_t)
 	//jr//
 	///////////////////////////////////
 	//n_grid - кількість ребер
-	j1 = new double*[geom1->n_grid_1-1];
+	j1 = new flcuda*[geom1->n_grid_1-1];
 	for (int i=0; i<(geom1->n_grid_1-1);i++)
 	{
-		j1[i]= new double[geom1->n_grid_2];
+		j1[i]= new flcuda[geom1->n_grid_2];
 	}
 	///////////////////////////////////
 	//jfi//
-	j2 = new double*[geom1->n_grid_1];
+	j2 = new flcuda*[geom1->n_grid_1];
 
 	for (int i=0; i<(geom1->n_grid_1);i++)
 	{
-		j2[i]= new double[geom1->n_grid_2];
+		j2[i]= new flcuda[geom1->n_grid_2];
 	}
 	//////////////////////////////////////
 	//jz//
 	//////////////////////////////////////
-	j3 = new double*[geom1->n_grid_1];
+	j3 = new flcuda*[geom1->n_grid_1];
 
 	for (int i=0; i<(geom1->n_grid_1);i++)
 	{
-		j3[i]= new double[geom1->n_grid_2-1];
+		j3[i]= new flcuda[geom1->n_grid_2-1];
 	}
 	///////////////////////////////////////
 
@@ -89,17 +89,17 @@ current::~current(void)
  //functions for getting access to j arrays//
 /////////////////////////////////////////
 
-double** current::get_j1() const
+flcuda** current::get_j1() const
 {
 	return this->j1;
 }
 
-double** current::get_j2() const
+flcuda** current::get_j2() const
 {
 	return this->j2;
 }
 
-double** current::get_j3() const
+flcuda** current::get_j3() const
 {
 	return this->j3;
 }
@@ -107,17 +107,17 @@ double** current::get_j3() const
 
 //////////////////////////////////////////
 	// functions for changing values of j//
-void current::set_j1(int i, int k, double value)
+void current::set_j1(int i, int k, flcuda value)
 {
 	j1[i][k]= j1[i][k]+value;
 }
 
-void current::set_j2(int i, int k, double value)
+void current::set_j2(int i, int k, flcuda value)
 {
 	j2[i][k]= j2[i][k]+value;
 }
 
-void current::set_j3(int i, int k, double value)
+void current::set_j3(int i, int k, flcuda value)
 {
 	j3[i][k]=j3[i][k]+value;
 }

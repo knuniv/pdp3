@@ -1,15 +1,15 @@
 #pragma once
-//#include "stdafx.h"
+#include "particles_struct.h"
 
 class Triple
 {
 public:
-	Triple(double f, double s, double t);
+	Triple(flcuda f, flcuda s, flcuda t);
 public:
 	~Triple(void);
 
 public:
-	double first;
-	double second;
-	double third;
+	flcuda first;
+	flcuda second;
+	flcuda third;
 };

@@ -1,6 +1,6 @@
 #pragma once
 #include "Geometry.h"
-#include "Time.h"
+#include "pdp3_time.h"
 #include "charge_density.h"
 #include"current.h"
 #include "triple.h"
@@ -17,31 +17,31 @@ class Particles
 public:
 	Particles(void);
 	Particles(Particles& cp_particles);
-	Particles(char* p_name, double p_charge, double p_mass, int p_number,
+	Particles(char* p_name, flcuda p_charge, flcuda p_mass, int p_number,
 			  Geometry* geom, particles_list* p_list);
 	 ~Particles();
 public:
 	// The specie name
 	char* name;
 	// The specie charge
-	double charge;
+	flcuda charge;
 	// The specie mass
-	double mass;
+	flcuda mass;
 	// Number of particles 
 	int number;
 	// Particles' coordinates
-	double* x1;  //r  
-	double* x3;  //z
+	flcuda* x1;  //r  
+	flcuda* x3;  //z
 	// Particles' velocity
-	double* v1; //vr
-	double* v2; //vphi
-	double* v3; //vz
+	flcuda* v1; //vr
+	flcuda* v2; //vphi
+	flcuda* v3; //vz
 
 	//indicator if particle is still alive
 	bool* is_alive;
 
-	double c_light ;
-	double c2 ;
+	flcuda c_light ;
+	flcuda c2 ;
     
 	//current density
 	//temporaty member of Particle class
@@ -56,17 +56,17 @@ public:
 	void set_j_0();
 	void set_v_0();
 	void set_x_0();
-	double get_gamma(int i);
-	double get_gamma_inv(int i);
-	void velocity_distribution(double therm_vel);
-	void velocity_distribution_v2 (double therm_vel);
+	flcuda get_gamma(int i);
+	flcuda get_gamma_inv(int i);
+	void velocity_distribution(flcuda therm_vel);
+	void velocity_distribution_v2 (flcuda therm_vel);
 	void load_spatial_distribution(double n1, double n2, double left_plasma_boundary,int type);
-	void load_velocity_distribution(double v_thermal);
-	void simple_j_weighting(Time* time1, current *j1, double x1_new,double x3_new, double x1_old, double x3_old, int i_n, int k_n);
-	void simple_constrho_j_weighting(Time* time1, current *j1, double x1_new,double x3_new, double x1_old, double x3_old, int i_n, int k_n);
-	void j_weighting(Time* time1, current *j1,double* x1,double* x3);
-	void strict_motion_weighting(Time* time1, current *j1, double x1_new,double x3_new, double x1_old, double x3_old);
+	void load_velocity_distribution(flcuda v_thermal);
+	void simple_j_weighting(Time* time1, current *j1, flcuda x1_new,flcuda x3_new, flcuda x1_old, flcuda x3_old, int i_n, int k_n);
+	void simple_constrho_j_weighting(Time* time1, current *j1, flcuda x1_new,flcuda x3_new, flcuda x1_old, flcuda x3_old, int i_n, int k_n);
+	void j_weighting(Time* time1, current *j1,flcuda* x1,flcuda* x3);
+	void strict_motion_weighting(Time* time1, current *j1, flcuda x1_new,flcuda x3_new, flcuda x1_old, flcuda x3_old);
 	void azimuthal_j_weighting(Time* time1, current *j1);
-	double  random_reverse(double vel, int power);
+	flcuda  random_reverse(flcuda vel, int power);
 	};
 bool continuity_equation(Time *input_time, Geometry *input_geometry, current *input_J, charge_density *rho_start, charge_density *rho_end);
