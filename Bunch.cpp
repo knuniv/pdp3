@@ -66,6 +66,7 @@ void Bunch::bunch_inject_calc_E(Geometry* geom,E_field*E_beam, E_field*E, Time* 
 		
 			x3[i+start_number] = dl*(rand_z)-dl;
 			v3[i+start_number] =vel_bunch;
+			v1[i+start_number] = 1e5;
 			is_alive[i+start_number] = true;
 		}
 if (time->current_time==0)
