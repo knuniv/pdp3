@@ -33,7 +33,7 @@ void input_output_class::out_data(char* comp_name, double** out_value,int step_n
 	char str_int [50]; 
 	itoa(inc_value,str_int,10);
 	strcat(st_name, str_int);
-	char path[50] = "e:/taras/_results/";
+	char path[50] = "e:/Science[Plasma]/pdp3_result/";
 	strcat(path,st_name);
 	ofstream out_val(path,ios::app);
 	// write  values  into file 
@@ -72,7 +72,7 @@ void input_output_class::out_coord(char* comp_name, double* coord_r, double* coo
 	char str_int [50]; 
 	itoa(inc_value,str_int,10);
 	strcat(st_name, str_int);
-	char path[50] = "e:/Plazma/pdp3_result/";
+	char path[50] = "e:/Science[Plasma]/pdp3_result/";
 	strcat(path,st_name);
 	ofstream out_val(path,ios::app);
 	// write  values  into file 
