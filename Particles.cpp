@@ -517,7 +517,9 @@ void Particles::load_spatial_distribution(double n1, double n2, double left_plas
 		{
 		rand_r = random_reverse(n,13);		
 		rand_z = random_reverse(number - 1 - n,11);
-		x1[n] = (geom1->first_size - dr)*sqrt(rand_r) + dr/2.0;
+		x1[n] = sqrt(rand_r*geom1->first_size*(geom1->first_size-dr)+dr*dr/4.0);
+		if (x1[n]>=(geom1->first_size-dr/2.0))
+			x1[n]=0;
 		//x3[n] = (geom1->second_size - dz)*sqrt(rand_z) + dz/2.0;
 		x3[n] = (geom1->second_size - left_plasma_boundary - dz)/dn*(sqrt(n1*n1 + rand_z*(2*n1*dn + dn*dn)) - n1) +
 			    left_plasma_boundary + dz/2.0;
@@ -527,17 +529,19 @@ void Particles::load_spatial_distribution(double n1, double n2, double left_plas
 	case 1: //Normal distribution
 		{
 	
-			double sigma = 0.01;
-			double R_sq= (geom1->first_size - 1.0*dr/1.0)*(geom1->first_size - 1.0*dr/1.0 );
+			double sigma = 0.004;
+			double R_sq= (geom1->first_size - dr/2.0)*(geom1->first_size - dr/2.0 );
 			double tt=0;
 		 for (int i = 0; i<number;i++)
 		 {
 			 rand_r = random_reverse(i,13);
-			 //x1[i]=sigma*sqrt(-2.0*log(1.0 - rand_r*(1.0-exp(-R_sq/(2.0*sigma*sigma)))))+dr/2.0;
-			 x1[i] = (geom1->first_size - dr)*sqrt(rand_r) + dr/2.0;
+			 double int_rd = exp(-dr*dr/(8.0*sigma*sigma));
+			 x1[i]=sigma*sqrt(-2.0*log(int_rd - rand_r*(int_rd-exp(-R_sq/(2.0*sigma*sigma)))));
+
+			 //x1[i] = (geom1->first_size - dr)*(rand_r)*rand_r + dr/2.0;
 			 double tt = exp(-R_sq/(2.0*sigma*sigma));
 			 rand_z = random_reverse(number - 1 - i,11);
-			 x3[i] = (geom1->second_size - dz)*rand_z + dz/2.0;
+			 x3[i] = (geom1->second_size - dz/2.0)*rand_z - dz/2.0;
 			//x3[i] = (geom1->second_size - left_plasma_boundary - dz)/dn*(sqrt(n1*n1 + rand_z*(2*n1*dn + dn*dn)) - n1) + left_plasma_boundary + dz/2.0;
 		 }
 
