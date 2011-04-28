@@ -74,15 +74,15 @@ int main()
 	// beam part
 	//Beam electron_beam("electron_beam", -1, 1, 10e5, &geom1,&p_list,0.01);
 	//electron_beam.calc_init_param(&time1,50,5e12,3e7);
-	Bunch electron_bunch("electron_bunch", -1,1836,1e6,&geom1,&p_list,1.11e-8,0.02);
+	Bunch electron_bunch("electron_bunch", -0,30000,1e6,&geom1,&p_list,1e-8,0.01);
 	electron_bunch.calc_init_param(2e12,3e7);
 	///////////////////////////////////////////
 	Particles electrons("electrons", -1, 1, 1.5e6, &geom1,&p_list);
 	Particles ions("ions", 1, 1836, 1.5e6, &geom1,&p_list);
 	p_list.create_coord_arrays();
 
-	electrons.load_spatial_distribution(1e14, 1.01e14, left_plasma_boundary);
-	ions.load_spatial_distribution(1e14, 1.01e14, left_plasma_boundary);
+	electrons.load_spatial_distribution(1.6e14, 1.61e14, left_plasma_boundary,0);
+	ions.load_spatial_distribution(1.6e14, 1.61e14, left_plasma_boundary,0);
 
 	electrons.velocity_distribution_v2(3e4);
 	ions.velocity_distribution_v2(2e3);
@@ -101,11 +101,14 @@ int main()
 	if (cuda_particles_number < p_list.part_list[i]->number)
 		cuda_particles_number = p_list.part_list[i]->number;
 
+	charge_density rho_elect(&geom1);
+		electrons.charge_weighting(&rho_elect);
+		out_class.out_data("rho",rho_elect.get_ro(),0,100,geom1.n_grid_1-1,geom1.n_grid_2-1);
 
-    #ifdef BUILD_CUDA
-	  InitCUDA();
-	  SetupCUDA(geom1.n_grid_1, geom1.n_grid_2, cuda_particles_number);
-    #endif
+   // #ifdef BUILD_CUDA
+	  //InitCUDA();
+	  //SetupCUDA(geom1.n_grid_1, geom1.n_grid_2, cuda_particles_number);
+   // #endif
 	   
     /////////////////////////////////
 	//0. Half step back
@@ -184,8 +187,8 @@ int main()
 		res =  continuity_equation(&time1, &geom1, &current1, &rho_old, &rho_new); 
 		
 
-			
-		if  ((((int)(time1.current_time/time1.delta_t))%100==0))
+		
+		if  ((((int)(time1.current_time/time1.delta_t))%10==0))
 		//if  ( abs(time1.current_time - time1.end_time + time1.delta_t) < 1e-13)
 		{
 			cout<<time1.current_time<<" ";
@@ -194,11 +197,10 @@ int main()
 			out_class.out_data("rho_beam", rho_beam.get_ro(),step_number,100,geom1.n_grid_1-1,geom1.n_grid_2-1);
 			out_class.out_data("e3",e_field1.e3,step_number,100,geom1.n_grid_1-1,geom1.n_grid_2-1);
 			out_class.out_data("e1",e_field1.e1,step_number,100,geom1.n_grid_1-1,geom1.n_grid_2-1);
-			//out_class.out_coord("coords",electron_bunch.x1, electron_bunch.x3, step_number, 100, electron_bunch.number);
+			out_class.out_data("rho",rho_elect.get_ro(),step_number,100,geom1.n_grid_1-1,geom1.n_grid_2-1);
 			//out_class.out_coord("vels",electron_bunch.v1, electron_bunch.v3, step_number, 100, electron_bunch.number);
 			//out_class.out_coord("coords",electrons.x1, electrons.x3, step_number, 100, electrons.number);
 			//out_class.out_coord("vels",electrons.v1, electrons.v3, step_number, 100, electrons.number);
-			//out_class.out_data("rho",rho_new.get_ro(),step_number,100,geom1.n_grid_1-1,geom1.n_grid_2-1);
 			out_class.out_data("h2",h_field1.h2,step_number,100,geom1.n_grid_1-1,geom1.n_grid_2-1);
 				step_number=step_number+1;
 		}

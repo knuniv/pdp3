@@ -60,7 +60,7 @@ public:
 	flcuda get_gamma_inv(int i);
 	void velocity_distribution(flcuda therm_vel);
 	void velocity_distribution_v2 (flcuda therm_vel);
-	void load_spatial_distribution(flcuda n1, flcuda n2, flcuda left_plasma_boundary);
+	void load_spatial_distribution(double n1, double n2, double left_plasma_boundary,int type);
 	void load_velocity_distribution(flcuda v_thermal);
 	void simple_j_weighting(Time* time1, current *j1, flcuda x1_new,flcuda x3_new, flcuda x1_old, flcuda x3_old, int i_n, int k_n);
 	void simple_constrho_j_weighting(Time* time1, current *j1, flcuda x1_new,flcuda x3_new, flcuda x1_old, flcuda x3_old, int i_n, int k_n);
