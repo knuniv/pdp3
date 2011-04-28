@@ -46,7 +46,7 @@ void Bunch::bunch_inject( Time* time)
 		
 			x3[i+start_number] = dl*(rand_z)+dz/2.0;
 			v3[i+start_number] = vel_bunch;
-			v1[i+start_number] = 1e5;
+			v1[i+start_number] = 0;
 			is_alive[i+start_number] = true;
 		}
 }
@@ -65,7 +65,7 @@ void Bunch::bunch_inject_calc_E(Geometry* geom,E_field*E_beam, E_field*E, Time* 
 		double	rand_z = random_reverse(i,5);
 			x1[i+start_number] = (radius)*sqrt(rand_r) + dr/2.0;
 		
-			x3[i+start_number] = dl*(rand_z)-dl;
+			x3[i+start_number] = dl*(rand_z)+dz/2.0;;
 			v3[i+start_number] =vel_bunch;
 			is_alive[i+start_number] = true;
 		}

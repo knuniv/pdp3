@@ -51,6 +51,9 @@ int main()
 	h_field1.set_homogeneous_h(0.0, 0.0, 0.0);
 	e_field1.set_fi_on_z();
 
+	E_field e_beam(&geom1);
+    e_beam.set_homogeneous_efield(0.0, 0.0, 0);
+
 	/////////////////////////////////////////////
 	
 //	////////////////////////////////////////
@@ -72,10 +75,10 @@ int main()
 	//Beam electron_beam("electron_beam", -1, 1, 10e5, &geom1,&p_list,0.01);
 	//electron_beam.calc_init_param(&time1,50,5e12,3e7);
 	Bunch electron_bunch("electron_bunch", -1,1836,1e6,&geom1,&p_list,1.11e-8,0.02);
-	electron_bunch.calc_init_param(8e12,3e7);
+	electron_bunch.calc_init_param(2e12,3e7);
 	///////////////////////////////////////////
-	Particles electrons("electrons", -1, 1, 2e4, &geom1,&p_list);
-	Particles ions("ions", 1, 1836, 2e4, &geom1,&p_list);
+	Particles electrons("electrons", -1, 1, 1.5e6, &geom1,&p_list);
+	Particles ions("ions", 1, 1836, 1.5e6, &geom1,&p_list);
 	p_list.create_coord_arrays();
 
 	electrons.load_spatial_distribution(1e14, 1.01e14, left_plasma_boundary);
@@ -148,6 +151,7 @@ int main()
 //electron_beam.beam_inject(1e14,5e7,&time1);
 		//electron_beam.beam_inject(&time1,50,1.6e8,0.5);
 	    electron_bunch.bunch_inject(&time1);
+		//electron_bunch.bunch_inject_calc_E(&geom1, &e_beam, &e_field1, &time1);
 		//radiation  source
 		//maxwell_rad.radiation_source(&geom1,0.4,2e9,0,time1.current_time);
 		
