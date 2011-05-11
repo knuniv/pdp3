@@ -78,8 +78,8 @@ int main()
 	Particles ions("ions", 1, 1836, 1e6, &geom1,&p_list);
 	p_list.create_coord_arrays();
 
-	electrons.load_spatial_distribution(1.6e14, 1.61e14, left_plasma_boundary,0);
-	ions.load_spatial_distribution(1.6e14, 1.61e14, left_plasma_boundary,0);
+	electrons.load_spatial_distribution(1.6e14, 1.61e14, left_plasma_boundary,1);
+	ions.load_spatial_distribution(1.6e14, 1.61e14, left_plasma_boundary,1);
 
 	electrons.velocity_distribution_v2(3e4);
 	ions.velocity_distribution_v2(2e3);

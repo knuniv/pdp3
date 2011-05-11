@@ -287,7 +287,37 @@ void Particles::charge_weighting(charge_density* ro1)
 			ro1->set_ro_weighting(r_i+1, z_k+1, value);
 
 		}
-		else 
+		else if (x1[i]<=dr/2.0)
+		{
+			 r_i = 0;
+			 r1 =  0.0;
+			 r2 = (r_i+0.5)*dr;
+			 r3 = x1[i]+0.5*dr;
+			 dz1 = (z_k+1)*dz-x3[i];
+			 dz2 = x3[i] - z_k*dz;
+			 ro_v = charge/(pi*dz*(x1[i]*x1[i]+x1[i]*dr+dr*dr/4.0));
+			 v_1 = pi*dz*dr*dr/4.0;
+			 v_2 = pi*dz*dr*dr*2.0*(r_i+1);
+		   ///////////////////////////
+
+			// weighting in ro[i][k] cell
+			value = ro_v*pi*dz1*(r2*r2-r1*r1)/v_1; 			
+			ro1->set_ro_weighting(r_i, z_k, value);
+		
+			// weighting in ro[i+1][k] cell
+			value = ro_v*pi*dz1*(r3*r3-r2*r2)/v_2;
+			ro1->set_ro_weighting(r_i+1,z_k, value);
+
+			// weighting in ro[i][k+1] cell
+			value = ro_v*pi*dz2*(r2*r2-r1*r1)/v_1;
+			ro1->set_ro_weighting(r_i, z_k+1, value);
+
+			// weighting in ro[i+1][k+1] cell
+			value = ro_v*pi*dz2*(r3*r3-r2*r2)/v_2;
+			ro1->set_ro_weighting(r_i+1, z_k+1, value);
+
+		}
+		else
 		{
 			///////////////////////////
 			 r1 =  x1[i] - 0.5*dr;
@@ -529,13 +559,13 @@ void Particles::load_spatial_distribution(double n1, double n2, double left_plas
 	case 1: //Normal distribution
 		{
 	
-			double sigma = 0.004;
+			double sigma = 0.05;
 			double R_sq= (geom1->first_size - dr/2.0)*(geom1->first_size - dr/2.0 );
 			double tt=0;
 		 for (int i = 0; i<number;i++)
 		 {
 			 rand_r = random_reverse(i,13);
-			 double int_rd = exp(-dr*dr/(8.0*sigma*sigma));
+			 double int_rd = 1;// exp(-dr*dr/(8.0*sigma*sigma));
 			 x1[i]=sigma*sqrt(-2.0*log(int_rd - rand_r*(int_rd-exp(-R_sq/(2.0*sigma*sigma)))));
 
 			 //x1[i] = (geom1->first_size - dr)*(rand_r)*rand_r + dr/2.0;
