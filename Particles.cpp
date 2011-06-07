@@ -295,13 +295,13 @@ void Particles::charge_weighting(charge_density* ro1)
 			 r3 = x1[i]+0.5*dr;
 			 dz1 = (z_k+1)*dz-x3[i];
 			 dz2 = x3[i] - z_k*dz;
-			 ro_v = charge/(pi*dz*(x1[i]*x1[i]+x1[i]*dr+dr*dr/4.0));
+			 ro_v = charge/(pi*dz*(2.0*x1[i]*x1[i]+dr*dr/2.0));
 			 v_1 = pi*dz*dr*dr/4.0;
 			 v_2 = pi*dz*dr*dr*2.0*(r_i+1);
 		   ///////////////////////////
 
 			// weighting in ro[i][k] cell
-			value = ro_v*pi*dz1*(r2*r2-r1*r1)/v_1; 			
+			value = ro_v*pi*dz1*(dr*dr/2.0-x1[i]*dr+x1[i]*x1[i])/v_1; 			
 			ro1->set_ro_weighting(r_i, z_k, value);
 		
 			// weighting in ro[i+1][k] cell
@@ -309,7 +309,7 @@ void Particles::charge_weighting(charge_density* ro1)
 			ro1->set_ro_weighting(r_i+1,z_k, value);
 
 			// weighting in ro[i][k+1] cell
-			value = ro_v*pi*dz2*(r2*r2-r1*r1)/v_1;
+			value = ro_v*pi*dz2*(dr*dr/2.0-x1[i]*dr+x1[i]*x1[i])/v_1;
 			ro1->set_ro_weighting(r_i, z_k+1, value);
 
 			// weighting in ro[i+1][k+1] cell
@@ -858,7 +858,7 @@ void Particles::j_weighting(Time* time1, current *j1, flcuda* x1_o,flcuda* x3_o)
 		if(x3[i]==(k_n+1)*dz)
 			k_n=k_o;
 	    int res_cell = abs(i_n-i_o) + abs(k_n-k_o); 
-		if ((x1[i]==x1_old)||(x3[i]==x3_old))
+		if ((abs(x1[i]-x1_old)<1e-15)||(abs(x3[i]-x3_old)<1e-15))
 		{
 			strict_motion_weighting(time1, j1,x1[i],x3[i],x1_old,x3_old);
 		}
@@ -1162,12 +1162,12 @@ void Particles:: strict_motion_weighting(Time *time1, current *this_j, flcuda x1
 
 	//stirct axis motion
 //////////////////////////////////////////
-	if (x1_new == x1_old)
+	if (abs(x1_new-x1_old)<1e-15)
 	{
 
 			flcuda r1=0, r2=0,r3=0;
 			flcuda delta_z = 0.0;
-			double value_part = 2.0*pi*x1_new*dr*dz;
+			flcuda  value_part = 2.0*pi*x1_new*dr*dz;
 			flcuda wj_lower =0;
 			r1 = x1_new-0.5*dr;
 			r2 = (i_n+0.5)*dr;
@@ -1201,9 +1201,9 @@ void Particles:: strict_motion_weighting(Time *time1, current *this_j, flcuda x1
 					{
 						delta_z = k_n*dz - x3_old;
 						wj = wj_lower*delta_z;
-						this_j->set_j3(i_n,k_n-1,wj_lower);
+ 						this_j->set_j3(i_n,k_n-1,wj);
 						wj = wj_upper*delta_z;
-						this_j->set_j3(i_n+1,k_n-1,wj_lower);
+						this_j->set_j3(i_n+1,k_n-1,wj);
 
 						delta_z = x3_new - k_n*dz;
 						wj = wj_lower*delta_z;
@@ -1236,7 +1236,7 @@ void Particles:: strict_motion_weighting(Time *time1, current *this_j, flcuda x1
 	
 	////stirct radial motion///
 //////////////////////////////////////////////////////
-	else if (x3_new==x3_old)
+	else if (abs(x3_new-x3_old)<1e15)
 	{
 		flcuda r0  =(i_n+0.5)*dr;
 		flcuda wj= 0;
@@ -1313,7 +1313,7 @@ bool continuity_equation(Time *input_time, Geometry *input_geometry, current *in
     flcuda **rho_new_array = rho_new->get_ro() ;
 	flcuda **J1 = input_J->get_j1() ;
 	flcuda **J3 = input_J->get_j3() ;
-	flcuda delta_rho = 1.0/(input_geometry->dz*4.0*3.1415*input_geometry->dr*input_geometry->dr) ;
+	flcuda delta_rho = 1.0/(input_geometry->dz*4.0*pi*input_geometry->dr*input_geometry->dr) ;
 	int i, k;
 	bool ok = true;
 	double res, tolerance = 1e-3 ;
