@@ -74,11 +74,11 @@ int main()
 	// beam part
 	//Beam electron_beam("electron_beam", -1, 1, 10e5, &geom1,&p_list,0.01);
 	//electron_beam.calc_init_param(&time1,50,5e12,3e7);
-	Bunch electron_bunch("electron_bunch", -1,1,1e6,&geom1,&p_list,1e-8,0.01);
-	electron_bunch.calc_init_param(2e12,3e7);
+	Bunch electron_bunch("electron_bunch", -1,30000,1e5,&geom1,&p_list,1e-8,0.01);
+	electron_bunch.calc_init_param(8e12,2.0e8);
 	///////////////////////////////////////////
-	Particles electrons("electrons", -1, 1, 1.0e6, &geom1,&p_list);
-	Particles ions("ions", 1, 1836, 1.0e6, &geom1,&p_list);
+	Particles electrons("electrons", -1, 1,0*1e6, &geom1,&p_list);
+	Particles ions("ions", 1, 1836, 0*1e6, &geom1,&p_list);
 	p_list.create_coord_arrays();
 
 	electrons.load_spatial_distribution(1.6e14, 1.61e14, left_plasma_boundary,0);
@@ -188,7 +188,7 @@ int main()
 		
 
 		
-		if  ((((int)(time1.current_time/time1.delta_t))%100==0))
+		if  ((((int)(time1.current_time/time1.delta_t))%50==0))
 		//if  ( abs(time1.current_time - time1.end_time + time1.delta_t) < 1e-13)
 		{
 			cout<<time1.current_time<<" ";
