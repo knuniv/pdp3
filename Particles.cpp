@@ -563,13 +563,13 @@ void Particles::load_spatial_distribution(double n1, double n2, double left_plas
 		 for (int i = 0; i<number;i++)
 		 {
 			 rand_r = random_reverse(i,13);
-			 double int_rd = 1;// exp(-dr*dr/(8.0*sigma*sigma));
+			 double int_rd =  exp(-dr*dr/(8.0*sigma*sigma));
 			 x1[i]=sigma*sqrt(-2.0*log(int_rd - rand_r*(int_rd-exp(-R_sq/(2.0*sigma*sigma)))));
 
 			 //x1[i] = (geom1->first_size - dr)*(rand_r)*rand_r + dr/2.0;
 			 double tt = exp(-R_sq/(2.0*sigma*sigma));
 			 rand_z = random_reverse(number - 1 - i,11);
-			 x3[i] = (geom1->second_size - dz/2.0)*rand_z - dz/2.0;
+			 x3[i] = (geom1->second_size - dz/2.0)*rand_z + dz/2.0;
 			//x3[i] = (geom1->second_size - left_plasma_boundary - dz)/dn*(sqrt(n1*n1 + rand_z*(2*n1*dn + dn*dn)) - n1) + left_plasma_boundary + dz/2.0;
 		 }
 
@@ -1216,9 +1216,9 @@ void Particles:: strict_motion_weighting(Time *time1, current *this_j, flcuda x1
 						
 						delta_z = (k_n+1)*dz - x3_old;
 						wj = wj_lower*delta_z;
-						this_j->set_j3(i_n,k_n+1,wj_lower);
+						this_j->set_j3(i_n,k_n+1,wj);
 						wj = wj_upper*delta_z;
-						this_j->set_j3(i_n+1,k_n+1,wj_lower);
+						this_j->set_j3(i_n+1,k_n+1,wj);
 
 						delta_z = x3_new - (k_n+1)*dz;
 						wj = wj_lower*delta_z;
