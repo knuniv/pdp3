@@ -560,9 +560,8 @@ void Particles::load_spatial_distribution(double n1, double n2, double left_plas
 		{
 			
 
-			double sigma = 0.1;
-			flcuda n_in_big = (pi*geom1->first_size*geom1->first_size*geom1->second_size/number*(n2+n1)/2.0);
-		 n_in_big = (pi*geom1->second_size*(n2+n1)*sigma*sigma*(1.0-exp(-geom1->first_size*geom1->first_size/(2.0*sigma*sigma)))/number);
+			double sigma = 0.01;
+			flcuda n_in_big = (pi*geom1->second_size*(n2+n1)*sigma*sigma*(1.0-exp(-geom1->first_size*geom1->first_size/(2.0*sigma*sigma)))/number);
 			charge *= n_in_big;
 			mass *= n_in_big;
 			double R_sq= (geom1->first_size - dr/2.0)*(geom1->first_size - dr/2.0 );
