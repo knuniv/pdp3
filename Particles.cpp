@@ -532,17 +532,17 @@ void Particles::load_spatial_distribution(double n1, double n2, double left_plas
 {
 	int n =0;
 	//calculate number of electrons in a big particle
-	flcuda n_in_big = (pi*geom1->first_size*geom1->first_size*geom1->second_size/number*(n2+n1)/2.0);
 	flcuda rand_r;
 	flcuda rand_z;
 	flcuda dr = geom1->dr*1.00000001;
 	flcuda dz = geom1->dz*1.00000001;
-	charge *= n_in_big;
-	mass *= n_in_big;
 	flcuda dn = n2 - n1;
 	switch (type) {
 	case 0: 
 		{
+		flcuda n_in_big = (pi*geom1->first_size*geom1->first_size*geom1->second_size/number*(n2+n1)/2.0);
+		charge *= n_in_big;
+		mass *= n_in_big;
 		for(n = 0; n < number; n++)
 		{
 		rand_r = random_reverse(n,13);		
@@ -556,8 +556,12 @@ void Particles::load_spatial_distribution(double n1, double n2, double left_plas
 	break;
 	case 1: //Normal distribution
 		{
-	
-			double sigma = 0.05;
+			
+
+			double sigma = 0.01;
+			flcuda n_in_big = (pi*geom1->second_size*(n2+n1)*sigma*sigma*(1.0-exp(-geom1->first_size*geom1->first_size/(2.0*sigma*sigma)))/number);
+			charge *= n_in_big;
+			mass *= n_in_big;
 			double R_sq= (geom1->first_size - dr/2.0)*(geom1->first_size - dr/2.0 );
 			double tt=0;
 		 for (int i = 0; i<number;i++)
