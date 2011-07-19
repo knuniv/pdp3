@@ -27,7 +27,7 @@ int main()
 	flcuda time_elapsed;
 
 	PML pml1(0.0,0.0, 0.0, 0.000001, 0.07);
-	Geometry geom1(0.4,1.5, 255, 1023, &pml1);
+	Geometry geom1(0.2,1.5, 255, 2047, &pml1);
     //Geometry geom1(0.2,1.5, 63, 255, &pml1);
 	flcuda left_plasma_boundary = geom1.second_size*0.0;
 
@@ -74,15 +74,16 @@ int main()
 	// beam part
 	//Beam electron_beam("electron_beam", -1, 1, 10e5, &geom1,&p_list,0.01);
 	//electron_beam.calc_init_param(&time1,50,5e12,3e7);
-	Bunch electron_bunch("electron_bunch", -1,1836,1e6,&geom1,&p_list,1e-8,0.02);
+	Bunch electron_bunch("electron_bunch", -1,1,1e6,&geom1,&p_list,1e-8,0.02);
 	electron_bunch.calc_init_param(8e12,3.0e7);
 	///////////////////////////////////////////
-	Particles electrons("electrons", -1, 1,1e6, &geom1,&p_list);
-	Particles ions("ions", 1, 1836, 1e6, &geom1,&p_list);
+	Particles electrons("electrons", -1, 1,2e6, &geom1,&p_list);
+	Particles ions("ions", 1, 1836, 2e6, &geom1,&p_list);
 	p_list.create_coord_arrays();
 
-	electrons.load_spatial_distribution(1.6e14, 1.61e14, left_plasma_boundary,1);
-	ions.load_spatial_distribution(1.6e14, 1.61e14, left_plasma_boundary,1);
+	//electrons.load_spatial_distribution(0.8e14, 0.81e14, left_plasma_boundary,0);
+    electrons.load_spatial_distribution(2.6e15, 2.61e15, left_plasma_boundary,0);
+	ions.load_spatial_distribution(2.6e15, 2.61e15, left_plasma_boundary,0);
 
 	electrons.velocity_distribution_v2(3e4);
 	ions.velocity_distribution_v2(2e3);
@@ -193,6 +194,9 @@ int main()
 		{
 			cout<<time1.current_time<<" ";
 			electron_bunch.charge_weighting(&rho_beam);
+			//rho_old.reset_rho();
+			//electrons.charge_weighting(&rho_old);
+			//out_class.out_data("rho_el", rho_old.get_ro(),step_number,100,geom1.n_grid_1-1,geom1.n_grid_2-1);
 			//out_class.out_data("e1",e_field1.e1,100,128,2048);
 			out_class.out_data("rho_beam", rho_beam.get_ro(),step_number,100,geom1.n_grid_1-1,geom1.n_grid_2-1);
 			out_class.out_data("e3",e_field1.e3,step_number,100,geom1.n_grid_1-1,geom1.n_grid_2-1);
