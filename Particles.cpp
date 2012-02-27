@@ -406,13 +406,14 @@ delete []v;
 
 }
 //////////////////////////////////////////////////////
-void Particles::velocity_distribution_v2(flcuda therm_vel)
+void Particles::velocity_distribution_v2(flcuda tempr_ev)
 {
+double therm_vel = sqrt(tempr_ev*2.0*1.6e-19/9.1e-31);
 int i = 0;
 int j=0;
 flcuda R =0; // number from [0;1]
-flcuda dv = therm_vel/1e7; // velocity step in calculation integral
-flcuda cutoff_vel = 12.0*therm_vel; //cutoff velocity
+flcuda dv = therm_vel/0.5e7; // velocity step in calculation integral
+flcuda cutoff_vel = 9.0*therm_vel; //cutoff velocity
 int lenght_arr = (int)cutoff_vel/dv;
 flcuda s =0; 
 flcuda ds =0;
