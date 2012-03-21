@@ -77,16 +77,16 @@ int main()
 	Bunch electron_bunch("electron_bunch", -1,1,1e6,&geom1,&p_list,1e-8,0.02);
 	electron_bunch.calc_init_param(8e12,3.0e7);
 	///////////////////////////////////////////
-	Particles electrons("electrons", -1, 1,2e6, &geom1,&p_list);
-	Particles ions("ions", 1, 1836, 2e6, &geom1,&p_list);
+	Particles electrons("electrons", -1, 1,3e6, &geom1,&p_list);
+	Particles ions("ions", 1, 1836, 3e6, &geom1,&p_list);
 	p_list.create_coord_arrays();
 
 	//electrons.load_spatial_distribution(0.8e14, 0.81e14, left_plasma_boundary,0);
-    electrons.load_spatial_distribution(2.6e15, 2.61e15, left_plasma_boundary,0);
-	ions.load_spatial_distribution(2.6e15, 2.61e15, left_plasma_boundary,0);
+    electrons.load_spatial_distribution(5e14, 5.1e14, left_plasma_boundary,0);
+	ions.load_spatial_distribution(5e14, 5.1e14, left_plasma_boundary,0);
 
-	electrons.velocity_distribution_v2(3e4);
-	ions.velocity_distribution_v2(2e3);
+	electrons.velocity_distribution_v2(0.5);
+	ions.velocity_distribution_v2(0.5);
 	//ofstream out_vel("velocities");
 	//ofstream out_coords("coords");
 	//for (i = 0; i< electrons.number; i++)

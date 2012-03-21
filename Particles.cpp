@@ -861,7 +861,7 @@ void Particles::j_weighting(Time* time1, current *j1, flcuda* x1_o,flcuda* x3_o)
 		if(x3[i]==(k_n+1)*dz)
 			k_n=k_o;
 	    int res_cell = abs(i_n-i_o) + abs(k_n-k_o); 
-		if ((abs(x1[i]-x1_old)<1e-15)||(abs(x3[i]-x3_old)<1e-15))
+		if ((abs(x1[i]-x1_old)<3e-15)||(abs(x3[i]-x3_old)<3e-15))
 		{
 			strict_motion_weighting(time1, j1,x1[i],x3[i],x1_old,x3_old);
 		}
@@ -1163,6 +1163,11 @@ void Particles:: strict_motion_weighting(Time *time1, current *this_j, flcuda x1
 	int i_o = (int)ceil((x1_old)/dr)-1;
 	int k_o =(int)ceil((x3_old)/dz)-1;
 
+	if ((abs(x1_new-x1_old)<1e-15)&&(abs(x3_new-x3_old)<1e-15))
+	{
+		cout<<"zero velocity";
+		return;
+	}
 	//stirct axis motion
 //////////////////////////////////////////
 	if (abs(x1_new-x1_old)<1e-15)
@@ -1239,7 +1244,7 @@ void Particles:: strict_motion_weighting(Time *time1, current *this_j, flcuda x1
 	
 	////stirct radial motion///
 //////////////////////////////////////////////////////
-	else if (abs(x3_new-x3_old)<1e15)
+	else if (abs(x3_new-x3_old)<1e-15)
 	{
 		flcuda r0  =(i_n+0.5)*dr;
 		flcuda wj= 0;
