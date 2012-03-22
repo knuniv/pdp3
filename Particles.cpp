@@ -406,13 +406,14 @@ delete []v;
 
 }
 //////////////////////////////////////////////////////
-void Particles::velocity_distribution_v2(flcuda therm_vel)
+void Particles::velocity_distribution_v2(flcuda tempr_ev)
 {
+double therm_vel = sqrt(tempr_ev*2.0*1.6e-19/9.1e-31);
 int i = 0;
 int j=0;
 flcuda R =0; // number from [0;1]
-flcuda dv = therm_vel/1e7; // velocity step in calculation integral
-flcuda cutoff_vel = 12.0*therm_vel; //cutoff velocity
+flcuda dv = therm_vel/0.5e7; // velocity step in calculation integral
+flcuda cutoff_vel = 9.0*therm_vel; //cutoff velocity
 int lenght_arr = (int)cutoff_vel/dv;
 flcuda s =0; 
 flcuda ds =0;
@@ -548,8 +549,6 @@ void Particles::load_spatial_distribution(double n1, double n2, double left_plas
 		rand_r = random_reverse(n,13);		
 		rand_z = random_reverse(number - 1 - n,11);
 		x1[n] = sqrt(rand_r*geom1->first_size*(geom1->first_size-dr)+dr*dr/4.0);
-		if (x1[n]>=(geom1->first_size-dr/2.0))
-			x1[n]=0;
 		//x3[n] = (geom1->second_size - dz)*sqrt(rand_z) + dz/2.0;
 		x3[n] = (geom1->second_size - left_plasma_boundary - dz)/dn*(sqrt(n1*n1 + rand_z*(2*n1*dn + dn*dn)) - n1) +
 			    left_plasma_boundary + dz/2.0;
@@ -569,13 +568,13 @@ void Particles::load_spatial_distribution(double n1, double n2, double left_plas
 		 for (int i = 0; i<number;i++)
 		 {
 			 rand_r = random_reverse(i,13);
-			 double int_rd = 1;// exp(-dr*dr/(8.0*sigma*sigma));
+			 double int_rd =  exp(-dr*dr/(8.0*sigma*sigma));
 			 x1[i]=sigma*sqrt(-2.0*log(int_rd - rand_r*(int_rd-exp(-R_sq/(2.0*sigma*sigma)))));
 
 			 //x1[i] = (geom1->first_size - dr)*(rand_r)*rand_r + dr/2.0;
 			 double tt = exp(-R_sq/(2.0*sigma*sigma));
 			 rand_z = random_reverse(number - 1 - i,11);
-			 x3[i] = (geom1->second_size - dz/2.0)*rand_z - dz/2.0;
+			 x3[i] = (geom1->second_size - dz/2.0)*rand_z + dz/2.0;
 			//x3[i] = (geom1->second_size - left_plasma_boundary - dz)/dn*(sqrt(n1*n1 + rand_z*(2*n1*dn + dn*dn)) - n1) + left_plasma_boundary + dz/2.0;
 		 }
 
@@ -862,7 +861,7 @@ void Particles::j_weighting(Time* time1, current *j1, flcuda* x1_o,flcuda* x3_o)
 		if(x3[i]==(k_n+1)*dz)
 			k_n=k_o;
 	    int res_cell = abs(i_n-i_o) + abs(k_n-k_o); 
-		if ((abs(x1[i]-x1_old)<1e-15)||(abs(x3[i]-x3_old)<1e-15))
+		if ((abs(x1[i]-x1_old)<3e-15)||(abs(x3[i]-x3_old)<3e-15))
 		{
 			strict_motion_weighting(time1, j1,x1[i],x3[i],x1_old,x3_old);
 		}
@@ -1164,6 +1163,11 @@ void Particles:: strict_motion_weighting(Time *time1, current *this_j, flcuda x1
 	int i_o = (int)ceil((x1_old)/dr)-1;
 	int k_o =(int)ceil((x3_old)/dz)-1;
 
+	if ((abs(x1_new-x1_old)<1e-15)&&(abs(x3_new-x3_old)<1e-15))
+	{
+		cout<<"zero velocity";
+		return;
+	}
 	//stirct axis motion
 //////////////////////////////////////////
 	if (abs(x1_new-x1_old)<1e-15)
@@ -1222,9 +1226,9 @@ void Particles:: strict_motion_weighting(Time *time1, current *this_j, flcuda x1
 						
 						delta_z = (k_n+1)*dz - x3_old;
 						wj = wj_lower*delta_z;
-						this_j->set_j3(i_n,k_n+1,wj_lower);
+						this_j->set_j3(i_n,k_n+1,wj);
 						wj = wj_upper*delta_z;
-						this_j->set_j3(i_n+1,k_n+1,wj_lower);
+						this_j->set_j3(i_n+1,k_n+1,wj);
 
 						delta_z = x3_new - (k_n+1)*dz;
 						wj = wj_lower*delta_z;
@@ -1240,7 +1244,7 @@ void Particles:: strict_motion_weighting(Time *time1, current *this_j, flcuda x1
 	
 	////stirct radial motion///
 //////////////////////////////////////////////////////
-	else if (abs(x3_new-x3_old)<1e15)
+	else if (abs(x3_new-x3_old)<1e-15)
 	{
 		flcuda r0  =(i_n+0.5)*dr;
 		flcuda wj= 0;
