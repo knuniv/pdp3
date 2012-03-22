@@ -74,12 +74,12 @@ int main()
 	Bunch electron_bunch("electron_bunch", -1,30000,1e5,&geom1,&p_list,1e-8,0.01);
 	electron_bunch.calc_init_param(8e12,2.0e8);
 	///////////////////////////////////////////
-	Particles electrons("electrons", -1, 1,0*1e6, &geom1,&p_list);
-	Particles ions("ions", 1, 1836, 0*1e6, &geom1,&p_list);
+	Particles electrons("electrons", -1, 1,01e6, &geom1,&p_list);
+	Particles ions("ions", 1, 1836, 1e6, &geom1,&p_list);
 	p_list.create_coord_arrays();
 
-	electrons.load_spatial_distribution(1.6e14, 1.61e14, left_plasma_boundary,0);
-	ions.load_spatial_distribution(1.6e14, 1.61e14, left_plasma_boundary,0);
+	electrons.load_spatial_distribution(1.6e14, 1.61e14, left_plasma_boundary,1);
+	ions.load_spatial_distribution(1.6e14, 1.61e14, left_plasma_boundary,1);
 
 	electrons.velocity_distribution_v2(3e4);
 	ions.velocity_distribution_v2(2e3);
@@ -115,7 +115,6 @@ int main()
 		
 	p_list.charge_weighting(&rho_new);
 	//electrons.charge_weighting(&rho_new);
-	//out_class.out_data("rho",rho_new.get_ro(),1,128,2048);
 
 	//weight currents and charges before relaxation period
 		//solve Poisson equation
