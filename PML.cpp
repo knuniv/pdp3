@@ -14,6 +14,15 @@ PML::PML(flcuda comp_l_1, flcuda comp_l_2, flcuda comp_l_3, flcuda sigma1_t, flc
 	sigma2 = sigma2_t;
 		
 };
+PML::PML(double * pml_params)
+{
+	comparative_l_1 = pml_params[0]; // lenhgt sigma on left wall
+	comparative_l_2 = pml_params[1]; //  lenhgt sigma on right_wall
+	comparative_l_3 = pml_params[2]; // lenght sigma on external wall
+	sigma1 = pml_params[3];
+	sigma2 = pml_params[4];
+		
+};
 
 PML::~PML(void)
 {

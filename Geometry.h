@@ -22,7 +22,9 @@ public:
 	void set_epsilon();
 //	friend void calc_sigma(Geometry *geom1);
 	Geometry(flcuda fs, flcuda ss,  int ng1, int ng2, PML* pml1_t);
+	Geometry(double * param, PML* pml1_t);
 	Geometry(flcuda fs, flcuda ss,  int ng1, int ng2);
+	Geometry::Geometry( PML* pml1_t);
 	Geometry();
 
 	~Geometry(void);

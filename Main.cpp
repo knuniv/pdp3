@@ -18,6 +18,7 @@
 #include "time.h"
 #include "particles_struct.h"
 #include "system_host.cuh"
+#include "Load_init_param.h"
 #define  pi = 3.1415926535897932;
 using namespace std;
 Particles_struct specie;
@@ -25,6 +26,9 @@ int main()
 {
 	clock_t start, finish;
 	flcuda time_elapsed;
+	Load_init_param init_param("parameters.xml");
+	init_param.read_xml();
+	init_param.load_system();
 
 	PML pml1(0.0,0.0, 0.0, 0.000001, 0.07);
 	Geometry geom1(0.2,1.5, 255, 2047, &pml1);
@@ -36,6 +40,7 @@ int main()
 	H_field h_field1(&geom1);
 	Fourier four1(0);
 	input_output_class out_class;
+	
 	Boundary_Maxwell_conditions maxwell_rad(&e_field1);
 	maxwell_rad.specify_initial_field(&geom1,0,0,0);
 	bool res = true;
@@ -56,15 +61,6 @@ int main()
 
 	/////////////////////////////////////////////
 	
-//	////////////////////////////////////////
-//	poisson  equetion testing//
-	//for(k=0;k<geom1.n_grid_2;k++)
-	//	rho_new.set_ro_weighting(20,k,1e-7);
-
-	//e_field1.poisson_equation2(&geom1,&rho_new);
-	////e_field1.poisson_equation(&geom1,&rho_new);
-	//bool res2 = e_field1.test_poisson_equation(&rho_new);
-//////////////////////////////////////////////////////
 
 ////////////////////////////////////////////////
 	geom1.set_epsilon() ;
@@ -106,11 +102,11 @@ int main()
 		electrons.charge_weighting(&rho_elect);
 		out_class.out_data("rho",rho_elect.get_ro(),0,100,geom1.n_grid_1-1,geom1.n_grid_2-1);*/
 
-    #ifdef BUILD_CUDA
-	  InitCUDA();
-	  SetupCUDA(geom1.n_grid_1, geom1.n_grid_2, cuda_particles_number);
-    #endif
-	   
+   // #ifdef BUILD_CUDA
+	  //InitCUDA();
+	  //SetupCUDA(geom1.n_grid_1, geom1.n_grid_2, cuda_particles_number);
+   // #endif
+	  // 
     /////////////////////////////////
 	//0. Half step back
 

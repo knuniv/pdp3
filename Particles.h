@@ -19,6 +19,8 @@ public:
 	Particles(Particles& cp_particles);
 	Particles(char* p_name, flcuda p_charge, flcuda p_mass, int p_number,
 			  Geometry* geom, particles_list* p_list);
+	Particles(char* p_name, double* params,
+			  Geometry* geom, particles_list* p_list);
 	 ~Particles();
 public:
 	// The specie name

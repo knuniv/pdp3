@@ -37,6 +37,32 @@ Particles::Particles(char* p_name, flcuda p_charge, flcuda p_mass, int p_number,
 };
 ///////////////////////////////////////////////////
 
+	////////constructor//////
+////////////////////////////////////////////////
+Particles::Particles(char* p_name, double* params,
+					 Geometry* geom,particles_list* t_p_list)  : geom1(geom),p_list(t_p_list), c_light(3.0e8), c2(9.0e16) 
+{
+	name = p_name;
+	charge = (flcuda)params[0]*(flcuda)1.6e-19;
+	mass = (flcuda)params[1]*(flcuda)9.1e-31;
+	number = params[2];
+
+    //allocate memory for coordinates and velocities of particles
+
+	x1 = new flcuda[number];
+	x3 = new flcuda[number];
+	x3 = new flcuda[number];
+	v1 = new flcuda[number];
+	v2 = new flcuda[number];
+	v3 = new flcuda[number];
+	is_alive = new bool[number];
+	////////////////////////////////
+	//insert to particles_lists
+	p_list->part_list.push_back(this);
+	
+};
+///////////////////////////////////////////////////
+
 //////////////////////////////////////////////////
 //copy constructor//
 Particles::Particles(Particles &cp_particles)
