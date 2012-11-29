@@ -47,6 +47,14 @@
     <right_density> 1e15 </right_density>
     <temperature> 1 </temperature>
     </ions>
-     
+  
+  <Boundary_Maxwell_conditions>
+    <E_fi_upper> 0  </E_fi_upper>
+    <E_fi_left> 0 </E_fi_left>
+    <E_fi_right> 0 </E_fi_right>
+  </Boundary_Maxwell_conditions>
+ 
+  <Boundary_conditions type = "dirichlet">0</Boundary_conditions>
+    
   
 </Initial_parameters>
