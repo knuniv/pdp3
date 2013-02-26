@@ -55,6 +55,21 @@
   </Boundary_Maxwell_conditions>
  
   <Boundary_conditions type = "dirichlet">0</Boundary_conditions>
-    
+  
+  <file_save_paramters> 
+    <time_step>100</time_step>
+    <number>100</number>
+  </file_save_paramters>
+  <out_folder>D:/plasma</out_folder>
+  <e1>true</e1>
+  <e2>true</e2>
+  <e3>false</e3>
+  <h1>true</h1>
+  <h2>true</h2>
+  <h3>false</h3>
+  <rho_plasma>true</rho_plasma>
+  <rho_beam>true</rho_beam>
+ 
+
   
 </Initial_parameters>
