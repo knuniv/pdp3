@@ -55,6 +55,11 @@
   </Boundary_Maxwell_conditions>
  
   <Boundary_conditions type = "dirichlet">0</Boundary_conditions>
+  
+  
+  <PathtoResult>D:/pdp3 files/_results/</PathtoResult>
+  <PathtoSaveState>D:/pdp3 files/_dump/</PathtoSaveState>
+  
     
   
 </Initial_parameters>

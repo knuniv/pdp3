@@ -11,6 +11,7 @@ Load_init_param::Load_init_param(char* xml_file_l):xml_file(xml_file_l)
 
 Load_init_param::~Load_init_param(void)
 {
+
 }
 
 void Load_init_param::read_xml()
@@ -195,6 +196,25 @@ if (get_int_value(a)==0)
 }
 
 
+	//load File Path///
+	/////////////////////////////////////
+    char* path_res  =  read_char("PathtoResult");
+	char* path_dump  =  read_char("PathtoSaveState");
+    c_io_class  = new input_output_class (path_res , path_res );
+	
+	//////////////////////////////////////////////////
 
 
+
+}
+bool Load_init_param:: SaveSystemState() 
+{
+	c_io_class->out_field_dump("e1",efield->e1,c_geom->n_grid_1-1,c_geom->n_grid_2-1);
+	c_io_class->out_field_dump("e2",efield->e2,c_geom->n_grid_1-1,c_geom->n_grid_2-1);
+	c_io_class->out_field_dump("e3",efield->e3,c_geom->n_grid_1-1,c_geom->n_grid_2-1);
+	c_io_class->out_field_dump("h1",hfield->h1,c_geom->n_grid_1-1,c_geom->n_grid_2-1);
+	c_io_class->out_field_dump("h2",hfield->h2,c_geom->n_grid_1-1,c_geom->n_grid_2-1);
+	c_io_class->out_field_dump("h3",hfield->h3,c_geom->n_grid_1-1,c_geom->n_grid_2-1);
+	//c_io_class->out_coord_dump(p_list[0],electrons.x1, electrons.x3, step_number, 100, electrons.number);
+	return true;
 }
