@@ -3,6 +3,12 @@
 input_output_class::input_output_class(void)
 {
 }
+input_output_class::input_output_class(char* c_pathres,char*c_pathdump)
+{
+	strcpy(path_result,c_pathres);
+	strcpy(path_dump,c_pathdump);
+}
+
 
 input_output_class::~input_output_class(void)
 {
@@ -33,9 +39,31 @@ void input_output_class::out_data(char* comp_name, flcuda** out_value,int step_n
 	char str_int [50]; 
 	itoa(inc_value,str_int,10);
 	strcat(st_name, str_int);
-	char path[50] = "e:/Science[Plasma]/pdp3_result/";
+	char path[50] = "D:/pdp3 files/_results/";
 	strcat(path,st_name);
 	ofstream out_val(path,ios::app);
+	// write  values  into file 
+	for (int i=0; i<r_step;i++)
+	{
+	for(int k=0;k<z_step;k++)
+	{
+		out_val<<out_value[i][k]<<" ";
+	}
+	}
+	out_val.close();
+}
+void input_output_class::out_field_dump(char* comp_name,flcuda** out_value,int r_step,int z_step)
+{
+	
+	char st_name[100];
+	
+	strcpy(st_name,this->path_result);
+	
+
+
+	//char path[50] = "D:/pdp3 files/_results/";
+	strcat(st_name,comp_name);
+	ofstream out_val(st_name);
 	// write  values  into file 
 	for (int i=0; i<r_step;i++)
 	{
@@ -72,7 +100,7 @@ void input_output_class::out_coord(char* comp_name, flcuda* coord_r, flcuda* coo
 	char str_int [50]; 
 	itoa(inc_value,str_int,10);
 	strcat(st_name, str_int);
-	char path[50] = "e:/Science[Plasma]/pdp3_result/";
+	char path[50] = "D:/pdp3 files/_results/";
 	strcat(path,st_name);
 	ofstream out_val(path,ios::app);
 	// write  values  into file 
@@ -86,4 +114,29 @@ void input_output_class::out_coord(char* comp_name, flcuda* coord_r, flcuda* coo
 	}
 
 	out_val.close();
+}
+
+void input_output_class::out_coord_dump(char* comp_name, flcuda* coord_r, flcuda* coord_z, int particles_number)
+{
+
+		char st_name[100];
+	
+	strcpy(st_name,this->path_result);
+	
+
+
+	//char path[50] = "D:/pdp3 files/_results/";
+	strcat(st_name,comp_name);
+	ofstream out_val(st_name);
+	out_val.setf(std::ios_base::scientific);
+	out_val.precision(14);
+	for (int i=0; i<particles_number;i++)
+	
+	{
+		out_val<<coord_r[i]<<" ";
+		out_val<<coord_z[i]<<" ";
+	}
+
+	out_val.close();
+
 }

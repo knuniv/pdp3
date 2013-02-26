@@ -39,8 +39,7 @@ public:
 	double* read_double_params(const char* p_name);
 	void read_load_particles();
 	void load_system();
-
-	
+	bool SaveSystemState(void);
 
 public:
 	char* xml_file;
@@ -53,6 +52,7 @@ public:
 		particles_list* p_list;
 		E_field* efield;
 		H_field* hfield;
+		input_output_class * c_io_class;
 
 
 };
