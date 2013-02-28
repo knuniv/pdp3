@@ -20,6 +20,7 @@ public:
 
 	void out_coord(char* comp_name,flcuda* coord_r, flcuda* coord_z,int step_number, int number, int particles_number);
 	void out_coord_dump(char* comp_name,flcuda* coord_r, flcuda* coord_z,int particles_number);
+	void out_velocity_dump(char* comp_name,flcuda* v1, flcuda* v2,flcuda* v3, int particles_number);
 
 	
 };
