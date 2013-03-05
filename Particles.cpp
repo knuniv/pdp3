@@ -17,9 +17,11 @@ Particles::Particles(char* p_name, flcuda p_charge, flcuda p_mass, int p_number,
 					 Geometry* geom,particles_list* t_p_list)  : geom1(geom),p_list(t_p_list), c_light(3.0e8), c2(9.0e16) 
 {
 	name = p_name;
+	init_const_mass =p_mass;
 	charge = (flcuda)p_charge*(flcuda)1.6e-19;
 	mass = (flcuda)p_mass*(flcuda)9.1e-31;
 	number = p_number;
+
 
     //allocate memory for coordinates and velocities of particles
 
@@ -434,7 +436,7 @@ delete []v;
 //////////////////////////////////////////////////////
 void Particles::velocity_distribution_v2(flcuda tempr_ev)
 {
-double therm_vel = sqrt(tempr_ev*2.0*1.6e-19/9.1e-31);
+	double therm_vel = sqrt(tempr_ev*2.0*1.6e-19/(this->init_const_mass*9.1e-31));
 int i = 0;
 int j=0;
 flcuda R =0; // number from [0;1]

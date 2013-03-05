@@ -29,6 +29,7 @@ public:
 	flcuda charge;
 	// The specie mass
 	flcuda mass;
+	flcuda init_const_mass;
 	// Number of particles 
 	int number;
 	// Particles' coordinates
