@@ -39,7 +39,7 @@ void input_output_class::out_data(char* comp_name, flcuda** out_value,int step_n
 	char str_int [50]; 
 	itoa(inc_value,str_int,10);
 	strcat(st_name, str_int);
-	char path[50] = "D:/pdp3 files/_results/";
+	char path[50] = "D:/pdp3_files/_results/";
 	strcat(path,st_name);
 	ofstream out_val(path,ios::app);
 	// write  values  into file 
@@ -100,7 +100,7 @@ void input_output_class::out_coord(char* comp_name, flcuda* coord_r, flcuda* coo
 	char str_int [50]; 
 	itoa(inc_value,str_int,10);
 	strcat(st_name, str_int);
-	char path[50] = "D:/pdp3 files/_results/";
+	char path[50] = "D:/pdp3_files/_results/";
 	strcat(path,st_name);
 	ofstream out_val(path,ios::app);
 	// write  values  into file 
