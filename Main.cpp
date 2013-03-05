@@ -18,6 +18,7 @@
 #include "time.h"
 #include "particles_struct.h"
 #include "system_host.cuh"
+#include "Load_init_param.h"
 #define  pi = 3.1415926535897932;
 using namespace std;
 Particles_struct specie;
@@ -25,6 +26,10 @@ int main()
 {
 	clock_t start, finish;
 	flcuda time_elapsed;
+	Load_init_param init_param("parameters.xml");
+	init_param.read_xml();
+	init_param.load_system();
+	init_param.Run();
 
 	PML pml1(0.0,0.0, 0.0, 0.000001, 0.07);
 	Geometry geom1(0.25,2.0, 255, 2047, &pml1);
@@ -35,7 +40,8 @@ int main()
 	E_field e_field1(&geom1);
 	H_field h_field1(&geom1);
 	Fourier four1(0);
-	input_output_class out_class;
+	input_output_class out_class("E:/Science[Plasma]/pdp3_result/","E:/Science[Plasma]/pdp3_result/dump");
+	
 	Boundary_Maxwell_conditions maxwell_rad(&e_field1);
 	maxwell_rad.specify_initial_field(&geom1,0,0,0);
 	bool res = true;
@@ -45,7 +51,6 @@ int main()
 	charge_density rho_new(&geom1);
 	charge_density rho_old(&geom1);
 	charge_density rho_beam(&geom1);
-
 	e_field1.boundary_conditions();
 	e_field1.set_homogeneous_efield(0.0, 0.0, 0);
 	h_field1.set_homogeneous_h(0.0, 0.0, 0.0);

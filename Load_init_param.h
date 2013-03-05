@@ -38,8 +38,10 @@ public:
 	char* read_char(char* p_name);
 	double* read_double_params(const char* p_name);
 	void read_load_particles();
+	Bunch*  read_load_bunch();
 	void load_system();
 	bool SaveSystemState(void);
+	void Run(void);
 
 public:
 	char* xml_file;
@@ -53,7 +55,9 @@ public:
 		E_field* efield;
 		H_field* hfield;
 		input_output_class * c_io_class;
-
-
+		charge_density * c_rho_new;
+		charge_density * c_rho_old;
+		charge_density * c_rho_beam;
+		current * c_current;
 };
 

@@ -34,12 +34,14 @@ void input_output_class::out_data(char* comp_name, flcuda** out_value,int step_n
 	//}
 
    inc_value = step_number/number;
-		char st_name[50];
+		char st_name[100];
 	strcpy(st_name,comp_name);
-	char str_int [50]; 
+	char str_int [100]; 
 	itoa(inc_value,str_int,10);
 	strcat(st_name, str_int);
 	char path[50] = "D:/pdp3_files/_results/";
+	//char path[50] = "D:/pdp3 files/_results/";
+	strcpy(path,this->path_result);
 	strcat(path,st_name);
 	ofstream out_val(path,ios::app);
 	// write  values  into file 
@@ -57,7 +59,7 @@ void input_output_class::out_field_dump(char* comp_name,flcuda** out_value,int r
 	
 	char st_name[100];
 	
-	strcpy(st_name,this->path_result);
+	strcpy(st_name,this->path_dump);
 	
 
 
@@ -100,7 +102,9 @@ void input_output_class::out_coord(char* comp_name, flcuda* coord_r, flcuda* coo
 	char str_int [50]; 
 	itoa(inc_value,str_int,10);
 	strcat(st_name, str_int);
-	char path[50] = "D:/pdp3_files/_results/";
+	char path[100];
+	//char path[50] = "D:/pdp3 files/_results/";
+	strcpy(path,this->path_result);
 	strcat(path,st_name);
 	ofstream out_val(path,ios::app);
 	// write  values  into file 
@@ -116,12 +120,12 @@ void input_output_class::out_coord(char* comp_name, flcuda* coord_r, flcuda* coo
 	out_val.close();
 }
 
-void input_output_class::out_coord_dump(char* comp_name, flcuda* coord_r, flcuda* coord_z, int particles_number)
+void input_output_class::out_coord_dump(char* comp_name , flcuda* coord_r, flcuda* coord_z, int particles_number)
 {
 
-		char st_name[100];
+		char st_name[100] ;
 	
-	strcpy(st_name,this->path_result);
+	strcat(strcpy(st_name,this->path_dump),"_coords_");
 	
 
 
@@ -135,6 +139,30 @@ void input_output_class::out_coord_dump(char* comp_name, flcuda* coord_r, flcuda
 	{
 		out_val<<coord_r[i]<<" ";
 		out_val<<coord_z[i]<<" ";
+	}
+
+	out_val.close();
+
+}
+void input_output_class:: out_velocity_dump(char* comp_name,flcuda* v1, flcuda* v2,flcuda* v3, int particles_number){
+	char st_name[100] ;
+	
+	strcat(strcpy(st_name,this->path_dump),"_velocities_");
+	
+
+
+	//char path[50] = "D:/pdp3 files/_results/";
+	strcat(st_name,comp_name);
+	ofstream out_val(st_name);
+	out_val.setf(std::ios_base::scientific);
+	out_val.precision(14);
+	for (int i=0; i<particles_number;i++)
+	
+	{
+		out_val<<v1[i]<<" ";
+		out_val<<v2[i]<<" ";
+		out_val<<v3[i]<<" ";
+
 	}
 
 	out_val.close();
