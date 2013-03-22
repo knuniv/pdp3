@@ -41,7 +41,7 @@ public:
 	flcuda* v3; //vz
 
 	//indicator if particle is still alive
-	bool* is_alive;
+	int* is_alive;
 
 	flcuda c_light ;
 	flcuda c2 ;

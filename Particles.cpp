@@ -31,7 +31,7 @@ Particles::Particles(char* p_name, flcuda p_charge, flcuda p_mass, int p_number,
 	v1 = new flcuda[number];
 	v2 = new flcuda[number];
 	v3 = new flcuda[number];
-	is_alive = new bool[number];
+	is_alive = new int[number];
 	////////////////////////////////
 	//insert to particles_lists
 	p_list->part_list.push_back(this);
@@ -46,7 +46,8 @@ Particles::Particles(char* p_name, double* params,
 {
 	name = p_name;
 	charge = (flcuda)params[0]*(flcuda)1.6e-19;
-	mass = (flcuda)params[1]*(flcuda)9.1e-31;
+	init_const_mass =(flcuda)params[1];
+	mass = init_const_mass*(flcuda)9.1e-31;
 	number = params[2];
 
     //allocate memory for coordinates and velocities of particles
@@ -57,7 +58,7 @@ Particles::Particles(char* p_name, double* params,
 	v1 = new flcuda[number];
 	v2 = new flcuda[number];
 	v3 = new flcuda[number];
-	is_alive = new bool[number];
+	is_alive = new int[number];
 	////////////////////////////////
 	//insert to particles_lists
 	p_list->part_list.push_back(this);
@@ -81,7 +82,7 @@ Particles::Particles(Particles &cp_particles)
 	v1 = new flcuda[number];
 	v2 = new flcuda[number];
 	v3 = new flcuda[number];
-	is_alive = new bool[number];
+	is_alive = new int[number];
 	for (int i=0;i<cp_particles.number;i++)
 	{
 		x1[i] = cp_particles.x1[i];
@@ -147,7 +148,7 @@ void Particles::step_v(E_field *e_fld, H_field *h_fld, Time* t)
 	const flcuda mu0 = 1e-6;
 	Triple E_compon(0.0, 0.0, 0.0), B_compon(0.0, 0.0, 0.0);
 	flcuda const1 = charge*t->delta_t/2.0/mass, const2;
-	if (t->current_time == t->start_time) const1 = const1/2.0;
+	//if (t->current_time == t->start_time) const1 = const1/2.0;
 	for( i=0;i<number;i++)
 		if (is_alive[i])
 		{
@@ -692,7 +693,7 @@ void Particles::simple_j_weighting(Time* time1, current *j1, flcuda x1_new,flcud
 		flcuda delta_r = x1_new - x1_old;
 		flcuda delta_z = x3_new - x3_old;
 		
-		if ((delta_r==0)||(delta_z==0))
+		if ((abs(delta_r)<1e-15)||(abs(delta_z)<1e-15))
 			return;
 		// if i cell is not equal 0 
 		if (i_n>=1)
@@ -889,7 +890,7 @@ void Particles::j_weighting(Time* time1, current *j1, flcuda* x1_o,flcuda* x3_o)
 		if(x3[i]==(k_n+1)*dz)
 			k_n=k_o;
 	    int res_cell = abs(i_n-i_o) + abs(k_n-k_o); 
-		if ((abs(x1[i]-x1_old)<3e-15)||(abs(x3[i]-x3_old)<3e-15))
+		if ((abs(x1[i]-x1_old)<1e-15)||(abs(x3[i]-x3_old)<1e-15))
 		{
 			strict_motion_weighting(time1, j1,x1[i],x3[i],x1_old,x3_old);
 		}

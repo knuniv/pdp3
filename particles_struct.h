@@ -2,9 +2,9 @@
 #define __PARTICLESSTRUCTH__
 
 typedef double flcuda;
-#ifndef BUILD_CUDA
-#define BUILD_CUDA
-#endif
+
+//#define BUILD_OPENCL
+
 
 struct Particles_struct
 {

@@ -29,6 +29,7 @@ int main()
 	Load_init_param init_param("parameters.xml");
 	init_param.read_xml();
 	init_param.load_system();
+
 	init_param.Run();
 
 	PML pml1(0.0,0.0, 0.0, 0.000001, 0.07);

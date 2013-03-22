@@ -1,6 +1,7 @@
 #include "Load_init_param.h"
-
-
+#include "time.h"
+#include "kern_accessor.h"
+extern KernAccessor *kern_access_global;
 Load_init_param::Load_init_param(void)
 {
 }
@@ -239,7 +240,8 @@ if (get_int_value(a)==0)
 	
 	//////////////////////////////////////////////////
 
-
+	KernAccessor *kern_access = new KernAccessor(c_geom->n_grid_1, c_geom->n_grid_2);
+	kern_access_global = kern_access;
 
 }
 bool Load_init_param:: SaveSystemState() 
@@ -272,7 +274,7 @@ void Load_init_param:: Run(void)
      
     while (c_time->current_time < c_time->end_time)
 	{
-
+		clock_t t1 = clock();
 	    c_bunch->bunch_inject(c_time);
 
         //1. Calculate H field
@@ -301,11 +303,12 @@ void Load_init_param:: Run(void)
 		c_rho_new->reset_rho();
 		
 			p_list->charge_weighting(c_rho_new);  //continuity equation
-		bool res =  continuity_equation(c_time, c_geom, c_current, c_rho_old, c_rho_new); 
+		//bool res =  continuity_equation(c_time, c_geom, c_current, c_rho_old, c_rho_new); 
 		
-
+		cout << "Execution time: " << clock() - t1 << endl;
 		
-		if  ((((int)(c_time->current_time/c_time->delta_t))%100==0))
+		//if  ((((int)(c_time->current_time/c_time->delta_t))%100==0))
+		if  ((((int)(c_time->current_time/c_time->delta_t)) < 10))
 		//if  ( abs(time1.current_time - time1.end_time + time1.delta_t) < 1e-13)
 		{
 			cout<<c_time->current_time<<" ";
@@ -324,13 +327,12 @@ void Load_init_param:: Run(void)
 			c_io_class->out_data("h2",hfield->h2,step_number,100,c_geom->n_grid_1-1,c_geom->n_grid_2-1);
 				step_number=step_number+1;
 
-				this->SaveSystemState();
+				//this->SaveSystemState();
 		}
 	
 		c_time->current_time = c_time->current_time + c_time->delta_t;
-		if (!res)
-			//break;
-			cout<<"Error:"<<c_time->current_time<<"! ";
+		//if (!res)
+		//	cout<<"Error:"<<c_time->current_time<<"! ";
 
 	}
 }
