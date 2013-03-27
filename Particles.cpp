@@ -8,6 +8,7 @@
 
 using namespace std;
 
+const double B0 = 1e-3;// 1e-7;
 Particles::Particles(void)
 {
 }
@@ -158,8 +159,8 @@ void Particles::step_v(E_field *e_fld, H_field *h_fld, Time* t)
 	        e2 = E_compon.second*const1;
 	        e3 = E_compon.third*const1;
 	        b1 = B_compon.first*mu0*const1;
-	        b2 = B_compon.second*mu0*const1;
-	        b3 = B_compon.third*mu0*const1;
+	        b2 = (B_compon.second*mu0)*const1;
+	        b3 = (B_compon.third*mu0 + B0)*const1;               //++++++++++++++++++++++++++++
 			//1. Multiplication by relativistic factor
 			//u(n-1/2) = gamma(n-1/2)*v(n-1/)
 			gamma = get_gamma(i);
