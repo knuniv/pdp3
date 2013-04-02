@@ -177,6 +177,7 @@ void Load_init_param:: load_system()
 	/////////////////////////////////////
     r_params   =  read_double_params("geometry");
     c_geom  = new Geometry (r_params ,c_pml);
+	c_geom->set_epsilon() ;
 	//delete r_params;
 	//////////////////////////////////////////////////
 	///////////////////////
@@ -307,8 +308,8 @@ void Load_init_param:: Run(void)
 		
 		cout << "Execution time: " << clock() - t1 << endl;
 		
-		//if  ((((int)(c_time->current_time/c_time->delta_t))%100==0))
-		if  ((((int)(c_time->current_time/c_time->delta_t)) < 10))
+		if  ((((int)(c_time->current_time/c_time->delta_t))%100==0))
+		//if  ((((int)(c_time->current_time/c_time->delta_t)) < 10))
 		//if  ( abs(time1.current_time - time1.end_time + time1.delta_t) < 1e-13)
 		{
 			cout<<c_time->current_time<<" ";
@@ -326,8 +327,8 @@ void Load_init_param:: Run(void)
 			//out_class.out_coord("vels",electrons.v1, electrons.v3, step_number, 100, electrons.number);
 			c_io_class->out_data("h2",hfield->h2,step_number,100,c_geom->n_grid_1-1,c_geom->n_grid_2-1);
 				step_number=step_number+1;
-
-				//this->SaveSystemState();
+				if  ((((int)(c_time->current_time/c_time->delta_t))%1000==0)&&(step_number!=1))
+				this->SaveSystemState();
 		}
 	
 		c_time->current_time = c_time->current_time + c_time->delta_t;
