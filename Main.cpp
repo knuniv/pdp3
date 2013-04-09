@@ -21,9 +21,11 @@
 #include "Load_init_param.h"
 #define  pi = 3.1415926535897932;
 using namespace std;
-Particles_struct specie;
+Particles_struct specie;	
+#define BUILD_OPENCL
 int main() 
 {
+
 	clock_t start, finish;
 	flcuda time_elapsed;
 	Load_init_param init_param("parameters.xml");
@@ -41,7 +43,7 @@ int main()
 	E_field e_field1(&geom1);
 	H_field h_field1(&geom1);
 	Fourier four1(0);
-	input_output_class out_class("E:/Science[Plasma]/pdp3_result/","E:/Science[Plasma]/pdp3_result/dump");
+	input_output_class out_class("D:/pdp3_files/_results_ocl/","E:/Science[Plasma]/pdp3_result/dump");
 	
 	Boundary_Maxwell_conditions maxwell_rad(&e_field1);
 	maxwell_rad.specify_initial_field(&geom1,0,0,0);
@@ -83,8 +85,8 @@ int main()
 	Bunch electron_bunch("electron_bunch", -1,1,1e6,&geom1,&p_list,2e-8,0.02);
 	electron_bunch.calc_init_param(10e12,3.0e7);
 	///////////////////////////////////////////
-	Particles electrons("electrons", -1, 1,3e6, &geom1,&p_list);
-	Particles ions("ions", 1, 1836, 3e6, &geom1,&p_list);
+	Particles electrons("electrons", -1, 1,0e6, &geom1,&p_list);
+	Particles ions("ions", 1, 1836, 0e6, &geom1,&p_list);
 	p_list.create_coord_arrays();
 
 	//electrons.load_spatial_distribution(0.8e14, 0.81e14, left_plasma_boundary,0);

@@ -59,6 +59,12 @@ Particles::Particles(char* p_name, double* params,
 	v2 = new flcuda[number];
 	v3 = new flcuda[number];
 	is_alive = new int[number];
+
+	for (int i = 0; i < number; i++)
+	{
+		is_alive[i] = 1;
+	}
+
 	////////////////////////////////
 	//insert to particles_lists
 	p_list->part_list.push_back(this);

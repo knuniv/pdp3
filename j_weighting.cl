@@ -44,7 +44,7 @@ __kernel void j_weighting_kernel(__global double *j1,
                                  __global double *x3, 
                                  __global double *x1_o, 
                                  __global double *x3_o, 
-                                 __global bool   *is_alive, 
+                                 __global int   *is_alive, 
                                  __global const double *params,
                                              int  number)
 {
@@ -66,7 +66,7 @@ __kernel void j_weighting_kernel(__global double *j1,
     if (i >= number)
         return;
     
-    if ((is_alive[i]) && (i < number))
+    if ((is_alive[i] > 0) && (i < number))
     {
 
 	    //if (i < number)

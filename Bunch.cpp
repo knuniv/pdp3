@@ -20,7 +20,7 @@ void Bunch::calc_init_param(double n_b, double b_vel)
 	mass *= n_in_big;
 	for(int i=0;i<number;i++)
 	{
-		is_alive[i]=false;
+		is_alive[i] = 0;
 		v1[i]=0;
 		v2[i]=0;
 		v3[i]=0;
