@@ -32,7 +32,7 @@
   <Electrons>
        <charge> -1 </charge>
        <mass> 1 </mass>
-       <number> 0e6</number>
+       <number> 3e6</number>
        <left_density> 2e14</left_density>
        <right_density>8.0e14  </right_density>
        <temperature> 1.0 </temperature>
@@ -42,7 +42,7 @@
   <ions>
     <charge> 1 </charge>
     <mass> 1836 </mass>
-    <number> 0e6 </number>
+    <number> 3e6 </number>
     <left_density> 2e14 </left_density>
     <right_density> 8e14 </right_density>
     <temperature> 0.1 </temperature>

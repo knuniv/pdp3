@@ -321,9 +321,9 @@ void Load_init_param:: Run(void)
 			c_io_class->out_data("rho_beam", c_rho_beam->get_ro(),step_number,100,c_geom->n_grid_1-1,c_geom->n_grid_2-1);
 			c_io_class->out_data("e3",efield->e3,step_number,100,c_geom->n_grid_1-1,c_geom->n_grid_2-1);
 			c_io_class->out_data("e1",efield->e1,step_number,100,c_geom->n_grid_1-1,c_geom->n_grid_2-1);
-			c_io_class->out_data("j1",c_current->get_j1(),step_number,100,c_geom->n_grid_1-1,c_geom->n_grid_2-1);
-			c_io_class->out_data("j3",c_current->get_j3(),step_number,100,c_geom->n_grid_1-1,c_geom->n_grid_2-1);
-			c_io_class->out_coord("vels",c_bunch->v1, c_bunch->v3, step_number, 100, c_bunch->number);
+			//c_io_class->out_data("j1",c_current->get_j1(),step_number,100,c_geom->n_grid_1-1,c_geom->n_grid_2-1);
+			//c_io_class->out_data("j3",c_current->get_j3(),step_number,100,c_geom->n_grid_1-1,c_geom->n_grid_2-1);
+			//c_io_class->out_coord("vels",c_bunch->v1, c_bunch->v3, step_number, 100, c_bunch->number);
 			//out_class.out_data("rho",rho_elect.get_ro(),step_number,100,geom1.n_grid_1-1,geom1.n_grid_2-1);
 			//out_class.out_coord("vels",electron_bunch.v1, electron_bunch.v3, step_number, 100, electron_bunch.number);
 			//out_class.out_coord("coords",electrons.x1, electrons.x3, step_number, 100, electrons.number);

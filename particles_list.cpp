@@ -89,12 +89,13 @@ void particles_list::j_weighting(Time* time1, current *j1)
 	double params[10];
 	for(i=0;i<part_list.size();i++)
 	{
-         
+         /*
         #ifdef BUILD_OPENCL
 		 params[0] = part_list[i]->geom1->n_grid_1; // first_size;
 		 params[1] = part_list[i]->geom1->n_grid_2; // second_size;
 		 params[2] = part_list[i]->geom1->dr;
-		 params[3] = part_list[i]->geom1->dz;
+		 params[3] = part_list
+[i]->geom1->dz;
   		 params[4] = time1->delta_t;
 		 params[5] = part_list[i]->charge;
 		 params[6] = part_list[i]->mass;
@@ -104,8 +105,11 @@ void particles_list::j_weighting(Time* time1, current *j1)
 								         part_list[i]->number, 
 							             j1->geom1->n_grid_1, j1->geom1->n_grid_2); 
         #else 
+		*/
 		    part_list[i]->j_weighting(time1,j1,x1_old[i],x3_old[i]);
+		/*
         #endif
+		*/
 
 
 	}
