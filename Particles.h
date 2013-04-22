@@ -70,5 +70,7 @@ public:
 	void strict_motion_weighting(Time* time1, current *j1, flcuda x1_new,flcuda x3_new, flcuda x1_old, flcuda x3_old);
 	void azimuthal_j_weighting(Time* time1, current *j1);
 	flcuda  random_reverse(flcuda vel, int power);
+	int* get_cell_numbers_jr( flcuda x1_new,flcuda x3_new, flcuda x1_old, flcuda x3_old);
+	int* get_cell_numbers_jz( flcuda x1_new,flcuda x3_new, flcuda x1_old, flcuda x3_old);
 	};
 bool continuity_equation(Time *input_time, Geometry *input_geometry, current *input_J, charge_density *rho_start, charge_density *rho_end);

@@ -1367,3 +1367,81 @@ bool continuity_equation(Time *input_time, Geometry *input_geometry, current *in
 	return ok;
 
 }
+int* Particles::get_cell_numbers_jr(flcuda x1_new,flcuda x3_new, flcuda x1_old, flcuda x3_old)
+{
+
+		int i_new = (int)ceil((x1_new)/geom1->dr)-1;
+		int k_new =(int)ceil((x3_new)/geom1->dz)-1;
+		int i_old = (int)ceil((x1_old)/geom1->dr)-1;
+		int k_old =(int)ceil((x3_old)/geom1->dz)-1;
+		if (x1_old==(i_old+1)*geom1->dr)
+			i_old=i_new;
+		if(x3_old==(k_old+1)*geom1->dz)
+			k_old=k_new;
+		if (x1_new==(i_new+1)*geom1->dr)
+			i_new=i_old;
+		if(x3_new==(k_new+1)*geom1->dz)
+			k_new=k_old;
+
+
+  /// 4 cells
+
+	if (i_new==i_old&&k_new==k_old)
+	{
+	  int * res_cells = new int[4];
+	
+	 	res_cells[0]=i_new;
+	    res_cells[1]=k_new;
+		res_cells[2]=i_new;
+		res_cells[3]=k_new+1;
+
+	}
+	/// 7 cells
+	if (i_new!=i_old||k_new!=k_old)
+	{
+		if(i_new!=i_old)
+		{
+	   int i_new_max=0;
+		if (i_new<i_old)
+			int i_new_max=i_old;
+		else
+			i_new_max=i_new;
+		int * res_cells = new int[8];
+		res_cells[0]= i_new_max;
+	    res_cells[1]= k_new;
+		res_cells[2]=i_new_max;
+		res_cells[3]=k_new+1;
+		res_cells[4]=i_new_max-1;
+	    res_cells[5]=k_new;
+		res_cells[6]=i_new_max-1;
+	    res_cells[7]=k_new+1;
+
+		}
+
+		if(k_new!=k_old)
+		{
+		int k_new_max=0;
+		if (k_new<k_old)
+			int k_new_max=k_old;
+		else
+			k_new_max=k_new;
+
+		int * res_cells = new int[6];
+		res_cells[0]=i_new;
+	    res_cells[1]=k_new_max-1;
+		res_cells[2]=i_new;
+		res_cells[3]=k_new_max;
+		res_cells[4]=i_new;
+	    res_cells[5]=k_new_max+1;
+
+		}
+
+	}
+	// 10 cells
+	
+	{
+      
+   
+	}
+
+}
