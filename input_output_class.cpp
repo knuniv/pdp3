@@ -39,7 +39,7 @@ void input_output_class::out_data(char* comp_name, flcuda** out_value,int step_n
 	char str_int [100]; 
 	itoa(inc_value,str_int,10);
 	strcat(st_name, str_int);
-	char path[100];
+	char path[50] = "D:/pdp3_files/_results/";
 	//char path[50] = "D:/pdp3 files/_results/";
 	strcpy(path,this->path_result);
 	strcat(path,st_name);

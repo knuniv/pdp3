@@ -17,9 +17,11 @@ Particles::Particles(char* p_name, flcuda p_charge, flcuda p_mass, int p_number,
 					 Geometry* geom,particles_list* t_p_list)  : geom1(geom),p_list(t_p_list), c_light(3.0e8), c2(9.0e16) 
 {
 	name = p_name;
+	init_const_mass =p_mass;
 	charge = (flcuda)p_charge*(flcuda)1.6e-19;
 	mass = (flcuda)p_mass*(flcuda)9.1e-31;
 	number = p_number;
+
 
     //allocate memory for coordinates and velocities of particles
 
@@ -29,7 +31,7 @@ Particles::Particles(char* p_name, flcuda p_charge, flcuda p_mass, int p_number,
 	v1 = new flcuda[number];
 	v2 = new flcuda[number];
 	v3 = new flcuda[number];
-	is_alive = new bool[number];
+	is_alive = new int[number];
 	////////////////////////////////
 	//insert to particles_lists
 	p_list->part_list.push_back(this);
@@ -44,7 +46,8 @@ Particles::Particles(char* p_name, double* params,
 {
 	name = p_name;
 	charge = (flcuda)params[0]*(flcuda)1.6e-19;
-	mass = (flcuda)params[1]*(flcuda)9.1e-31;
+	init_const_mass =(flcuda)params[1];
+	mass = init_const_mass*(flcuda)9.1e-31;
 	number = params[2];
 
     //allocate memory for coordinates and velocities of particles
@@ -55,7 +58,13 @@ Particles::Particles(char* p_name, double* params,
 	v1 = new flcuda[number];
 	v2 = new flcuda[number];
 	v3 = new flcuda[number];
-	is_alive = new bool[number];
+	is_alive = new int[number];
+
+	for (int i = 0; i < number; i++)
+	{
+		is_alive[i] = 1;
+	}
+
 	////////////////////////////////
 	//insert to particles_lists
 	p_list->part_list.push_back(this);
@@ -79,7 +88,7 @@ Particles::Particles(Particles &cp_particles)
 	v1 = new flcuda[number];
 	v2 = new flcuda[number];
 	v3 = new flcuda[number];
-	is_alive = new bool[number];
+	is_alive = new int[number];
 	for (int i=0;i<cp_particles.number;i++)
 	{
 		x1[i] = cp_particles.x1[i];
@@ -145,7 +154,7 @@ void Particles::step_v(E_field *e_fld, H_field *h_fld, Time* t)
 	const flcuda mu0 = 1e-6;
 	Triple E_compon(0.0, 0.0, 0.0), B_compon(0.0, 0.0, 0.0);
 	flcuda const1 = charge*t->delta_t/2.0/mass, const2;
-	if (t->current_time == t->start_time) const1 = const1/2.0;
+	//if (t->current_time == t->start_time) const1 = const1/2.0;
 	for( i=0;i<number;i++)
 		if (is_alive[i])
 		{
@@ -434,7 +443,7 @@ delete []v;
 //////////////////////////////////////////////////////
 void Particles::velocity_distribution_v2(flcuda tempr_ev)
 {
-double therm_vel = sqrt(tempr_ev*2.0*1.6e-19/9.1e-31);
+	double therm_vel = sqrt(tempr_ev*2.0*1.6e-19/(this->init_const_mass*9.1e-31));
 int i = 0;
 int j=0;
 flcuda R =0; // number from [0;1]
@@ -690,7 +699,7 @@ void Particles::simple_j_weighting(Time* time1, current *j1, flcuda x1_new,flcud
 		flcuda delta_r = x1_new - x1_old;
 		flcuda delta_z = x3_new - x3_old;
 		
-		if ((delta_r==0)||(delta_z==0))
+		if ((abs(delta_r)<1e-15)||(abs(delta_z)<1e-15))
 			return;
 		// if i cell is not equal 0 
 		if (i_n>=1)
@@ -887,7 +896,7 @@ void Particles::j_weighting(Time* time1, current *j1, flcuda* x1_o,flcuda* x3_o)
 		if(x3[i]==(k_n+1)*dz)
 			k_n=k_o;
 	    int res_cell = abs(i_n-i_o) + abs(k_n-k_o); 
-		if ((abs(x1[i]-x1_old)<3e-15)||(abs(x3[i]-x3_old)<3e-15))
+		if ((abs(x1[i]-x1_old)<1e-15)||(abs(x3[i]-x3_old)<1e-15))
 		{
 			strict_motion_weighting(time1, j1,x1[i],x3[i],x1_old,x3_old);
 		}
@@ -1368,80 +1377,388 @@ bool continuity_equation(Time *input_time, Geometry *input_geometry, current *in
 
 }
 int* Particles::get_cell_numbers_jr(flcuda x1_new,flcuda x3_new, flcuda x1_old, flcuda x3_old)
+/*
+int* Particles::get_cell_numbers_jr(flcuda x1_new,flcuda x3_new, flcuda x1_old, flcuda x3_old)
 {
 
-		int i_new = (int)ceil((x1_new)/geom1->dr)-1;
-		int k_new =(int)ceil((x3_new)/geom1->dz)-1;
-		int i_old = (int)ceil((x1_old)/geom1->dr)-1;
-		int k_old =(int)ceil((x3_old)/geom1->dz)-1;
-		if (x1_old==(i_old+1)*geom1->dr)
-			i_old=i_new;
-		if(x3_old==(k_old+1)*geom1->dz)
-			k_old=k_new;
-		if (x1_new==(i_new+1)*geom1->dr)
-			i_new=i_old;
-		if(x3_new==(k_new+1)*geom1->dz)
-			k_new=k_old;
+        int i_new = (int)ceil((x1_new)/geom1->dr)-1;
+        int k_new =(int)ceil((x3_new)/geom1->dz)-1;
+        int i_old = (int)ceil((x1_old)/geom1->dr)-1;
+        int k_old =(int)ceil((x3_old)/geom1->dz)-1;
+        if (x1_old==(i_old+1)*geom1->dr)
+            i_old=i_new;
+        if(x3_old==(k_old+1)*geom1->dz)
+            k_old=k_new;
+        if (x1_new==(i_new+1)*geom1->dr)
+            i_new=i_old;
+        if(x3_new==(k_new+1)*geom1->dz)
+            k_new=k_old;
 
 
   /// 4 cells
 
-	if (i_new==i_old&&k_new==k_old)
-	{
-	  int * res_cells = new int[4];
-	
-	 	res_cells[0]=i_new;
-	    res_cells[1]=k_new;
-		res_cells[2]=i_new;
-		res_cells[3]=k_new+1;
+    if (i_new==i_old&&k_new==k_old)
+    {
+      int * res_cells = new int[4];
+  
+         res_cells[0]=i_new;
+        res_cells[1]=k_new;
+        res_cells[2]=i_new;
+        res_cells[3]=k_new+1;
 
-	}
-	/// 7 cells
-	if (i_new!=i_old||k_new!=k_old)
-	{
-		if(i_new!=i_old)
-		{
-	   int i_new_max=0;
-		if (i_new<i_old)
-			int i_new_max=i_old;
-		else
-			i_new_max=i_new;
-		int * res_cells = new int[8];
-		res_cells[0]= i_new_max;
-	    res_cells[1]= k_new;
-		res_cells[2]=i_new_max;
-		res_cells[3]=k_new+1;
-		res_cells[4]=i_new_max-1;
-	    res_cells[5]=k_new;
-		res_cells[6]=i_new_max-1;
-	    res_cells[7]=k_new+1;
+    }
+    /// 7 cells
+    if (i_new!=i_old||k_new!=k_old)
+    {
+        if(i_new!=i_old)
+        {
+       int i_new_max=0;
+        if (i_new<i_old)
+            int i_new_max=i_old;
+        else
+            i_new_max=i_new;
+        int * res_cells = new int[8];
+        res_cells[0]= i_new_max;
+        res_cells[1]= k_new;
+        res_cells[2]=i_new_max;
+        res_cells[3]=k_new+1;
+        res_cells[4]=i_new_max-1;
+        res_cells[5]=k_new;
+        res_cells[6]=i_new_max-1;
+        res_cells[7]=k_new+1;
 
-		}
+        }
 
-		if(k_new!=k_old)
-		{
-		int k_new_max=0;
-		if (k_new<k_old)
-			int k_new_max=k_old;
-		else
-			k_new_max=k_new;
+        if(k_new!=k_old)
+        {
+        int k_new_max=0;
+        if (k_new<k_old)
+            int k_new_max=k_old;
+        else
+            k_new_max=k_new;
 
-		int * res_cells = new int[6];
-		res_cells[0]=i_new;
-	    res_cells[1]=k_new_max-1;
-		res_cells[2]=i_new;
-		res_cells[3]=k_new_max;
-		res_cells[4]=i_new;
-	    res_cells[5]=k_new_max+1;
+        int * res_cells = new int[6];
+        res_cells[0]=i_new;
+        res_cells[1]=k_new_max-1;
+        res_cells[2]=i_new;
+        res_cells[3]=k_new_max;
+        res_cells[4]=i_new;
+        res_cells[5]=k_new_max+1;
 
-		}
+        }
 
-	}
-	// 10 cells
-	
-	{
-      
-   
-	}
+    }
+    // 10 cells
+  
+    {
+     if((i_new>i_old)&&(k_new>k_old)||(i_new<i_old)&&(k_new<k_old))
+     {
+        int ik_temp=0;
+        flcuda x_temp= 0;
+        if (i_new<i_old)
+        {
+            x_temp=x1_new;
+             ik_temp=i_new;
+             i_new=i_old;
+             x1_new=x1_old;
+             i_old=ik_temp;
+             x1_old=x_temp;
+
+        }
+
+
+        if (k_new<k_old)
+        {
+              x_temp=x3_new;
+             ik_temp=k_new;
+             k_new=k_old;
+             x3_new=x3_old;
+             k_old=ik_temp;
+             x3_old=x_temp;
+        }
+        flcuda a = (x1_new - x1_old)/(x3_new - x3_old);
+                        flcuda r1 = i_new*geom1->dr;
+                    flcuda delta_z1 = (r1 - x1_old)/a;
+                        flcuda z1 = x3_old + delta_z1;
+                        flcuda z2 = k_new*geom1->dz;
+                        flcuda delta_r2 = (z2-x3_old)*a;
+                        flcuda r2 = x1_old+ delta_r2;
+                        if (z1<k_new*geom1->dz)
+                        {
+                             int * res_cells = new int[10];
+                             res_cells[0]=i_new-1;
+                             res_cells[1]=k_new-1;
+                             res_cells[2]=i_new-1;
+                             res_cells[3]=k_new;
+
+                             res_cells[4]=i_new;
+                             res_cells[5]=k_new-1;
+                             res_cells[6]=i_new;
+                             res_cells[7]=k_new;
+
+                             res_cells[8]=i_new;
+                             res_cells[9]=k_new+1;
+
+
+                       
+                        }
+                        else if (z1>k_new*geom1->dz)
+                        {
+                             int * res_cells = new int[10];
+                             res_cells[0]=i_new-1;
+                             res_cells[1]=k_new-1;
+
+                             res_cells[2]=i_new-1;
+                             res_cells[3]=k_new;
+
+
+                             res_cells[6]=i_new-1;
+                             res_cells[7]=k_new+1;
+
+                             res_cells[8]=i_new;
+                             res_cells[9]=k_new+1;
+                           
+                        }
+
+
+
+
+     }
+ 
+    }
 
 }
+void Particles::get_cell_numbers_jr_1(flcuda x1_new,flcuda x3_new, flcuda x1_old, flcuda x3_old,int *i_return, int* k_return,int* accur)
+{
+
+        int i_new = (int)ceil((x1_new)/geom1->dr)-1;
+        int k_new =(int)ceil((x3_new)/geom1->dz)-1;
+        int i_old = (int)ceil((x1_old)/geom1->dr)-1;
+        int k_old =(int)ceil((x3_old)/geom1->dz)-1;
+        if (x1_old==(i_old+1)*geom1->dr)
+            i_old=i_new;
+        if(x3_old==(k_old+1)*geom1->dz)
+            k_old=k_new;
+        if (x1_new==(i_new+1)*geom1->dr)
+            i_new=i_old;
+        if(x3_new==(k_new+1)*geom1->dz)
+            k_new=k_old;
+
+        int cell_value = abs(i_new-i_old)+abs(k_new-k_old);
+
+  /// 4 cells
+
+    if (cell_value==0)
+    {
+    *i_return=i_new;
+    *k_return=k_new;
+    *accur=1;
+    }
+    /// 7 cells
+    if (cell_value==1)
+    {
+    *i_return=i_new;
+    *k_return=k_new;
+    *accur=2;
+
+    }
+    // 10 cells
+  
+    {
+    
+     *i_return=i_new;
+    *k_return=k_new;
+    *accur=3;
+
+
+    }
+ 
+    }
+
+void Particles::get_cell_numbers_jr_2(flcuda x1_new,flcuda x3_new, flcuda x1_old, flcuda x3_old,int **cell_arr_jr, int **cell_arr_jz, int* number)
+{
+
+        int i_new = (int)ceil((x1_new)/geom1->dr)-1;
+        int k_new =(int)ceil((x3_new)/geom1->dz)-1;
+        int i_old = (int)ceil((x1_old)/geom1->dr)-1;
+        int k_old =(int)ceil((x3_old)/geom1->dz)-1;
+        if (x1_old==(i_old+1)*geom1->dr)
+            i_old=i_new;
+        if(x3_old==(k_old+1)*geom1->dz)
+            k_old=k_new;
+        if (x1_new==(i_new+1)*geom1->dr)
+            i_new=i_old;
+        if(x3_new==(k_new+1)*geom1->dz)
+            k_new=k_old;
+
+        int cell_value = abs(i_new-i_old)+abs(k_new-k_old);
+
+  /// 4 cells
+
+    if (cell_value==0)
+    {
+	
+        cell_arr_jr[0][0]=i_new;
+        cell_arr_jr[0][1]=k_new;
+        cell_arr_jr[1][0]=i_new;
+        cell_arr_jr[1][1]=k_new+1;
+
+        cell_arr_jz[0][0]=i_new;
+        cell_arr_jz[0][1]=k_new;
+        cell_arr_jz[1][0]=i_new+1;
+        cell_arr_jz[1][1]=k_new;
+
+
+  
+    }
+    /// 7 cells
+    if (cell_value==1)
+    {
+    set_simple_cell(cell_arr_jr, cell_arr_jz, 0,i_old,k_old);
+    set_simple_cell(cell_arr_jr, cell_arr_jz, 2,i_new,k_new);
+
+    }
+    // 10 cells
+  
+    {
+    
+    if (((i_new-i_old)+(k_new-k_old))!=0)
+    {
+         set_simple_cell(cell_arr_jr, cell_arr_jz, 0,i_old,k_old);
+         set_simple_cell(cell_arr_jr, cell_arr_jz, 2,i_new,k_new);
+         int i_temp= i_new;
+         int k_temp = k_new;
+         if (i_new <i_old)
+             i_temp=i_old;
+          if (k_new <k_old)
+             k_temp=k_old;
+         set_simple_cell(cell_arr_jr, cell_arr_jz, 4,i_temp,k_temp-1);
+         set_simple_cell(cell_arr_jr, cell_arr_jz, 6,i_temp-1,k_temp);
+
+    }
+       else if (((i_new-i_old)+(k_new-k_old))==0)
+    {
+         set_simple_cell(cell_arr_jr, cell_arr_jz, 0,i_old,k_old);
+         set_simple_cell(cell_arr_jr, cell_arr_jz, 2,i_new,k_new);
+         int i_temp= i_new;
+         int k_temp = k_new;
+         if (i_new <i_old)
+             i_temp=i_old;
+          if (k_new >k_old)
+             k_temp=k_old;
+         set_simple_cell(cell_arr_jr, cell_arr_jz, 4,i_temp-1,k_temp);
+         set_simple_cell(cell_arr_jr, cell_arr_jz, 6,i_temp,k_temp+1);
+
+    }
+
+
+    }
+ 
+    }
+void Particles:: set_simple_cell(int** cell_arr_jr, int** cell_arr_jz,int start_number, int i_new, int k_new)
+{
+        cell_arr_jr[0+start_number][0]=i_new;
+        cell_arr_jr[0+start_number][1]=k_new;
+        cell_arr_jr[1+start_number][0]=i_new;
+        cell_arr_jr[1+start_number][1]=k_new+1;
+
+        cell_arr_jz[0+start_number][0]=i_new;
+        cell_arr_jz[0+start_number][1]=k_new;
+        cell_arr_jz[1+start_number][0]=i_new+1;
+        cell_arr_jz[1+start_number][1]=k_new;
+
+}
+
+void Particles::get_cell_numbers_new(flcuda x1_new,flcuda x3_new, flcuda x1_old, flcuda x3_old, int*i_min, int* i_max,int* k_min, int* k_max)
+{
+
+        int i_new = (int)ceil((x1_new)/geom1->dr)-1;
+        int k_new =(int)ceil((x3_new)/geom1->dz)-1;
+        int i_old = (int)ceil((x1_old)/geom1->dr)-1;
+        int k_old =(int)ceil((x3_old)/geom1->dz)-1;
+        if (x1_old==(i_old+1)*geom1->dr)
+            i_old=i_new;
+        if(x3_old==(k_old+1)*geom1->dz)
+            k_old=k_new;
+        if (x1_new==(i_new+1)*geom1->dr)
+            i_new=i_old;
+        if(x3_new==(k_new+1)*geom1->dz)
+            k_new=k_old;
+
+        int cell_value = abs(i_new-i_old)+abs(k_new-k_old);
+
+  /// 4 cells
+
+    if (cell_value==0)
+    {
+	    *i_min = i_new;
+		*i_max  =i_new+1;
+		*k_min = k_new;
+		*k_min = k_new+1;
+
+
+    }
+    /// 7 cells
+    if (cell_value==1)
+    {
+		if (i_new!=i_old)
+		{
+			int i_m = i_new;
+			if (i_new<i_old)
+			{
+				i_m=i_old;
+			}
+		*i_min = i_m-1;
+		*i_max  =i_m+1;
+		*k_min = k_new;
+		*k_max = k_new+1;
+
+		}
+		else {
+
+			int k_m = k_new;
+			if (k_new<k_old)
+			{
+				k_m=k_old;
+			}
+		*i_min = i_new;
+		*i_max  =i_new+1;
+		*k_min = k_m-1;
+		*k_max = k_m+1;
+
+
+
+		}
+
+
+    }
+    // 10 cells
+  
+    {
+    
+    if (((i_new-i_old)+(k_new-k_old))!=0)
+    {
+       *i_max=i_new+1;
+	  *i_min = i_new-1; 
+	  if (i_new<i_old)
+	  {
+			 *i_max=i_old+1;
+			* i_min = i_old-1;
+	  }
+
+	  *k_max=k_new+1;
+	  *k_min=k_new-1;
+	  if (i_new<i_old)
+	  {
+			  *k_max=k_old+1;
+			  *k_min = k_old-1;
+	  }
+	  
+
+
+
+
+    }
+ 
+    }
+	*/

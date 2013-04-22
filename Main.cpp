@@ -21,18 +21,21 @@
 #include "Load_init_param.h"
 #define  pi = 3.1415926535897932;
 using namespace std;
-Particles_struct specie;
+Particles_struct specie;	
+#define BUILD_OPENCL
 int main() 
 {
+
 	clock_t start, finish;
 	flcuda time_elapsed;
 	Load_init_param init_param("parameters.xml");
 	init_param.read_xml();
 	init_param.load_system();
+
 	init_param.Run();
 
 	PML pml1(0.0,0.0, 0.0, 0.000001, 0.07);
-	Geometry geom1(0.2,1.5, 255, 2047, &pml1);
+	Geometry geom1(0.25,2.0, 255, 2047, &pml1);
     //Geometry geom1(0.2,1.5, 63, 255, &pml1);
 	flcuda left_plasma_boundary = geom1.second_size*0.0;
 
@@ -40,7 +43,7 @@ int main()
 	E_field e_field1(&geom1);
 	H_field h_field1(&geom1);
 	Fourier four1(0);
-	input_output_class out_class("E:/Science[Plasma]/pdp3_result/","E:/Science[Plasma]/pdp3_result/dump");
+	input_output_class out_class("D:/pdp3_files/_results_ocl/","E:/Science[Plasma]/pdp3_result/dump");
 	
 	Boundary_Maxwell_conditions maxwell_rad(&e_field1);
 	maxwell_rad.specify_initial_field(&geom1,0,0,0);
@@ -61,6 +64,15 @@ int main()
 
 	/////////////////////////////////////////////
 	
+//	////////////////////////////////////////
+//	poisson  equetion testing//
+	//for(k=0;k<geom1.n_grid_2;k++)
+	//	rho_new.set_ro_weighting(20,k,1e-7);
+
+	//e_field1.poisson_equation2(&geom1,&rho_new);
+	////e_field1.poisson_equation(&geom1,&rho_new);
+	//bool res2 = e_field1.test_poisson_equation(&rho_new);
+//////////////////////////////////////////////////////
 
 ////////////////////////////////////////////////
 	geom1.set_epsilon() ;
@@ -70,19 +82,19 @@ int main()
 	// beam part
 	//Beam electron_beam("electron_beam", -1, 1, 10e5, &geom1,&p_list,0.01);
 	//electron_beam.calc_init_param(&time1,50,5e12,3e7);
-	Bunch electron_bunch("electron_bunch", -1,1,1e6,&geom1,&p_list,1e-8,0.02);
-	electron_bunch.calc_init_param(8e12,3.0e7);
+	Bunch electron_bunch("electron_bunch", -1,1,1e6,&geom1,&p_list,2e-8,0.02);
+	electron_bunch.calc_init_param(10e12,3.0e7);
 	///////////////////////////////////////////
-	Particles electrons("electrons", -1, 1,3e6, &geom1,&p_list);
-	Particles ions("ions", 1, 1836, 3e6, &geom1,&p_list);
+	Particles electrons("electrons", -1, 1,0e6, &geom1,&p_list);
+	Particles ions("ions", 1, 1836, 0e6, &geom1,&p_list);
 	p_list.create_coord_arrays();
 
 	//electrons.load_spatial_distribution(0.8e14, 0.81e14, left_plasma_boundary,0);
-    electrons.load_spatial_distribution(5e14, 5.1e14, left_plasma_boundary,0);
-	ions.load_spatial_distribution(5e14, 5.1e14, left_plasma_boundary,0);
+    electrons.load_spatial_distribution(2e14, 8e14, left_plasma_boundary,0);
+	ions.load_spatial_distribution(2e14, 8e14, left_plasma_boundary,0);
 
-	electrons.velocity_distribution_v2(0.5);
-	ions.velocity_distribution_v2(0.5);
+	electrons.velocity_distribution_v2(1.0);
+	ions.velocity_distribution_v2(0.05);
 	//ofstream out_vel("velocities");
 	//ofstream out_coords("coords");
 	//for (i = 0; i< electrons.number; i++)
@@ -102,11 +114,11 @@ int main()
 		electrons.charge_weighting(&rho_elect);
 		out_class.out_data("rho",rho_elect.get_ro(),0,100,geom1.n_grid_1-1,geom1.n_grid_2-1);*/
 
-   // #ifdef BUILD_CUDA
-	  //InitCUDA();
-	  //SetupCUDA(geom1.n_grid_1, geom1.n_grid_2, cuda_particles_number);
-   // #endif
-	  // 
+    #ifdef BUILD_CUDA
+	  InitCUDA();
+	  SetupCUDA(geom1.n_grid_1, geom1.n_grid_2, cuda_particles_number);
+    #endif
+	   
     /////////////////////////////////
 	//0. Half step back
 
@@ -115,6 +127,7 @@ int main()
 		
 	p_list.charge_weighting(&rho_new);
 	//electrons.charge_weighting(&rho_new);
+	//out_class.out_data("rho",rho_new.get_ro(),1,128,2048);
 
 	//weight currents and charges before relaxation period
 		//solve Poisson equation
@@ -201,6 +214,7 @@ int main()
 			//out_class.out_coord("coords",electrons.x1, electrons.x3, step_number, 100, electrons.number);
 			//out_class.out_coord("vels",electrons.v1, electrons.v3, step_number, 100, electrons.number);
 			out_class.out_data("h2",h_field1.h2,step_number,100,geom1.n_grid_1-1,geom1.n_grid_2-1);
+			
 				step_number=step_number+1;
 		}
 	
