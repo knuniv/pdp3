@@ -1,8 +1,8 @@
 #include "particles_list.h"
-#include "system_host.cuh"
-#include "kern_accessor.h"
+//#include "system_host.cuh"
+//#include "kern_accessor.h"
 
-KernAccessor *kern_access_global;
+//KernAccessor *kern_access_global;
 particles_list::particles_list(int i=0)
 {
 	x1_old = 0;

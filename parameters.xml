@@ -34,7 +34,7 @@
        <mass> 1 </mass>
        <number> 3e6</number>
        <left_density> 2e14</left_density>
-       <right_density>8.0e14  </right_density>
+       <right_density>2.05e14  </right_density>
        <temperature> 1.0 </temperature>
     </Electrons>
   
@@ -44,7 +44,7 @@
     <mass> 1836 </mass>
     <number> 3e6 </number>
     <left_density> 2e14 </left_density>
-    <right_density> 8e14 </right_density>
+    <right_density> 2.05e14 </right_density>
     <temperature> 0.1 </temperature>
     </ions>
 
@@ -71,7 +71,7 @@
   <Boundary_conditions type = "dirichlet">0</Boundary_conditions>
   
   
-  <PathtoResult>D:/pdp3_files/_results_ocl/</PathtoResult>
+  <PathtoResult>D:/</PathtoResult>
   <PathtoSaveState>D:/pdp3_files/_results_ocl/Dump/</PathtoSaveState>
 
   <file_save_paramters>

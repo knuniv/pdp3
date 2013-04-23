@@ -24,6 +24,8 @@ void Bunch::calc_init_param(double n_b, double b_vel)
 		v1[i]=0;
 		v2[i]=0;
 		v3[i]=0;
+	    mass_array[i]=mass;
+		charge_array[i]=charge;
 	}
 }
 

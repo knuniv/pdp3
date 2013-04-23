@@ -27,8 +27,10 @@ public:
 	char* name;
 	// The specie charge
 	flcuda charge;
-	// The specie mass
-	flcuda mass;
+	// The specie * mass
+	flcuda  mass;
+	flcuda * mass_array;
+	flcuda * charge_array;
 	flcuda init_const_mass;
 	// Number of particles 
 	int number;
@@ -64,11 +66,12 @@ public:
 	void velocity_distribution(flcuda therm_vel);
 	void velocity_distribution_v2 (flcuda therm_vel);
 	void load_spatial_distribution(double n1, double n2, double left_plasma_boundary,int type);
+	void load_spatial_distribution_with_variable_mass(double n1, double n2, double left_plasma_boundary,int type);
 	void load_velocity_distribution(flcuda v_thermal);
-	void simple_j_weighting(Time* time1, current *j1, flcuda x1_new,flcuda x3_new, flcuda x1_old, flcuda x3_old, int i_n, int k_n);
-	void simple_constrho_j_weighting(Time* time1, current *j1, flcuda x1_new,flcuda x3_new, flcuda x1_old, flcuda x3_old, int i_n, int k_n);
+	void simple_j_weighting(Time* time1, current *j1, flcuda x1_new,flcuda x3_new, flcuda x1_old, flcuda x3_old, int i_n, int k_n, int p_number);
+	void simple_constrho_j_weighting(Time* time1, current *j1, flcuda x1_new,flcuda x3_new, flcuda x1_old, flcuda x3_old, int i_n, int k_n,int p_number);
 	void j_weighting(Time* time1, current *j1,flcuda* x1,flcuda* x3);
-	void strict_motion_weighting(Time* time1, current *j1, flcuda x1_new,flcuda x3_new, flcuda x1_old, flcuda x3_old);
+	void strict_motion_weighting(Time* time1, current *j1, flcuda x1_new,flcuda x3_new, flcuda x1_old, flcuda x3_old,int p_number);
 	void azimuthal_j_weighting(Time* time1, current *j1);
 	flcuda  random_reverse(flcuda vel, int power);
 	void set_simple_cell(int** cell_arr_jr, int** cell_arr_jz,int start_number, int i_new, int k_new);

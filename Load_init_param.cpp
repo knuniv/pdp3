@@ -1,7 +1,7 @@
 #include "Load_init_param.h"
 #include "time.h"
 #include "kern_accessor.h"
-extern KernAccessor *kern_access_global;
+//extern KernAccessor *kern_access_global;
 Load_init_param::Load_init_param(void)
 {
 }
@@ -128,7 +128,8 @@ void Load_init_param:: read_load_particles()
 			 strcpy (p_name,sub_root->GetText());
 			params = read_double_params(p_name);
 			 prtls = new Particles(strcpy(new char [50],p_name),params,c_geom, p_list);
-			 prtls->load_spatial_distribution(params[3],params[4],0,0);
+			 prtls->load_spatial_distribution_with_variable_mass(params[3],params[4],0,0);
+			// prtls->load_spatial_distribution(params[3],params[4],0,0);
 			 prtls->velocity_distribution_v2(params[5]);
 			 sub_root = sub_root->NextSiblingElement("Particle_Name");      
         }
@@ -241,9 +242,9 @@ if (get_int_value(a)==0)
 	
 	//////////////////////////////////////////////////
 
-	KernAccessor *kern_access = new KernAccessor(c_geom->n_grid_1, c_geom->n_grid_2);
-	kern_access_global = kern_access;
-
+//	KernAccessor *kern_access = new KernAccessor(c_geom->n_grid_1, c_geom->n_grid_2);
+//	kern_access_global = kern_access;
+//
 }
 bool Load_init_param:: SaveSystemState() 
 {
@@ -308,15 +309,15 @@ void Load_init_param:: Run(void)
 		
 		cout << "Execution time: " << clock() - t1 << endl;
 		
-		if  ((((int)(c_time->current_time/c_time->delta_t))%100==0))
+		if  ((((int)(c_time->current_time/c_time->delta_t))%5==0))
 		//if  ((((int)(c_time->current_time/c_time->delta_t)) < 10))
 		//if  ( abs(time1.current_time - time1.end_time + time1.delta_t) < 1e-13)
 		{
 			cout<<c_time->current_time<<" ";
 			c_bunch->charge_weighting(c_rho_beam);
-			//rho_old.reset_rho();
-			//electrons.charge_weighting(&rho_old);
-			//out_class.out_data("rho_el", rho_old.get_ro(),step_number,100,geom1.n_grid_1-1,geom1.n_grid_2-1);
+			c_rho_old->reset_rho();
+			p_list[0].charge_weighting(c_rho_old);
+			c_io_class->out_data("rho_el", c_rho_old->get_ro(),step_number,100,c_geom->n_grid_1-1,c_geom->n_grid_2-1);
 			//out_class.out_data("e1",e_field1.e1,100,128,2048);
 			c_io_class->out_data("rho_beam", c_rho_beam->get_ro(),step_number,100,c_geom->n_grid_1-1,c_geom->n_grid_2-1);
 			c_io_class->out_data("e3",efield->e3,step_number,100,c_geom->n_grid_1-1,c_geom->n_grid_2-1);
