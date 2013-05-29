@@ -31,7 +31,7 @@ KernAccessor::KernAccessor(int size1, int size3)
 									sizeof(double) * N_MAX_PART, NULL, NULL);
 
 	// is_alive
-	memObjects[5] = clCreateBuffer(m_context, CL_MEM_READ_ONLY,
+	memObjects[5] = clCreateBuffer(m_context, CL_MEM_READ_WRITE,
 									sizeof(int) * N_MAX_PART, NULL, NULL);
 
 	// params
@@ -84,7 +84,7 @@ KernAccessor::~KernAccessor()
 {
 }
 
-void KernAccessor::halfStepCoord(double *x1, double *x3, double *v1, double *v3, double *params, int *is_alive, int n_particles)
+void KernAccessor::halfStepCoord(double *x1, double *x3, double *v1, double *v3, double *params, int *is_alive, int n_particles, int is_absorb)
 {
 	cl_int errNum;
 	errNum = clEnqueueWriteBuffer(m_commandQueue, memObjects[0],
@@ -119,6 +119,7 @@ void KernAccessor::halfStepCoord(double *x1, double *x3, double *v1, double *v3,
 	errNum |= clSetKernelArg(m_kernel1, 4, sizeof(cl_mem), &memObjects[4]);
 	errNum |= clSetKernelArg(m_kernel1, 5, sizeof(cl_mem), &memObjects[5]);
 	errNum |= clSetKernelArg(m_kernel1, 6, sizeof(cl_mem), (void *)(&n_particles));
+	errNum |= clSetKernelArg(m_kernel1, 7, sizeof(cl_mem), (void *)(&is_absorb));
 
 	size_t globalWorkSize1[1] = { (n_particles / 64 + 1) * 64 };
 	size_t localWorkSize1[1] = { 64 };
@@ -143,7 +144,9 @@ void KernAccessor::halfStepCoord(double *x1, double *x3, double *v1, double *v3,
 									CL_TRUE, 0, n_particles * sizeof(double),
 									v3, 0, NULL, NULL);
 
-
+	errNum = clEnqueueReadBuffer(m_commandQueue, memObjects[5],
+									CL_TRUE, 0, n_particles * sizeof(int),
+									is_alive, 0, NULL, NULL);
 }
 
 void KernAccessor::stepV(double *x1, double *x3, double *v1, double *v2, double *v3, 

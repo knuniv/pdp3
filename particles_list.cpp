@@ -1,8 +1,8 @@
 #include "particles_list.h"
 //#include "system_host.cuh"
-//#include "kern_accessor.h"
+#include "kern_accessor.h"
 
-//KernAccessor *kern_access_global;
+KernAccessor *kern_access_global;
 particles_list::particles_list(int i=0)
 {
 	x1_old = 0;
@@ -76,7 +76,7 @@ void particles_list::half_step_coord(Time* t)
 			 params[3] = part_list[i]->geom1->dz;
   			 params[4] = t->delta_t;
 			 kern_access_global->halfStepCoord(part_list[i]->x1, part_list[i]->x3, part_list[i]->v1, part_list[i]->v3, 
-	 										  params, part_list[i]->is_alive, part_list[i]->number);
+	 										  params, part_list[i]->is_alive, part_list[i]->number, part_list[i]->is_particle() ? 0 : 1);
         #else 
 		    part_list[i]->half_step_coord(t);
         #endif  

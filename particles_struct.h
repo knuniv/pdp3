@@ -3,7 +3,7 @@
 
 typedef double flcuda;
 
-//#define BUILD_OPENCL
+#define BUILD_OPENCL
 
 
 struct Particles_struct

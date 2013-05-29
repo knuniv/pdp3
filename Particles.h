@@ -21,6 +21,10 @@ public:
 			  Geometry* geom, particles_list* p_list);
 	Particles(char* p_name, double* params,
 			  Geometry* geom, particles_list* p_list);
+	virtual bool is_particle()
+	{
+		return true;
+	}
 	 ~Particles();
 public:
 	// The specie name

@@ -15,6 +15,10 @@ public:
 	flcuda n_bunch;// bunch density;
 	flcuda vel_bunch; //bunch velocity
 	double radius; //bunch radius
+	bool is_particle()
+	{
+		return false;
+	}
 public:
 	void calc_init_param(double n_b,double b_vel);
 	void bunch_inject(Time* time);

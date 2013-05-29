@@ -1,3 +1,4 @@
+#pragma OPENCL EXTENSION cl_khr_fp64: enable
 double get_field_e(double x1, double x3, global const double* e_input, int component, global const double *params, int gid);
 double get_field_h(double x1, double x3, global const double* h_input, int component, global const double *params);
 double get_gamma(int i, global const double* v1, global const double* v2, global const double* v3);
@@ -9,9 +10,10 @@ __kernel void step_coord_kernel(__global double *x1,
 								__global double *v1,
 								__global double *v3,
 								__global const double *params,
-								__global const int    *is_alive,
+								__global int    *is_alive,
 
-					                     const int n_particles)
+					                     const int n_particles,
+										 const int is_absorb)
 
 {
     int gid = get_global_id(0);
@@ -46,8 +48,15 @@ __kernel void step_coord_kernel(__global double *x1,
 
 			if (x3[gid] > x3_wall)
 			{
-				x3[gid] = x3_wallX2 - x3[gid];
-				v3[gid] = -v3[gid];
+			    if (is_absorb)
+				{
+  				    is_alive[gid] = false;
+				}
+				else
+				{
+				    x3[gid] = x3_wallX2 - x3[gid];
+				    v3[gid] = -v3[gid];
+				}
 			}
 
 			if (x1[gid] < half_dr)
@@ -164,6 +173,10 @@ __kernel void kernel_stepV(global const double* x1,
 		}
 
 }
+
+
+
+
 
 
 double get_field_e(double x1, double x3, 

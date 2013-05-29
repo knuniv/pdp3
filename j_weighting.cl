@@ -1,3 +1,4 @@
+#pragma OPENCL EXTENSION cl_khr_fp64: enable
 #define pi        3.14159265358979
 
 void strict_motion_weighting(double dt, __global double *j1, __global double *j2, __global double *j3, 

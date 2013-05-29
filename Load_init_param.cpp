@@ -1,7 +1,7 @@
 #include "Load_init_param.h"
 #include "time.h"
 #include "kern_accessor.h"
-//extern KernAccessor *kern_access_global;
+extern KernAccessor *kern_access_global;
 Load_init_param::Load_init_param(void)
 {
 }
@@ -242,8 +242,8 @@ if (get_int_value(a)==0)
 	
 	//////////////////////////////////////////////////
 
-//	KernAccessor *kern_access = new KernAccessor(c_geom->n_grid_1, c_geom->n_grid_2);
-//	kern_access_global = kern_access;
+	KernAccessor *kern_access = new KernAccessor(c_geom->n_grid_1, c_geom->n_grid_2);
+	kern_access_global = kern_access;
 //
 }
 bool Load_init_param:: SaveSystemState() 
@@ -309,8 +309,8 @@ void Load_init_param:: Run(void)
 		
 		cout << "Execution time: " << clock() - t1 << endl;
 		
-		if  ((((int)(c_time->current_time/c_time->delta_t))%5==0))
-		//if  ((((int)(c_time->current_time/c_time->delta_t)) < 10))
+		if  ((((int)(c_time->current_time/c_time->delta_t))%100==0))
+	//	if  ((((int)(c_time->current_time/c_time->delta_t)) < 5))
 		//if  ( abs(time1.current_time - time1.end_time + time1.delta_t) < 1e-13)
 		{
 			cout<<c_time->current_time<<" ";
@@ -333,6 +333,11 @@ void Load_init_param:: Run(void)
 				step_number=step_number+1;
 				if  ((((int)(c_time->current_time/c_time->delta_t))%1000==0)&&(step_number!=1))
 				this->SaveSystemState();
+		}
+
+		else
+		{
+			break;
 		}
 	
 		c_time->current_time = c_time->current_time + c_time->delta_t;

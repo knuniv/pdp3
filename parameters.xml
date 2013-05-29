@@ -3,8 +3,8 @@
 <Initial_parameters>
   
 	<geometry>
-		<r_size>   0.25  </r_size>
-		<z_size>  2.0  </z_size>
+		<r_size>   0.2  </r_size>
+		<z_size>  1.5  </z_size>
 		<n_grid_r>  255  </n_grid_r>
 		<n_grid_z> 2047</n_grid_z>
 	</geometry>
@@ -33,8 +33,8 @@
        <charge> -1 </charge>
        <mass> 1 </mass>
        <number> 3e6</number>
-       <left_density> 2e14</left_density>
-       <right_density>2.05e14  </right_density>
+       <left_density> 5e14</left_density>
+       <right_density>5.1e14  </right_density>
        <temperature> 1.0 </temperature>
     </Electrons>
   
@@ -43,8 +43,8 @@
     <charge> 1 </charge>
     <mass> 1836 </mass>
     <number> 3e6 </number>
-    <left_density> 2e14 </left_density>
-    <right_density> 2.05e14 </right_density>
+    <left_density> 5e14 </left_density>
+    <right_density> 5.1e14 </right_density>
     <temperature> 0.1 </temperature>
     </ions>
 
@@ -54,9 +54,9 @@
     <charge> -1 </charge>
     <mass> 1 </mass>
     <number> 1e6</number>    
-    <duration>1e-8</duration>
+    <duration>2e-8</duration>
     <Radius>0.02</Radius>
-    <density> 1e13 </density>
+    <density> 16e12 </density>
     <initial_velocity> 3e7 </initial_velocity>
 
   </Electrons_bunch>
@@ -71,8 +71,8 @@
   <Boundary_conditions type = "dirichlet">0</Boundary_conditions>
   
   
-  <PathtoResult>D:/</PathtoResult>
-  <PathtoSaveState>D:/pdp3_files/_results_ocl/Dump/</PathtoSaveState>
+  <PathtoResult>D:/pdp3_files/</PathtoResult>
+  <PathtoSaveState>D:/pdp3_files/Dump</PathtoSaveState>
 
   <file_save_paramters>
     <time_step>100</time_step>
