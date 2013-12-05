@@ -43,13 +43,13 @@ int main()
 	E_field e_field1(&geom1);
 	H_field h_field1(&geom1);
 	Fourier four1(0);
-	input_output_class out_class("D:/pdp3_files/_results_ocl/","E:/Science[Plasma]/pdp3_result/dump");
+	input_output_class out_class("C://pdp3_files//_results//","C://pdp3_files//_results//");
 	
 	Boundary_Maxwell_conditions maxwell_rad(&e_field1);
 	maxwell_rad.specify_initial_field(&geom1,0,0,0);
 	bool res = true;
 	int  k, i;
-   
+//   
 	current current1(&geom1);
 	charge_density rho_new(&geom1);
 	charge_density rho_old(&geom1);
@@ -61,10 +61,10 @@ int main()
 
 	E_field e_beam(&geom1);
     e_beam.set_homogeneous_efield(0.0, 0.0, 0);
-
-	/////////////////////////////////////////////
-	
-//	////////////////////////////////////////
+//
+//	/////////////////////////////////////////////
+//	
+////	////////////////////////////////////////
 //	poisson  equetion testing//
 	//for(k=0;k<geom1.n_grid_2;k++)
 	//	rho_new.set_ro_weighting(20,k,1e-7);
@@ -72,29 +72,29 @@ int main()
 	//e_field1.poisson_equation2(&geom1,&rho_new);
 	////e_field1.poisson_equation(&geom1,&rho_new);
 	//bool res2 = e_field1.test_poisson_equation(&rho_new);
-//////////////////////////////////////////////////////
-
-////////////////////////////////////////////////
+////////////////////////////////////////////////////////
+//
+//////////////////////////////////////////////////
 	geom1.set_epsilon() ;
 //	e_field1.set_sigma();
 	particles_list p_list(0);
-	///////////////////////////////////////////
+//	///////////////////////////////////////////
 	// beam part
 	//Beam electron_beam("electron_beam", -1, 1, 10e5, &geom1,&p_list,0.01);
 	//electron_beam.calc_init_param(&time1,50,5e12,3e7);
 	Bunch electron_bunch("electron_bunch", -1,1,1e6,&geom1,&p_list,2e-8,0.02);
-	electron_bunch.calc_init_param(10e12,3.0e7);
+	electron_bunch.calc_init_param(5e12,3.0e7);
 	///////////////////////////////////////////
-	Particles electrons("electrons", -1, 1,0e6, &geom1,&p_list);
-	Particles ions("ions", 1, 1836, 0e6, &geom1,&p_list);
+	//Particles electrons("electrons", -1, 1, 1e8, &geom1,&p_list);!!!!!!!!!!!!!!!!!!!!!
+	//Particles ions("ions", 1, 1836, 1e8, &geom1,&p_list);//3e5!!!!!!!!!!!!!!!!!!!!!!!!
 	p_list.create_coord_arrays();
 
 	//electrons.load_spatial_distribution(0.8e14, 0.81e14, left_plasma_boundary,0);
-    electrons.load_spatial_distribution(2e14, 8e14, left_plasma_boundary,0);
-	ions.load_spatial_distribution(2e14, 8e14, left_plasma_boundary,0);
+   //!!!!!!!!!!!// electrons.load_spatial_distribution(2.54777e8, 2.54777e8, left_plasma_boundary,0);//(2e14, 8e14, left_plasma_boundary,0);
+	//!!!!!!!!!!// ions.load_spatial_distribution(2.54777e8, 2.54777e8, left_plasma_boundary,0);//(2e14, 8e14, left_plasma_boundary,0);
 
-	electrons.velocity_distribution_v2(1.0);
-	ions.velocity_distribution_v2(0.05);
+	//electrons.velocity_distribution_v2(1.0);!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+	//ions.velocity_distribution_v2(0.05);!!!!!!!!!!!!!!!!!!!!!!!!!!!
 	//ofstream out_vel("velocities");
 	//ofstream out_coords("coords");
 	//for (i = 0; i< electrons.number; i++)
@@ -125,7 +125,8 @@ int main()
 	//p_list.azimuthal_j_weighting(&time1, &current1);
 	//p_list.j_weighting(&time1,&current1,);
 		
-	p_list.charge_weighting(&rho_new);
+	//p_list.charge_weighting(&rho_new);///////////////////////////////////////
+
 	//electrons.charge_weighting(&rho_new);
 	//out_class.out_data("rho",rho_new.get_ro(),1,128,2048);
 
@@ -136,12 +137,16 @@ int main()
 	//Poisson_neumann poisson1(&geom1);
 
 	//poisson1.poisson_solve(&e_field1, &rho_new);
-	Poisson_dirichlet dirih(&geom1);
-	dirih.poisson_solve(&e_field1, &rho_new);
-	bool res1 = dirih.test_poisson_equation(&e_field1, &rho_new);
+	//Poisson_dirichlet dirih(&geom1);///////////////////////////////////////
+	//dirih.poisson_solve(&e_field1, &rho_new);/////////////////////////////////////////
+	//bool res1 = dirih.test_poisson_equation(&e_field1, &rho_new);///////////////////////////
 	//out_class.out_data("e3",e_field1.e3,0,100,geom1.n_grid_1-1,geom1.n_grid_2-1);
-	
+	  p_list.copy_coords();
+	  p_list.half_step_coord(&time1);
+	  p_list.half_step_coord(&time1);
+	  p_list.j_weighting(&time1,&current1);
 	//relaxation period
+	 int step_number= 0;
 	while (time1.current_time < time1.relaxation_time)
 	{
         //1. Calculate H field
@@ -149,15 +154,26 @@ int main()
 
         //2. Calculate E
         e_field1.calc_field(&h_field1, &time1, &current1);
-		time1.current_time = time1.current_time + time1.delta_t;
-		
+	time1.current_time = time1.current_time + time1.delta_t;
+
+		///////////////////////////////////////////////////////////new
+
+		if(((int)(time1.current_time/time1.delta_t))%100==0)//
+		{step_number+=1;}                                   //   new -- what is this?
+		//////////////////////////////////////////////////////////
        
 	}
+	p_list.charge_weighting(&rho_new);//new part!!
+	Poisson_dirichlet dirih(&geom1);//new part!!
+	dirih.poisson_solve(&e_field1,&rho_new);//new part!!
+
 	time1.current_time = 0.0 ;
 
+	p_list.set_init_coord(&time1);//new part!!
+
 	//variable for out_class function 
-	int step_number= 0;
-     
+	
+    
     while (time1.current_time < time1.end_time)
 	{
 //electron_beam.beam_inject(1e14,5e7,&time1);
@@ -168,7 +184,8 @@ int main()
 		//maxwell_rad.radiation_source(&geom1,0.4,2e9,0,time1.current_time);
 		
         //1. Calculate H field
-		h_field1.calc_field(&e_field1, &time1);
+		//                  clock_t time_start = clock();
+	h_field1.calc_field(&e_field1, &time1);
 
 		//2. Calculate v
 			current1.reset_j();
@@ -182,7 +199,7 @@ int main()
 			p_list.half_step_coord(&time1);
 			p_list.azimuthal_j_weighting(&time1, &current1);
 			p_list.half_step_coord(&time1);
-			p_list.j_weighting(&time1,&current1);
+		p_list.j_weighting(&time1,&current1);
 		
 
         //4. Calculate E
@@ -193,8 +210,9 @@ int main()
 		rho_new.reset_rho();
 		
 			p_list.charge_weighting(&rho_new);  //continuity equation
+
 		res =  continuity_equation(&time1, &geom1, &current1, &rho_old, &rho_new); 
-		
+		//                      clock_t time_end = clock();
 
 		
 		if  ((((int)(time1.current_time/time1.delta_t))%100==0))
@@ -209,6 +227,7 @@ int main()
 			out_class.out_data("rho_beam", rho_beam.get_ro(),step_number,100,geom1.n_grid_1-1,geom1.n_grid_2-1);
 			out_class.out_data("e3",e_field1.e3,step_number,100,geom1.n_grid_1-1,geom1.n_grid_2-1);
 			out_class.out_data("e1",e_field1.e1,step_number,100,geom1.n_grid_1-1,geom1.n_grid_2-1);
+			out_class.out_data("fi",e_field1.fi,step_number,100,geom1.n_grid_1-1,geom1.n_grid_2-1);
 			//out_class.out_data("rho",rho_elect.get_ro(),step_number,100,geom1.n_grid_1-1,geom1.n_grid_2-1);
 			//out_class.out_coord("vels",electron_bunch.v1, electron_bunch.v3, step_number, 100, electron_bunch.number);
 			//out_class.out_coord("coords",electrons.x1, electrons.x3, step_number, 100, electrons.number);

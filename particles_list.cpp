@@ -83,6 +83,18 @@ void particles_list::half_step_coord(Time* t)
 	 
 	}
 }
+
+
+void particles_list::set_init_coord(Time* t)
+{
+	int i = 0;
+	for(i=0;i<part_list.size();i++)
+	{
+		part_list[i]->x1[0] = 0.05;
+		part_list[i]->x3[0] = 0.75;
+	}
+}
+
 void particles_list::j_weighting(Time* time1, current *j1)
 {
 	int i = 0;

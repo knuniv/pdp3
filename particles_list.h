@@ -20,6 +20,7 @@ public:
 	void charge_weighting(charge_density* ro1);
 	void step_v(E_field *e_fld, H_field *h_fld, Time* t);
 	void half_step_coord(Time* t);
+	void set_init_coord(Time* t);
 	//void set_j_0();
 	//void set_v_0();
 	//void set_x_0();

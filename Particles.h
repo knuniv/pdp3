@@ -7,6 +7,8 @@
 #include"particles_list.h"
 #include <fstream>
 #include<iostream>
+
+
 using namespace std;
 class particles_list;
 class E_field;
@@ -58,6 +60,7 @@ public:
 	//with exsisting routine of Maxwell equations integration 
 	Geometry* geom1;
 	particles_list* p_list;
+	static flcuda Bz_0;
 public:
 	void charge_weighting(charge_density* ro1);
 	void step_v(E_field *e_fld, H_field *h_fld, Time* t);

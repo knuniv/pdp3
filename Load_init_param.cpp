@@ -1,7 +1,9 @@
 #include "Load_init_param.h"
 #include "time.h"
 #include "kern_accessor.h"
+
 extern KernAccessor *kern_access_global;
+
 Load_init_param::Load_init_param(void)
 {
 }
@@ -177,10 +179,11 @@ void Load_init_param:: load_system()
 	//load Geometry parameters///
 	/////////////////////////////////////
     r_params   =  read_double_params("geometry");
+	
     c_geom  = new Geometry (r_params ,c_pml);
 	c_geom->set_epsilon() ;
 	//delete r_params;
-	//////////////////////////////////////////////////
+
 	///////////////////////
 	///creating field objects
 
@@ -202,7 +205,8 @@ void Load_init_param:: load_system()
 	 p_list = new particles_list(0); 
 	 read_load_particles();
    //////////////////////////////////////
-
+	//////////////////////////////////////////////////
+	//p_list->part_list[0]->Bz_0 =  read_double_params("Magnetic_Fields_param")[0];
 	  //load bunch///
 	/////////////////////////////////////
 c_bunch = read_load_bunch();
@@ -335,10 +339,7 @@ void Load_init_param:: Run(void)
 				this->SaveSystemState();
 		}
 
-		else
-		{
-			break;
-		}
+		
 	
 		c_time->current_time = c_time->current_time + c_time->delta_t;
 		//if (!res)

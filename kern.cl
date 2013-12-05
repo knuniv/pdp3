@@ -4,6 +4,8 @@ double get_field_h(double x1, double x3, global const double* h_input, int compo
 double get_gamma(int i, global const double* v1, global const double* v2, global const double* v3);
 double get_gamma_inv(int i, global const double* v1, global const double* v2, global const double* v3);
 int get_linear_coord(int index_r, int index_z, int ngrid_z, int component);
+ 
+#define  B_0 0.00075
 
 __kernel void step_coord_kernel(__global double *x1,
                                 __global double *x3,
@@ -112,7 +114,7 @@ __kernel void kernel_stepV(global const double* x1,
 
 	        b1_val = get_field_h(x1[i] ,x3[i], h1, 4, params)*mu0*const1;
 	        b2_val = get_field_h(x1[i], x3[i], h2, 5, params)*mu0*const1;
-	        b3_val = get_field_h(x1[i], x3[i], h3, 6, params)*mu0*const1;
+	        b3_val = (get_field_h(x1[i], x3[i], h3, 6, params)*mu0+B_0)*const1;///////////////////////////////
 			/*
 			if (i == 1)
 			    printf("%d %e %e %e \n", i, e1_val, e2_val, e3_val);

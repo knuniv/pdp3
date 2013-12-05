@@ -5,8 +5,12 @@
 #include "Triple.h"
 #include <math.h>
 #define  pi 3.14159265358979
+#define  B__0 0.001
 
 using namespace std;
+
+
+
 
 Particles::Particles(void)
 {
@@ -44,7 +48,7 @@ Particles::Particles(char* p_name, flcuda p_charge, flcuda p_mass, int p_number,
 	////////constructor//////
 ////////////////////////////////////////////////
 Particles::Particles(char* p_name, double* params,
-					 Geometry* geom,particles_list* t_p_list)  : geom1(geom),p_list(t_p_list), c_light(3.0e8), c2(9.0e16) 
+					 Geometry* geom, particles_list* t_p_list)  : geom1(geom),p_list(t_p_list), c_light(3.0e8), c2(9.0e16) 
 {
 	name = p_name;
 	charge = (flcuda)params[0]*(flcuda)1.6e-19;
@@ -171,7 +175,7 @@ void Particles::step_v(E_field *e_fld, H_field *h_fld, Time* t)
 	        e3 = E_compon.third*const1;
 	        b1 = B_compon.first*mu0*const1;
 	        b2 = B_compon.second*mu0*const1;
-	        b3 = B_compon.third*mu0*const1;
+	        b3 = (B_compon.third*mu0 + B__0)*const1;//+ Bz_0
 			//1. Multiplication by relativistic factor
 			//u(n-1/2) = gamma(n-1/2)*v(n-1/)
 			gamma = get_gamma(i);
@@ -698,7 +702,8 @@ void Particles::load_spatial_distribution_with_variable_mass(double n1, double n
 		
 		
 		double N_big_for_cell=(double) number/( (double) geom1->n_grid_1*geom1->n_grid_2);
-		double N_real_i = 8.0*pi*(n2+n1)/2.0*dr*dz;
+		//double N_real_i =2.0 *pi*(n2+n1)*dr*dz;
+		double N_real_i = pi*(n2+n1)*dr*dz;
 		double n_in_big =0;
 		for(n = 0; n < number; n++)
 		{
@@ -712,8 +717,11 @@ void Particles::load_spatial_distribution_with_variable_mass(double n1, double n
 		//x3[n] = (geom1->second_size - dz)*(rand_z) + dz/2;
 		//x3[n] = (geom1->second_size - dz)*sqrt(rand_z) + dz/2.0;
 
-		x3[n] = (geom1->second_size - left_plasma_boundary - dz)/dn*(sqrt(n1*n1 + rand_z*(2*n1*dn + dn*dn)) - n1) +
+		if (dn != 0.0)
+			x3[n] = (geom1->second_size - left_plasma_boundary - dz)/dn*(sqrt(n1*n1 + rand_z*(2*n1*dn + dn*dn)) - n1) +
 			    left_plasma_boundary + dz/2.0;
+		else
+			x3[n] = (geom1->second_size - left_plasma_boundary - dz) * rand_z + left_plasma_boundary + dz/2;
 		}
 		}
 	break;
